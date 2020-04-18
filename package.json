@@ -5,7 +5,7 @@
   "author": "D.",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node ./src/index.ts"
+    "start": "ts-node ./src/index.ts --project ./config/tsconfig.json"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",
