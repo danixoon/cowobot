@@ -1,0 +1,14 @@
+{
+  "name": "cowobot",
+  "version": "0.0.1",
+  "main": "build/index.js",
+  "author": "D.",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.6",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
