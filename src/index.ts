@@ -7,8 +7,8 @@ const { PORT } = process.env;
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("Dat is works!");
+app.get("/test", (req, res) => {
+  res.send(Math.random() > 0.5 ? "ok" : "not ok");
 });
 
 app.listen(PORT, () => {
