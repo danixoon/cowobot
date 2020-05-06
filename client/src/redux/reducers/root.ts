@@ -1,6 +1,8 @@
 import { Reducer } from "redux";
 
-const rootReducer: Reducer = (state, action) => {
+const defaultState = () => ({ owo: true });
+
+const rootReducer: Reducer = (state = defaultState(), action) => {
   switch (action.type) {
     default:
       return state;

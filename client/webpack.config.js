@@ -7,7 +7,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 module.exports = {
   mode: isDevelopment ? "development" : "production",
   entry: path.resolve(__dirname, "src/index.tsx"),
-  module: { 
+  module: {
     rules: [
       {
         test: /\.tsx?$/,
@@ -23,6 +23,26 @@ module.exports = {
         test: /\.pug$/i,
         use: "pug-loader",
         exclude: /node_modules/,
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
+          // Translates CSS into CommonJS
+          "css-loader",
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        use: [
+          {
+            loader: "file-loader",
+          },
+        ],
       },
     ],
   },
