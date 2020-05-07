@@ -10,11 +10,11 @@ interface ButtonProps
 
 const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
   const [active, toggle] = React.useState(() => false);
-  const { children, color, ...rest } = props;
+  const { children, color = "secondary", ...rest } = props;
 
   return (
     <button
-      className={"btn" + (color ? ` btn_${color}` : ` btn_secondary`)}
+      className={`btn btn_${color}`}
       onClick={() => toggle(!active)}
       {...rest}
     >
