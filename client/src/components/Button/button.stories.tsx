@@ -1,7 +1,7 @@
 import { storiesOf } from "@storybook/react";
 import React from "react";
-import Input from ".";
+import Button from ".";
 
-storiesOf("Button", module)
-  .add("with text", () => <Input>Hello Button</Input>)
-  .add("with some emoji", () => <Input>😀 😎 👍 💯</Input>);
+storiesOf("Components/Button", module)
+  .add("with text", () => <Button>Hello Button</Button>)
+  .add("with some emoji", () => <Button>😀 😎 👍 💯</Button>);
