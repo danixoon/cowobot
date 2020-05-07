@@ -1,7 +1,53 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap");
+$color-dark-0: #151515;
+$color-dark-1: #6f6f6f;
+$color-grey-0: #c4c4c4;
+$color-grey-1: #e0e0e0;
+$color-light-0: #eaeaea;
+$color-light-1: #f8f8f8;
 
-html {
+$color-secondary: white;
+$color-primary: #d0f0ff;
+
+$colors: (
+  secondary: $color-secondary,
+  primary: $color-primary,
+);
+
+$border-color: $color-grey-1;
+
+$font-color-light: $color-dark-1;
+$font-color-dark: $color-dark-0;
+
+@mixin margin-default() {
+  margin: 0.1rem;
+}
+
+@mixin font-default($color: $font-color-dark) {
   font-family: "Roboto", sans-serif;
-  font-size: 18px;
-  // font-weight: bold;
+  font-size: 1rem;
+  color: $color;
+}
+
+@mixin border-default($color: $color-grey-1, $rounded: true) {
+  @if ($rounded) {
+    border-radius: 5px;
+  }
+  box-sizing: border-box;
+  border: 1px solid $color;
+}
+
+@mixin unselectable() {
+  outline: 0;
+  user-select: none;
+}
+
+@mixin effect-hover($color: $color-primary) {
+  @include transition-ease-in(box-shadow);
+  &:hover:not(:active) {
+    box-shadow: 0px 0px 0px 2px $color;
+  }
+}
+
+@mixin transition-ease-in($property) {
+  transition: $property 0.1s ease-in;
 }

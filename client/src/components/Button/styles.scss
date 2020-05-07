@@ -1,26 +1,32 @@
+@import "../../sass/theme.scss";
+
 .btn {
-  outline: 0;
-  user-select: none;
+  @include unselectable();
+  @include font-default();
+
+  @include effect-hover();
+
+  @include margin-default();
 
   width: 160px;
   height: 40px;
 
-  background-color: white;
-  border-radius: 5px;
-  border: 1px solid #e0e0e0;
+  background-color: $color-secondary;
   padding: 0.5rem;
 
-  font-family: "Roboto", sans-serif;
-  font-size: 1rem;
-
-  transition: box-shadow 0.1s ease-in;
-
-  &:hover:not(:active) {
-    box-shadow: 0px 0px 0px 2px rgba(3, 155, 229, 0.3);
-  }
-
   &:active {
-    border: 1px solid white;
-    background-color: #eaeaea;
+    border: 1px solid $color-secondary;
+    background-color: $color-light-0;
+  }
+}
+
+@each $color-name, $color-value in $colors {
+  .btn_#{$color-name} {
+    background-color: $color-value;
+    @if (lightness($color-value) < 95) {
+      @include border-default($color-secondary);
+    } @else {
+      @include border-default();
+    }
   }
 }
