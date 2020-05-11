@@ -18,10 +18,16 @@
   position: absolute;
   width: 100%;
   background-color: $color-secondary;
+  max-height: 1rem;
 }
 
 .input__element-container {
   position: relative;
+}
+
+.dropdown-popup__container {
+  // max-height: 10rem;
+  // overflow-y: scroll;
 }
 
 .dropdown-popup__item {
@@ -53,11 +59,7 @@
 
   position: relative;
 
-  // @include transition-ease-in(border-radius);
-
   background-color: $color-secondary;
-
-  // box-sizing: content-box;
 
   width: 200px;
   height: 30px;
@@ -66,7 +68,6 @@
   position: relative;
 
   &:focus {
-    // border-bottom: 1px solid transparent;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 
