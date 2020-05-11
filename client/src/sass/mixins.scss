@@ -1,0 +1,48 @@
+@each $color-name, $color-value in $colors {
+  .col_#{$color-name} {
+    color: $color-value;
+  }
+}
+
+// mixins
+
+@mixin margin-default() {
+  margin: 0.1rem;
+}
+
+@mixin font-default($color: $font-color-dark) {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  color: $color;
+}
+
+@mixin border-custom($color: $color-grey-1, $rounded: true) {
+  @if ($rounded) {
+    border-radius: 5px;
+  }
+  box-sizing: border-box;
+  border: 1px solid $color;
+}
+
+@mixin border-default($color: $color-grey-1, $rounded: true) {
+  @if ($rounded) {
+    border-radius: 5px;
+  }
+  box-sizing: border-box;
+  border: 1px solid $color;
+}
+
+@mixin unselectable() {
+  outline: 0;
+  user-select: none;
+}
+
+@mixin effect-hover($color: $color-primary) {
+  &:hover:not(:active) {
+    box-shadow: 0px 0px 0px 2px $color;
+  }
+}
+
+@mixin transition-ease-in($property) {
+  transition: $property 0.1s ease-in;
+}

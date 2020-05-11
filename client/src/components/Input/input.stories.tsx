@@ -39,19 +39,9 @@ storiesOf("Components/Input", module)
           placeholder="текст"
           isResetable
           isDropdown
-          dropdownItems={["приВет", "пока", "пРизрак"]}
+          dropdownItems={["Привет", "Пока", "Призрак"]}
           label="Выпадающий список"
         />
       </InputWrapper>
     );
-  })
-  .add("multiple", () => (
-    <>
-      <Input
-        defaultValue="BB_PR_REVIEWER"
-        placeholder="текст"
-        label="Имя ревьювера"
-      />
-      <Input isResetable placeholder="текст" defaultValue="BB_PR_REVIEWER" />
-    </>
-  ));
+  });

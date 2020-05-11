@@ -26,17 +26,25 @@ const DropdownPopup: React.FC<DropdownPopupProps> = ({
   return (
     <div className="input__dropdown-popup">
       <div className="dropdown-popup__container">
-        {sortedItems.map((item) => (
-          <div
-            onMouseDown={(e) => {
-              handleSelect(item);
-            }}
-            key={item}
-            className="dropdown-popup__item"
-          >
-            {item}
-          </div>
-        ))}
+        {sortedItems.map((item) => {
+          const filtered = filter !== "";
+          return (
+            <div
+              onMouseDown={(e) => {
+                handleSelect(item);
+              }}
+              key={item}
+              className="dropdown-popup__item"
+            >
+              {filtered ? item.substring(0, filter.length) : item}
+              {filtered && (
+                <span className="col_muted">
+                  {item.substring(filter.length)}
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -66,6 +74,14 @@ const Input: React.FC<InputProps> = (props) => {
     ...rest
   } = props;
 
+  const [state, setState] = React.useState(() => ({ reset: false }));
+
+  let nextValue = value;
+  if (state.reset) {
+    nextValue = defaultValue;
+    setState({ ...state, reset: false });
+  }
+
   return (
     <span className="input__container">
       {label && <label className="input__label">{label}</label>}
@@ -73,7 +89,7 @@ const Input: React.FC<InputProps> = (props) => {
         <input
           {...rest}
           onChange={onChange}
-          value={value || defaultValue}
+          value={nextValue}
           name={name}
           autoComplete={isDropdown ? "off" : undefined}
           className={

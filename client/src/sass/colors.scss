@@ -1,0 +1,21 @@
+$color-dark-0: #151515;
+$color-dark-1: #6f6f6f;
+$color-grey-0: #c4c4c4;
+$color-grey-1: #e0e0e0;
+$color-light-0: #eaeaea;
+$color-light-1: #f8f8f8;
+
+$color-secondary: white;
+$color-primary: #d0f0ff;
+$color-muted: $color-grey-0;
+
+$colors: (
+  secondary: $color-secondary,
+  primary: $color-primary,
+  muted: $color-muted,
+);
+
+$border-color: $color-grey-1;
+
+$font-color-light: $color-dark-1;
+$font-color-dark: $color-dark-0;
