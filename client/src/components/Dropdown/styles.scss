@@ -1,0 +1,76 @@
+@import "../../sass/theme.scss";
+
+.dropdown {
+  @include margin-default();
+  @include unselectable();
+  @include font-default();
+
+  position: relative;
+  width: 200px;
+  // height: 25px;
+
+  transition: box-shadow 0.1s ease-out;
+}
+
+.dropdown__item {
+  padding: 0.1rem 0.3rem;
+  border-top: 1px solid $color-grey-1;
+
+  &:hover {
+    background-color: $color-grey-1;
+  }
+}
+
+.dropdown__selected-item {
+  @include effect-hover();
+  border-radius: 5px;
+
+  background-color: $color-light-0;
+
+  padding: 0.1rem 0.3rem;
+  &::after {
+    content: url("./dropdownToggleIcon.svg");
+    float: right;
+
+    transition: transform 0.15s ease-in-out;
+  }
+
+  &:hover {
+    background-color: $color-grey-1;
+  }
+}
+
+.dropdown__selected-item_opened {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+
+  &::after {
+    content: url("./dropdownToggleIcon.svg");
+    float: right;
+
+    transform: scaleY(-1);
+  }
+}
+
+.dropdown__container {
+  position: absolute;
+  overflow: hidden;
+
+  visibility: hidden;
+  opacity: 0;
+
+  width: 100%;
+  transition: opacity 0.2s ease-in-out;
+
+  background-color: $color-light-0;
+
+  &:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+}
+
+.dropdown__container_opened {
+  visibility: visible;
+  opacity: 1;
+}

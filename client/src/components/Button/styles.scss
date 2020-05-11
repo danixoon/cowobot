@@ -23,10 +23,8 @@
 @each $color-name, $color-value in $colors {
   .btn_#{$color-name} {
     background-color: $color-value;
-    @if (lightness($color-value) < 95) {
-      @include border-default($color-secondary);
-    } @else {
-      @include border-default();
-    }
+    @include border-default(
+      clamp-color-lightness($color-value, $color-secondary, $color-grey-1)
+    );
   }
 }

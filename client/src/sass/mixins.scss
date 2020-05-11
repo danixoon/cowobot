@@ -46,3 +46,11 @@
 @mixin transition-ease-in($property) {
   transition: $property 0.1s ease-in;
 }
+
+@function clamp-color-lightness($color, $color-a, $color-b, $max: 95) {
+  @if (lightness($color) < $max) {
+    @return $color-a;
+  } @else {
+    @return $color-b;
+  }
+}
