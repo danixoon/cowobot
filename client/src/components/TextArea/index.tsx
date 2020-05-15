@@ -1,5 +1,4 @@
 import * as React from "react";
-// import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 import Editor from "react-simple-code-editor";
 import reactStringReplace from "react-string-replace";
 
@@ -10,23 +9,6 @@ interface TextAreaProps
   extends React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>> {
   value: string;
 }
-
-const Cursor: React.FC<any> = ({ focus }) => {
-  const [show, setShow] = React.useState(() => true);
-
-  React.useEffect(() => {
-    if (focus) {
-      const timer = setTimeout(() => {
-        setShow(!show);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  });
-
-  return (
-    <span style={{ visibility: show && focus ? "visible" : "hidden" }}>|</span>
-  );
-};
 
 interface TextVariableProps {
   value: string;
@@ -99,7 +81,6 @@ const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
       }
     );
     return result;
-    // return formatted;
   };
 
   return (
@@ -116,37 +97,6 @@ const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
       value={input || ""}
     />
   );
-
-  // const onChange = (e: ContentEditableEvent) => {
-  //   console.log("before: ", input);
-  //   console.log("after: ", e.target.value);
-  //   console.log("formatted: ", formatContent(e.target.value));
-  //   setInput(formatContent(e.target.value));
-  // };
-
-  // const handleOnClick = () => {};
-  // const handleOnFocus = () => {
-  //   console.log("focused");
-  //   setFocus(true);
-  // };
-  // const handleOnKeyDown = (e: React.KeyboardEvent<HTMLPreElement>) => {
-  //   setInput(input + String.fromCharCode(e.keyCode));
-  // };
-
-  // return (
-  //   <pre
-  //     tabIndex={0}
-  //     onKeyDown={handleOnKeyDown}
-  //     onFocus={handleOnFocus}
-  //     onClick={handleOnClick}
-  //   >
-  //     <>
-  //       {formatContent(input || "")} <Cursor focus={focus} />
-  //     </>
-  //   </pre>
-  // );
-
-  // return <ContentEditable onChange={onChange} html={input || ""} />;
 };
 
 export default TextArea;
