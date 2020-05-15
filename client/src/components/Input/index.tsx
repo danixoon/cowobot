@@ -5,12 +5,15 @@ import resetIcon from "./reset-icon.svg";
 interface DropdownPopupProps {
   items: string[];
   filter: string;
+  opened?: boolean;
+  focusOpen?: boolean;
   onSelect: (item: string) => void;
 }
 
-const DropdownPopup: React.FC<DropdownPopupProps> = ({
+export const DropdownPopup: React.FC<DropdownPopupProps> = ({
   items,
   filter,
+  opened,
   onSelect,
 }) => {
   const sortedItems = items
@@ -24,7 +27,9 @@ const DropdownPopup: React.FC<DropdownPopupProps> = ({
   };
 
   return (
-    <div className="input__dropdown-popup">
+    <div
+      className={"dropdown-popup " + (opened ? "dropdown-popup_opened" : "")}
+    >
       <div className="dropdown-popup__container">
         {sortedItems.map((item) => {
           const filtered = filter !== "";
@@ -74,7 +79,10 @@ const Input: React.FC<InputProps> = (props) => {
     ...rest
   } = props;
 
-  const [state, setState] = React.useState(() => ({ reset: false }));
+  const [state, setState] = React.useState(() => ({
+    reset: false,
+    dropdownOpened: false,
+  }));
 
   let nextValue = value;
   if (state.reset) {
@@ -82,12 +90,18 @@ const Input: React.FC<InputProps> = (props) => {
     setState({ ...state, reset: false });
   }
 
+  const handleInputFocus = (focus: boolean) => {
+    setState({ ...state, dropdownOpened: focus });
+  };
+
   return (
     <span className="input__container">
       {label && <label className="input__label">{label}</label>}
       <div className="input__element-container">
         <input
           {...rest}
+          onFocus={() => handleInputFocus(true)}
+          onBlur={() => handleInputFocus(false)}
           onChange={onChange}
           value={nextValue}
           name={name}
@@ -100,6 +114,7 @@ const Input: React.FC<InputProps> = (props) => {
         />
         {isDropdown && (
           <DropdownPopup
+            opened={state.dropdownOpened}
             filter={value?.toString() || ""}
             items={dropdownItems || []}
             onSelect={(item) => {

@@ -28,9 +28,11 @@ const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
   };
 
   return (
-    <div onMouseLeave={() => handleDropdownToggle(false)} className="dropdown">
+    <div className="dropdown">
       <div
+        tabIndex={0}
         onClick={() => handleDropdownToggle()}
+        onBlur={() => handleDropdownToggle(false)}
         className={
           "dropdown__selected-item" +
           (opened ? " dropdown__selected-item_opened" : "")
@@ -43,7 +45,7 @@ const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
           "dropdown__container" + (opened ? " dropdown__container_opened" : "")
         }
       >
-        {dropdownItems.map((v) => (
+        {dropdownItems.map((v, i) => (
           <div
             onClick={() => handleItemSelect(v.id)}
             key={v.item}

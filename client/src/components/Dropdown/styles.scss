@@ -23,6 +23,8 @@
   @include effect-hover();
   border-radius: 5px;
 
+  outline: none;
+
   background-color: $color-light-0;
 
   padding: 0.1rem 0.3rem;

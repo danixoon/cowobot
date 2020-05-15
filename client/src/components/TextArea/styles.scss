@@ -1,0 +1,23 @@
+@import "../../sass/theme.scss";
+
+.editor {
+  @include border-default();
+  overflow: visible !important;
+}
+
+.editor__text-area {
+  outline: none;
+}
+
+.text-area__variable {
+  color: crimson;
+  position: relative;
+  pointer-events: initial;
+
+  &:focus {
+    outline: 2px solid $color-primary;
+    // color: white;
+    // background-color: crimson;
+    pointer-events: none;
+  }
+}
