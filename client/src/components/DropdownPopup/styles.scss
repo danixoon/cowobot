@@ -1,10 +1,5 @@
 @import "../../sass/theme.scss";
 
-// .dropdown-popup {
-
-//   max-height: 1rem;
-// }
-
 .dropdown-popup__container {
   box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
 
@@ -29,7 +24,6 @@
 }
 
 .dropdown-popup {
-  // visibility: hidden;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.1s ease-in-out;
@@ -38,11 +32,11 @@
   position: absolute;
   left: 0;
 
-    @include font-default();
+  @include font-default();
 
-    position: absolute;
-    width: 100%;
-    background-color: $color-secondary;
+  position: absolute;
+  width: 100%;
+  background-color: $color-secondary;
 }
 
 .dropdown-popup_opened {

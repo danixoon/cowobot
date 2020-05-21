@@ -33,7 +33,7 @@
 
   padding: 0.1rem 0.3rem;
   &::after {
-    content: url("./dropdownToggleIcon.svg");
+    content: url("../../icons/wideArrow.svg");
     float: right;
 
     transition: transform 0.15s ease-in-out;
@@ -49,9 +49,6 @@
   border-bottom-right-radius: 0px;
 
   &::after {
-    content: url("./dropdownToggleIcon.svg");
-    float: right;
-
     transform: scaleY(-1);
   }
 }

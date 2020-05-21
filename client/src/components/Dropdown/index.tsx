@@ -1,6 +1,5 @@
 import * as React from "react";
 import "./styles.scss";
-import dropdownToggleIcon from "./dropdownToggleIcon.svg";
 
 interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   items: string[];

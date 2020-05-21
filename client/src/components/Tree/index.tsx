@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./styles.scss";
-import resetIcon from "../../icons/reload.svg";
+import resetIcon from "./reset-icon.svg";
 import DropdownPopup from "../DropdownPopup";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
