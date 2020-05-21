@@ -3,7 +3,7 @@ import Editor from "react-simple-code-editor";
 import reactStringReplace from "react-string-replace";
 
 import "./styles.scss";
-import { DropdownPopup } from "../Input";
+import DropdownPopup from "../DropdownPopup";
 
 interface TextAreaProps
   extends React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>> {

@@ -1,9 +1,5 @@
 @import "../../sass/theme.scss";
 
-@mixin input-padding {
-  padding: 0.25rem;
-}
-
 .input__container {
   position: relative;
   display: inline-block;
@@ -11,52 +7,8 @@
   @include margin-default();
 }
 
-.dropdown-popup {
-  @include font-default();
-  // @include border-default($color-grey-1, false);
-
-  position: absolute;
-  width: 100%;
-  background-color: $color-secondary;
-  max-height: 1rem;
-}
-
 .input__element-container {
   position: relative;
-}
-
-.dropdown-popup__container {
-  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
-
-  // max-height: 10rem;
-  // overflow-y: scroll;
-}
-
-.dropdown-popup__item {
-  @include border-default($color-grey-1, false);
-  @include input-padding();
-  @include effect-hover();
-
-  cursor: pointer;
-
-
-  border-top: 0;
-
-  &:last-child {
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-  }
-}
-
-.dropdown-popup {
-  // visibility: hidden;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.1s ease-in-out;
-
-  display: table;
-  position: absolute;
-  left: 0;
 }
 
 .input__element {
@@ -81,12 +33,6 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
-}
-
-.dropdown-popup_opened {
-  // visibility: visible;
-  pointer-events: all;
-  opacity: 1;
 }
 
 .input__element_reset {
