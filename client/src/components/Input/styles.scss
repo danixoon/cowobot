@@ -37,6 +37,9 @@
   @include input-padding();
   @include effect-hover();
 
+  cursor: pointer;
+
+
   border-top: 0;
 
   &:last-child {

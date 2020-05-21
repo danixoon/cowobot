@@ -47,7 +47,8 @@ const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
       >
         {dropdownItems.map((v, i) => (
           <div
-            onClick={() => handleItemSelect(v.id)}
+            tabIndex={0}
+            onMouseDown={() => handleItemSelect(v.id)}
             key={v.item}
             className="dropdown__item"
           >

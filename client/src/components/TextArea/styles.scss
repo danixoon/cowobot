@@ -14,6 +14,8 @@
   position: relative;
   pointer-events: initial;
 
+  cursor: pointer;
+
   &:focus {
     outline: 2px solid $color-primary;
     // color: white;
