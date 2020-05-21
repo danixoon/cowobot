@@ -1,86 +1,69 @@
 import * as React from "react";
 import "./styles.scss";
-import resetIcon from "./reset-icon.svg";
-import DropdownPopup from "../DropdownPopup";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  isResetable?: boolean;
-  isDropdown?: boolean;
-  dropdownItems?: string[];
-  setInput?: (value: string) => void;
+type TreeItemProps = {
+  items?: TreeItemProps[];
+  content: string;
+};
 
-  label?: string;
+interface TreeProps extends React.InputHTMLAttributes<HTMLDivElement> {
+  items: TreeItemProps[];
 }
 
-const Input: React.FC<InputProps> = (props) => {
-  const {
-    isResetable,
-    onReset,
-    onChange,
-    setInput,
-    value,
-    name,
-    isDropdown,
-    dropdownItems,
-    label,
-    defaultValue = "",
-    ...rest
-  } = props;
+const renderTree = (items: TreeItemProps[], level: number = 0) =>
+  items.map((item, i) => (
+    <TreeItemComponent
+      level={level}
+      key={i}
+      items={item.items}
+      content={item.content}
+    />
+  ));
 
-  const [state, setState] = React.useState(() => ({
-    reset: false,
-    dropdownOpened: false,
-  }));
-
-  let nextValue = value;
-  if (state.reset) {
-    nextValue = defaultValue;
-    setState({ ...state, reset: false });
-  }
-
-  const handleInputFocus = (focus: boolean) => {
-    setState({ ...state, dropdownOpened: focus });
-  };
+const TreeItemComponent: React.FC<TreeItemProps & { level: number }> = ({
+  items,
+  level,
+  content,
+  ...rest
+}) => {
+  const divRef = React.useRef<HTMLElement>();
+  const [maxHeight, setMaxHeight] = React.useState<number | undefined>(
+    () => undefined
+  );
+  const [opened, toggleOpened] = React.useState<boolean>(() => false);
+  React.useEffect(() => {
+    if (divRef.current) setMaxHeight(divRef.current.offsetHeight);
+  }, [divRef.current]);
 
   return (
-    <span className="input__container">
-      {label && <label className="input__label">{label}</label>}
-      <div className="input__element-container">
-        <input
-          {...rest}
-          onFocus={() => handleInputFocus(true)}
-          onBlur={() => handleInputFocus(false)}
-          onChange={onChange}
-          value={nextValue}
-          name={name}
-          autoComplete={isDropdown ? "off" : undefined}
-          className={
-            "input__element" +
-            (isResetable ? "_reset" : "") +
-            (isDropdown ? " input__element_dropdown" : "")
-          }
-        />
-        {isDropdown && (
-          <DropdownPopup
-            opened={state.dropdownOpened}
-            filter={value?.toString() || ""}
-            items={dropdownItems || []}
-            onSelect={(item) => {
-              setInput && setInput(item);
-            }}
-          />
-        )}
-        {isResetable && (
-          <span
-            onClick={() => setInput && setInput(defaultValue?.toString() || "")}
-            className="input__reset"
-          >
-            <img src={resetIcon} />
-          </span>
-        )}
+    <div
+      className={"tree__item " + (items ? "tree__item_root" : "tree__item_end")}
+    >
+      <header
+        onClick={() => toggleOpened(!opened)}
+        className="tree-item__header"
+      >
+        {content}
+      </header>
+      <div
+        style={{ maxHeight }}
+        className={
+          "tree-item__content " +
+          (opened || !maxHeight
+            ? "tree-item__content_opened"
+            : "tree-item__content_closed")
+        }
+        ref={(ref) => (divRef.current = ref || undefined)}
+      >
+        {items && renderTree(items, level + 1)}
       </div>
-    </span>
+    </div>
   );
 };
 
-export default Input;
+const Tree: React.FC<TreeProps> = (props) => {
+  const { items } = props;
+  return <div className="tree">{renderTree(items)}</div>;
+};
+
+export default Tree;

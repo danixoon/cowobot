@@ -1,47 +1,45 @@
 import { storiesOf } from "@storybook/react";
 import React from "react";
-import Input from ".";
-import { InputWrapper } from "../../wrappers/InputWrapper";
-import { useInput } from "../../hooks/useInput";
+import Tree from ".";
 
-storiesOf("Components/Input", module)
-  .add("simple", () => <Input placeholder="текст" />)
-  .add("with reset", () => {
-    const [input, bind, setInput] = useInput();
-    return (
-      <>
-        <InputWrapper name="text1" setInput={setInput} input={input} {...bind}>
-          <Input
-            isResetable
-            placeholder="текст"
-            defaultValue="BB_PR_REVIEWER"
-          />
-        </InputWrapper>
-        <InputWrapper name="text2" setInput={setInput} input={input} {...bind}>
-          <Input isResetable placeholder="текст" />
-        </InputWrapper>
-      </>
-    );
-  })
-  .add("with label", () => (
-    <Input
-      defaultValue="BB_PR_REVIEWER"
-      placeholder="текст"
-      label="Имя ревьювера"
-    />
-  ))
-  .add("with dropdown", () => {
-    const [input, bind, setInput] = useInput({ dropdown: "при" });
-    return (
-      <InputWrapper name="dropdown" input={input} setInput={setInput} {...bind}>
-        <Input
-          defaultValue="прив"
-          placeholder="текст"
-          isResetable
-          isDropdown
-          dropdownItems={["Привет", "Пока", "Призрак"]}
-          label="Выпадающий список"
-        />
-      </InputWrapper>
-    );
-  });
+const items = [
+  {
+    content: "Group 1",
+    items: [
+      {
+        content: "Group 1-1",
+        items: [
+          { content: "Item 1-1-1" },
+          { content: "Item 1-1-2" },
+          { content: "Item 1-1-3" },
+        ],
+      },
+      {
+        content: "Group 1-2",
+        items: [{ content: "Item 1-2-1" }],
+      },
+      {
+        content: "Item 1-1",
+      },
+    ],
+  },
+  {
+    content: "Group 2",
+    items: [
+      {
+        content: "Item 2-1",
+      },
+      {
+        content: "Item 2-2",
+      },
+      {
+        content: "Group 2-1",
+        items: [{ content: "Item 2-1-1" }, { content: "Item 2-1-2" }],
+      },
+    ],
+  },
+];
+
+storiesOf("Components/Tree", module).add("simple", () => (
+  <Tree items={items} />
+));

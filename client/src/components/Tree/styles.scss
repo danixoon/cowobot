@@ -1,70 +1,14 @@
 @import "../../sass/theme.scss";
 
-.input__container {
-  position: relative;
-  display: inline-block;
-
-  @include margin-default();
+.tree {
 }
 
-.input__element-container {
-  position: relative;
+.tree-item__content {
+  overflow: hidden;
+  padding-left: 0.25rem;
+  transition: max-height 0.1s ease-in-out;
 }
 
-.input__element {
-  @include unselectable();
-  @include font-default();
-  @include effect-hover();
-  @include border-default();
-
-  transition: all 0.1s ease-in;
-
-  position: relative;
-
-  background-color: $color-secondary;
-
-  width: 200px;
-  height: 30px;
-
-  padding: 0 0.25rem;
-  position: relative;
-
-  &:focus {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-}
-
-.input__element_reset {
-  @extend .input__element;
-  padding-right: 1.75rem;
-}
-
-.input__label {
-  @include font-default($font-color-light);
-
-  display: block;
-
-  margin-bottom: 0.1rem;
-}
-
-.input__reset {
-  padding: 0px;
-  border-radius: 5px;
-  height: 100%;
-  width: 1.75rem;
-  display: flex;
-  position: absolute;
-  right: 0;
-  top: 0;
-  justify-content: center;
-  align-items: center;
-
-  transition: transform 0.1s ease-in;
-
-  user-select: none;
-
-  &:hover {
-    transform: scale(1.1);
-  }
+.tree-item__content_closed {
+  max-height: 0 !important;
 }
