@@ -25,6 +25,7 @@
   cursor: pointer;
   flex: 1;
   padding: 0.1rem;
+  padding-left: 1rem;
 }
 
 .tree__item_root {
@@ -34,7 +35,6 @@
     content: url("../../icons/plus.svg");
     float: left;
     margin-left: 0.5rem;
-    margin-right: 0.5rem;
     line-height: 1.6rem;
   }
 }
