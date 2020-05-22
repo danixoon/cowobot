@@ -1,12 +1,13 @@
-import { Reducer } from "redux";
+import { Reducer, combineReducers } from "redux";
+import { Action } from "../store";
+import popupReducer, { PopupState } from "./popup";
 
-const defaultState = () => ({ owo: true });
+export interface RootState {
+  popup: PopupState;
+}
 
-const rootReducer: Reducer = (state = defaultState(), action) => {
-  switch (action.type) {
-    default:
-      return state;
-  }
-};
+const rootReducer: Reducer<RootState, Action> = combineReducers({
+  popup: popupReducer,
+});
 
 export default rootReducer;

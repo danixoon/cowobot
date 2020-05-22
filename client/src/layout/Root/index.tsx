@@ -3,6 +3,8 @@ import "../../sass/theme.scss";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 
-const Root: React.FC<any> = (props) => <>"hi"</>;
+interface RootProps {}
+
+const Root: React.FC<RootProps> = (props) => <>"hi"</>;
 
 export default Root;
