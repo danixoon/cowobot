@@ -3,10 +3,69 @@
 .tree {
 }
 
+.tree__item {
+  display: flex;
+  flex-flow: row wrap;
+}
+
 .tree-item__content {
   overflow: hidden;
-  padding-left: 0.25rem;
+  padding-left: 0.5rem;
   transition: max-height 0.1s ease-in-out;
+  flex: 100%;
+}
+
+.tree-item__header {
+  @include font-default();
+  text-align: start;
+  background-color: transparent;
+
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  flex: 1;
+  padding: 0.1rem;
+}
+
+.tree__item_root {
+  // padding-right: 0.25rem;
+
+  &::before {
+    content: url("../../icons/plus.svg");
+    float: left;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    line-height: 1.6rem;
+  }
+}
+
+.tree__item_root-opened {
+  &::before {
+    content: url("../../icons/arrow.svg");
+  }
+}
+
+.tree__item_end {
+  // margin-left: 1rem;
+  // padding-right: 1rem;
+
+  &::after {
+    transition: transform 0.1s ease-out;
+    content: url("../../icons/arrow.svg");
+    float: right;
+    margin-right: 0.5rem;
+    // padding-right: 0.5rem;
+    // width: 1rem;
+    // right: 2rem;
+  }
+}
+
+.tree__item_end-opened {
+  background-color: $color-light-0;
+
+  &::after {
+    transform: rotate(-90deg);
+  }
 }
 
 .tree-item__content_closed {
