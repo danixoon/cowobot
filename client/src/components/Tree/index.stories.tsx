@@ -49,7 +49,7 @@ const items = [
 storiesOf("Components/Tree", module).add("simple", () => (
   <Tree
     onItemSelect={(id) => console.log(`Selected item with id <${id}>`)}
-    style={{ maxWidth: 150, backgroundColor: "#F8F8F8" }}
+    style={{ maxWidth: 200, backgroundColor: "#F8F8F8" }}
     items={items}
   />
 ));
