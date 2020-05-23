@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "./styles.scss";
-import { PopupLayoutContext } from "../../containers/PopupLayoutContainer";
-import PopupContainer from "../../containers/PopupContainer";
+import { PopupLayoutContext } from "../../providers/PopupLayoutProvider";
+import PopupProvider from "../../providers/PopupProvider";
 
 interface DialogPopupProps extends React.HTMLAttributes<HTMLDivElement> {
   onSubmit: () => void;
@@ -14,9 +14,9 @@ const DialogPopup: React.FC<React.PropsWithChildren<DialogPopupProps>> = (
 ) => {
   const { children } = props;
   return (
-    <PopupContainer>
+    <PopupProvider>
       <div className="dialog-popup">{children}</div>
-    </PopupContainer>
+    </PopupProvider>
   );
 };
 

@@ -3,10 +3,10 @@ import React from "react";
 import DialogPopup from ".";
 import Form from "../Form";
 import Button from "../Button";
-import PopupLayoutContainer from "../../containers/PopupLayoutContainer";
+import PopupLayoutProvider from "../../providers/PopupLayoutProvider";
 
 storiesOf("Components/Dialog Popup", module).add("simple", () => (
-  <PopupLayoutContainer>
+  <PopupLayoutProvider>
     <DialogPopup onSubmit={() => {}} onAbort={() => {}}>
       <Form
         preventDefault
@@ -24,5 +24,5 @@ storiesOf("Components/Dialog Popup", module).add("simple", () => (
         </div>
       </Form>
     </DialogPopup>
-  </PopupLayoutContainer>
+  </PopupLayoutProvider>
 ));

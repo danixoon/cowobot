@@ -3,10 +3,10 @@ import PopupLayout from "../layout/PopupLayout";
 
 export const PopupLayoutContext = React.createContext<HTMLElement | null>(null);
 
-export interface PopupLayoutContainerProps {}
+export interface PopupLayoutProviderProps {}
 
-const PopupLayoutContainer: React.FC<React.PropsWithChildren<
-  PopupLayoutContainerProps
+const PopupLayoutProvider: React.FC<React.PropsWithChildren<
+  PopupLayoutProviderProps
 >> = ({ children }) => {
   const layoutRef = React.useRef<HTMLElement | null>(null);
   const [layoutElement, setLayoutElement] = React.useState<HTMLElement | null>(
@@ -21,4 +21,4 @@ const PopupLayoutContainer: React.FC<React.PropsWithChildren<
   );
 };
 
-export default PopupLayoutContainer;
+export default PopupLayoutProvider;

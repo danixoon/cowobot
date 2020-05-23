@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { PopupLayoutContext } from "./PopupLayoutContainer";
+import { PopupLayoutContext } from "./PopupLayoutProvider";
 
 export interface PopupContainerProps {}
 
-const PopupContainer: React.FC<React.PropsWithChildren<
-  PopupContainerProps
->> = ({ children }) => {
+const PopupProvider: React.FC<React.PropsWithChildren<PopupContainerProps>> = ({
+  children,
+}) => {
   return (
     <PopupLayoutContext.Consumer>
       {(ref) => {
@@ -16,4 +16,4 @@ const PopupContainer: React.FC<React.PropsWithChildren<
   );
 };
 
-export default PopupContainer;
+export default PopupProvider;
