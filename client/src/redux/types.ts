@@ -1,14 +1,37 @@
-export type PPOPUP = {
-  ADD: "@prefix/ADD";
+import * as popupActions from "./actions/popup";
+
+export const mapState = (mapper: (state: RootState) => any) => mapper;
+
+export const ActionTypes = {
+  POPUP_PUSH: "POPUP.PUSH" as const,
+  POPUP_REMOVE: "POPUP.REMOVE" as const,
+  TEST_HELLO: "TEST.HELLO" as const,
 };
 
-export const ADD = "@prefix/ADD"; // => '@prefix/ADD'
+export type Action = ReturnType<typeof popupActions[keyof typeof popupActions]>;
 
-export const POPUP = {
-  ADD: "POPUP.ADD" as "POPUP.ADD",
-  PUSH: "POPUP.REMOVE" as "POPUP.REMOVE",
-};
+export interface PopupState {
+  popups: [];
+}
 
-export const TYPES = {
-  POPUP,
-};
+export interface TestState {
+  message: string;
+}
+
+export interface RootState {
+  popup: PopupState;
+  test: TestState;
+}
+
+// export type ActionType = typeof ActionTypes[keyof typeof ActionTypes];
+
+// export type ActionPayload<T> = {
+//   [ActionTypes.POPUP_PUSH]: { name: string };
+//   [ActionTypes.POPUP_REMOVE]: { name: string };
+//   [ActionTypes.TEST_HELLO]: { name: boolean };
+// }
+
+// export type Action<T extends ActionType> = {
+//   type: T;
+//   payload: ActionPayload[T];
+// }

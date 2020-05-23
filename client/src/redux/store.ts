@@ -1,9 +1,6 @@
 import { createStore, Action as ReduxAction } from "redux";
-import rootReducer, { RootState as ReducerRootState } from "./reducers/root";
-import types from "./types";
-
-export type RootState = ReducerRootState;
-export type Action = ReduxAction<typeof types>;
+import rootReducer from "./reducers/root";
+import { Action, RootState } from "./types";
 
 const devtoolsEnchancer = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
 

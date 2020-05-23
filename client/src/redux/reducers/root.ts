@@ -1,13 +1,12 @@
 import { Reducer, combineReducers } from "redux";
-import { Action } from "../store";
-import popupReducer, { PopupState } from "./popup";
+import { Action, RootState } from "../types";
 
-export interface RootState {
-  popup: PopupState;
-}
+import { popupReducer } from "./popup";
+import { testReducer } from "./test";
 
 const rootReducer: Reducer<RootState, Action> = combineReducers({
   popup: popupReducer,
+  test: testReducer,
 });
 
 export default rootReducer;

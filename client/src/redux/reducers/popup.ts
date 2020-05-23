@@ -1,22 +1,20 @@
-import { Reducer, Action } from "redux";
-import { TYPES, POPUP } from "../types";
-
-export interface PopupState {
-  popups: [];
-}
+import { Reducer } from "redux";
+import { ActionTypes, Action, PopupState } from "../types";
 
 const defaultState: () => PopupState = () => ({ popups: [] });
 
-const popupReducer: Reducer<
-  PopupState,
-  Action<typeof POPUP[keyof typeof POPUP]>
-> = (state = defaultState(), action) => {
+export const popupReducer: Reducer<PopupState, Action> = (
+  state = defaultState(),
+  action
+) => {
   switch (action.type) {
-    case POPUP.ADD:
+    case ActionTypes.POPUP_PUSH:
+      action.payload.hi;
+      return state;
+    case ActionTypes.POPUP_REMOVE:
+      action.payload.hi;
       return state;
     default:
       return state;
   }
 };
-
-export default popupReducer;
