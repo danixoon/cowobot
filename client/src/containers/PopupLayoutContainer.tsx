@@ -1,15 +1,24 @@
 import * as React from "react";
-import { connect } from "react-redux";
-import { RootState, mapState } from "../redux/types";
-import { testHello } from "../redux/actions/popup";
 import PopupLayout from "../layout/PopupLayout";
 
-const mapStateToProps = (state: RootState) => ({
-  message: state.test.message,
-});
+export const PopupLayoutContext = React.createContext<HTMLElement | null>(null);
 
-const mapDispatchToProps = {
-  showMessage: testHello,
+export interface PopupLayoutContainerProps {}
+
+const PopupLayoutContainer: React.FC<React.PropsWithChildren<
+  PopupLayoutContainerProps
+>> = ({ children }) => {
+  const layoutRef = React.useRef<HTMLElement | null>(null);
+  const [layoutElement, setLayoutElement] = React.useState<HTMLElement | null>(
+    () => layoutRef.current
+  );
+
+  return (
+    <PopupLayoutContext.Provider value={layoutElement}>
+      {children}
+      <PopupLayout ref={(ref) => setLayoutElement(ref)} />
+    </PopupLayoutContext.Provider>
+  );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PopupLayout);
+export default PopupLayoutContainer;

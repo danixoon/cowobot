@@ -1,13 +1,12 @@
-import * as React from "react";
-import "../../sass/theme.scss";
-import DialogPopup from "../../components/DialogPopup";
-import Form from "../../components/Form";
-import Button from "../../components/Button";
+import { storiesOf } from "@storybook/react";
+import React from "react";
+import DialogPopup from ".";
+import Form from "../Form";
+import Button from "../Button";
+import PopupLayoutContainer from "../../containers/PopupLayoutContainer";
 
-interface RootProps {}
-
-const Root: React.FC<RootProps> = (props) => (
-  <>
+storiesOf("Components/Dialog Popup", module).add("simple", () => (
+  <PopupLayoutContainer>
     <DialogPopup onSubmit={() => {}} onAbort={() => {}}>
       <Form
         preventDefault
@@ -25,8 +24,5 @@ const Root: React.FC<RootProps> = (props) => (
         </div>
       </Form>
     </DialogPopup>
-    я за попапом
-  </>
-);
-
-export default Root;
+  </PopupLayoutContainer>
+));

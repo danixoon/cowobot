@@ -1,25 +1,10 @@
 import * as React from "react";
-import "../../sass/theme.scss";
-import { testHello } from "../../redux/actions/popup";
+import "./styles.scss";
 
-export interface PopupLayoutProps {
-  showMessage: (message: string) => void;
-  message: string;
-}
+export interface PopupLayoutProps {}
 
-const PopupLayout: React.FC<React.PropsWithChildren<PopupLayoutProps>> = ({
-  children,
-  showMessage,
-  message,
-}) => {
-  React.useEffect(() => {
-    message !== "" && alert(message);
-  }, [message]);
-  return (
-    <div className="popup-layout">
-      {children} <button onClick={() => showMessage("Пупа")}> ЖМИ </button>
-    </div>
-  );
-};
+const PopupLayout = React.forwardRef<HTMLDivElement>((props, layoutRef) => {
+  return <div ref={layoutRef} className="popup-layout" />;
+});
 
 export default PopupLayout;
