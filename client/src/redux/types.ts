@@ -22,16 +22,3 @@ export interface RootState {
   popup: PopupState;
   test: TestState;
 }
-
-// export type ActionType = typeof ActionTypes[keyof typeof ActionTypes];
-
-// export type ActionPayload<T> = {
-//   [ActionTypes.POPUP_PUSH]: { name: string };
-//   [ActionTypes.POPUP_REMOVE]: { name: string };
-//   [ActionTypes.TEST_HELLO]: { name: boolean };
-// }
-
-// export type Action<T extends ActionType> = {
-//   type: T;
-//   payload: ActionPayload[T];
-// }
