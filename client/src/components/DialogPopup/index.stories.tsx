@@ -7,7 +7,7 @@ import PopupLayoutProvider from "../../providers/PopupLayoutProvider";
 
 storiesOf("Components/Dialog Popup", module).add("simple", () => (
   <PopupLayoutProvider>
-    <DialogPopup onSubmit={() => {}} onAbort={() => {}}>
+    <DialogPopup onSubmit={() => {}} onReset={() => {}}>
       <Form
         preventDefault
         style={{

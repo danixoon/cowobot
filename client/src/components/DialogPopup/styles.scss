@@ -1,10 +1,28 @@
 @import "../../sass/theme.scss";
 
 .dialog-popup {
-  background-color: rgba($color: black, $alpha: 0.2);
   height: 100vh;
   width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  position: relative;
+}
+
+.dialog-popup__background {
+  background-color: rgba($color: black, $alpha: 0.2);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.dialog-popup__content {
+  z-index: 1;
+}
+
+.dialog-popup_closed {
+  display: none;
 }

@@ -6,16 +6,31 @@ import PopupProvider from "../../providers/PopupProvider";
 
 interface DialogPopupProps extends React.HTMLAttributes<HTMLDivElement> {
   onSubmit: () => void;
-  onAbort: () => void;
+  onReset: () => void;
+  opened?: boolean;
 }
 
 const DialogPopup: React.FC<React.PropsWithChildren<DialogPopupProps>> = (
   props: DialogPopupProps
 ) => {
-  const { children } = props;
+  const { children, onSubmit, onReset, opened } = props;
+  const child = React.Children.only(children);
   return (
     <PopupProvider>
-      <div className="dialog-popup">{children}</div>
+      <div
+        className={`dialog-popup ${
+          opened ? "dialog-popup_opened" : "dialog-popup_closed"
+        }`}
+      >
+        <div onClick={onReset} className="dialog-popup__background" />
+        <div className="dialog-popup__content">
+          {child &&
+            React.cloneElement(child as React.ReactElement, {
+              onSubmit,
+              onReset,
+            })}
+        </div>
+      </div>
     </PopupProvider>
   );
 };
