@@ -1,10 +1,10 @@
 import { Reducer, combineReducers } from "redux";
-import { Action, RootState } from "../types";
+import { Actions, RootState } from "../types";
 
 import { userReducer } from "./user";
 import { testReducer } from "./test";
 
-const rootReducer: Reducer<RootState, Action> = combineReducers({
+const rootReducer: Reducer<RootState, Actions> = combineReducers({
   user: userReducer,
   test: testReducer,
 });

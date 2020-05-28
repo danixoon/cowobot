@@ -1,9 +1,9 @@
 import { Reducer } from "redux";
-import { ActionTypes, Action, UserState, TestState } from "../types";
+import { ActionTypes, Actions, UserState, TestState } from "../types";
 
 const defaultState: () => TestState = () => ({ message: "" });
 
-export const testReducer: Reducer<TestState, Action> = (
+export const testReducer: Reducer<TestState, Actions> = (
   state = defaultState(),
   action
 ) => {

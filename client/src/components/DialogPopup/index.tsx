@@ -5,8 +5,8 @@ import { PopupLayoutContext } from "../../providers/PopupLayoutProvider";
 import PopupProvider from "../../providers/PopupProvider";
 
 interface DialogPopupProps extends React.HTMLAttributes<HTMLDivElement> {
-  onSubmit: () => void;
-  onReset: () => void;
+  onSubmit?: () => void;
+  onReset?: () => void;
   opened?: boolean;
 }
 

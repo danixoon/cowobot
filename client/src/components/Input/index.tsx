@@ -7,9 +7,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   isResetable?: boolean;
   isDropdown?: boolean;
   dropdownItems?: string[];
-  setInput?: (value: string) => void;
-
   label?: string;
+  setInput?: (input: any) => void;
+
+  input: any;
+  name: string;
 }
 
 const Input: React.FC<InputProps> = (props) => {
@@ -18,12 +20,13 @@ const Input: React.FC<InputProps> = (props) => {
     onReset,
     onChange,
     setInput,
-    value,
+    input = {},
     name,
     isDropdown,
     dropdownItems,
     label,
     defaultValue = "",
+    value,
     ...rest
   } = props;
 
@@ -32,7 +35,9 @@ const Input: React.FC<InputProps> = (props) => {
     dropdownOpened: false,
   }));
 
-  let nextValue = value;
+  const inputValue = setInput ? input[name] : value;
+
+  let nextValue = inputValue;
   if (state.reset) {
     nextValue = defaultValue;
     setState({ ...state, reset: false });
@@ -63,16 +68,19 @@ const Input: React.FC<InputProps> = (props) => {
         {isDropdown && (
           <DropdownPopup
             opened={state.dropdownOpened}
-            filter={value?.toString() || ""}
+            filter={inputValue?.toString() || ""}
             items={dropdownItems || []}
             onSelect={(item) => {
-              setInput && setInput(item);
+              setInput && setInput({ ...input, [name]: item });
             }}
           />
         )}
         {isResetable && (
           <span
-            onClick={() => setInput && setInput(defaultValue?.toString() || "")}
+            onClick={() =>
+              setInput &&
+              setInput({ ...input, [name]: defaultValue?.toString() || "" })
+            }
             className="input__reset"
           >
             <img src={resetIcon} />

@@ -1,9 +1,13 @@
 import { Reducer } from "redux";
-import { ActionTypes, Action, UserState } from "../types";
+import { ActionTypes, Actions, UserState } from "../types";
 
-const defaultState: () => UserState = () => ({ username: "", avatarUrl: "" });
+const defaultState: () => UserState = () => ({
+  username: "",
+  avatarUrl: "",
+  login: false,
+});
 
-export const userReducer: Reducer<UserState, Action> = (
+export const userReducer: Reducer<UserState, Actions> = (
   state = defaultState(),
   action
 ) => {

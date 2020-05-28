@@ -1,17 +1,12 @@
 import * as React from "react";
-import { Provider } from "react-redux";
-import { store } from "../redux/store";
-import Root from "../layout/Root";
-import PopupLayoutProvider from "../providers/PopupLayoutProvider";
+import { RootState } from "../redux/types";
+import RootLayout, { RootLayoutProps } from "../layout/RootLayout";
+import { connect } from "react-redux";
 
-export type RootContainerProps = {};
+const mapStateToProps = (state: RootState) => ({
+  login: state.user.login,
+});
 
-const RootContainer: React.FC<RootContainerProps> = (props) => (
-  <Provider store={store}>
-    <PopupLayoutProvider>
-      <Root />
-    </PopupLayoutProvider>
-  </Provider>
-);
+const mapDispatchToProps = {};
 
-export default RootContainer;
+export default connect(mapStateToProps, mapDispatchToProps)(RootLayout);

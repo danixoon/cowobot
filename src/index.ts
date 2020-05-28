@@ -11,7 +11,7 @@ const { PORT, NODE_ENV } = getEnv("PORT", "NODE_ENV");
 const app = express();
 
 if (NODE_ENV === nodeEnvType.production) {
-  app.use("/", express.static(path.resolve(__dirname, "../client/build")));
+  app.use("/*", express.static(path.resolve(__dirname, "../client/build")));
 }
   
 app.use("/api", apiRouter);

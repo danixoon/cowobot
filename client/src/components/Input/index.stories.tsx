@@ -5,43 +5,58 @@ import { InputWrapper } from "../../wrappers/InputWrapper";
 import { useInput } from "../../hooks/useInput";
 
 storiesOf("Components/Input", module)
-  .add("simple", () => <Input placeholder="текст" />)
+  .add("simple", () => <Input name="simple" input={{}} placeholder="текст" />)
   .add("with reset", () => {
     const [input, bind, setInput] = useInput();
     return (
       <>
-        <InputWrapper name="text1" setInput={setInput} input={input} {...bind}>
-          <Input
-            isResetable
-            placeholder="текст"
-            defaultValue="BB_PR_REVIEWER"
-          />
-        </InputWrapper>
-        <InputWrapper name="text2" setInput={setInput} input={input} {...bind}>
-          <Input isResetable placeholder="текст" />
-        </InputWrapper>
+        <Input
+          name="resetable"
+          setInput={setInput}
+          input={input}
+          {...bind}
+          isResetable
+          placeholder="текст"
+          defaultValue="BB_PR_REVIEWER"
+        />
+
+        <Input
+          name="text2"
+          setInput={setInput}
+          input={input}
+          {...bind}
+          isResetable
+          placeholder="текст"
+        />
       </>
     );
   })
-  .add("with label", () => (
-    <Input
-      defaultValue="BB_PR_REVIEWER"
-      placeholder="текст"
-      label="Имя ревьювера"
-    />
-  ))
+  .add("with label", () => {
+    // const [input, bind, setInput] = useInput({});
+    return (
+      <Input
+        name="revieverName"
+        input={{}}
+        defaultValue="BB_PR_REVIEWER"
+        placeholder="текст"
+        label="Имя ревьювера"
+      />
+    );
+  })
   .add("with dropdown", () => {
     const [input, bind, setInput] = useInput({ dropdown: "при" });
     return (
-      <InputWrapper name="dropdown" input={input} setInput={setInput} {...bind}>
-        <Input
-          defaultValue="прив"
-          placeholder="текст"
-          isResetable
-          isDropdown
-          dropdownItems={["Привет", "Пока", "Призрак"]}
-          label="Выпадающий список"
-        />
-      </InputWrapper>
+      <Input
+        {...bind}
+        name="dropdown"
+        setInput={setInput}
+        input={input}
+        defaultValue="прив"
+        placeholder="текст"
+        isResetable
+        isDropdown
+        dropdownItems={["Привет", "Пока", "Призрак"]}
+        label="Выпадающий список"
+      />
     );
   });
