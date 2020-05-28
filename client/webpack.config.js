@@ -7,6 +7,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 module.exports = {
   mode: isDevelopment ? "development" : "production",
   entry: path.resolve(__dirname, "src/index.tsx"),
+  devtool: "inline-source-map",
   module: {
     rules: [
       {
@@ -63,5 +64,11 @@ module.exports = {
     contentBase: path.resolve(__dirname, "build"),
     compress: true,
     port: 3000,
+    historyApiFallback: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:5000",
+      },
+    },
   },
 };

@@ -1,15 +1,20 @@
 import * as express from "express";
-import { loadConfig } from "./config";
+import * as path from "path";
+import { loadConfig, getEnv, nodeEnvType } from "./config";
 
-loadConfig("development");
+import apiRouter from "./routes/api";
 
-const { PORT } = process.env;
+loadConfig();
+
+const { PORT, NODE_ENV } = getEnv("PORT", "NODE_ENV");
 
 const app = express();
 
-app.get("/test", (req, res) => {
-  res.send(Math.random() > 0.5 ? "ok" : "not ok");
-});
+if (NODE_ENV === nodeEnvType.production) {
+  app.use("/", express.static(path.resolve(__dirname, "../client/build")));
+}
+  
+app.use("/api", apiRouter);
 
 app.listen(PORT, () => {
   console.log("Server is listening on port " + PORT);
