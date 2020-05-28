@@ -1,11 +1,11 @@
 import { Reducer, combineReducers } from "redux";
 import { Action, RootState } from "../types";
 
-import { popupReducer } from "./popup";
+import { userReducer } from "./user";
 import { testReducer } from "./test";
 
 const rootReducer: Reducer<RootState, Action> = combineReducers({
-  popup: popupReducer,
+  user: userReducer,
   test: testReducer,
 });
 

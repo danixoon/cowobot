@@ -12,9 +12,7 @@ const Root: React.FC<RootProps> = (props) => {
         <ContainerLayout
           direction="column"
           style={{ flex: "1" }}
-        >
-          
-        </ContainerLayout>
+        ></ContainerLayout>
       </ContainerLayout>
     </>
   );

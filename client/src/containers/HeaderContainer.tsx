@@ -4,24 +4,11 @@ import { connect } from "react-redux";
 import ControlPanel from "../components/ControlPanel";
 import ContainerLayout from "../layout/ContainerLayout";
 import AccountPanel from "../components/AccountPanel";
+import HeaderPanel, { HeaderPanelProps } from "../layout/HeaderPanel";
 
-interface HeaderContainerProps {}
-
-const HeaderContainer: React.FC<HeaderContainerProps> = (props) => {
-  const user = { username: "danixoon", avatarUrl: "" };
-  return (
-    <ContainerLayout direction="row" style={{ flexBasis: "50px" }}>
-      <ControlPanel style={{ flex: 1 }} />
-      <AccountPanel
-        style={{ width: "220px" }}
-        username={user.username}
-        avatarUrl={user.avatarUrl}
-      />
-    </ContainerLayout>
-  );
-};
-
-const mapStateToProps = (state: RootState) => ({});
+const mapStateToProps = (state: RootState): HeaderPanelProps => ({
+  user: state.user,
+});
 const mapDispatchToProps = {};
 
-export default connect(mapStateToProps, mapDispatchToProps)(HeaderContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderPanel);

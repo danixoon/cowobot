@@ -1,17 +1,22 @@
-import * as popupActions from "./actions/popup";
+import * as actionCreators from "./actions";
 
 export const mapState = (mapper: (state: RootState) => any) => mapper;
 
 export const ActionTypes = {
-  POPUP_PUSH: "POPUP.PUSH" as const,
-  POPUP_REMOVE: "POPUP.REMOVE" as const,
-  TEST_HELLO: "TEST.HELLO" as const,
+  USER_LOGIN: "USER_LOGIN" as const,
+  USER_LOGOUT: "USER_LOGOUT" as const,
+  TEST_HELLO: "TEST_HELLO" as const,
 };
 
-export type Action = ReturnType<typeof popupActions[keyof typeof popupActions]>;
+export type ActionType = typeof ActionTypes[keyof typeof ActionTypes];
 
-export interface PopupState {
-  popups: [];
+export type Action = ReturnType<
+  typeof actionCreators[keyof typeof actionCreators]
+>;
+
+export interface UserState {
+  username: string;
+  avatarUrl: string;
 }
 
 export interface TestState {
@@ -19,6 +24,6 @@ export interface TestState {
 }
 
 export interface RootState {
-  popup: PopupState;
+  user: UserState;
   test: TestState;
 }
