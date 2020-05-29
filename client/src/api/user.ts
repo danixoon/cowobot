@@ -1,23 +1,21 @@
 import axios, { AxiosResponse } from "axios";
-
-export type ApiError = {
-  message: string;
-  param?: string;
-  statusCode: number;
-};
-
-export type ApiSuccessReponse<T = any> = {
-  error: null;
-  data: T;
-};
-
-export type ApiResponse<T = any> =
-  | ApiSuccessReponse<T>
-  | {
-      error: ApiError;
-    };
+import { store } from "../redux/store";
 
 export const userLogin = async (username: string, password: string) => {
-  return (await axios.get("/api/auth", { params: { username, password } }))
-    .data;
+  const token = window.localStorage.getItem("token");
+  return (
+    await axios.get("/api/auth", {
+      params: { username, password },
+      headers: token ? { Authorization: token } : undefined,
+    })
+  ).data;
+};
+
+export const userFetchData = async () => {
+  const token = window.localStorage.getItem("token");
+  return (
+    await axios.get("/api/user", {
+      headers: token ? { Authorization: token } : undefined,
+    })
+  ).data;
 };

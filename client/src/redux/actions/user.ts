@@ -1,5 +1,5 @@
 import { ActionTypes } from "../types";
-import { ApiError } from "../../api/user";
+import { ApiError } from "../../api";
 
 export const userLogin = (username: string, password: string) => ({
   type: ActionTypes.USER_LOGIN,
@@ -16,7 +16,7 @@ export const userLoginSuccess = (data: {
 
 export const userLoginError = (error: ApiError) => ({
   type: ActionTypes.USER_LOGIN_ERROR,
-  payload: error
+  payload: error,
 });
 
 export const userLogout = () => {

@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose } from "redux";
+import { createStore, applyMiddleware, compose, Store } from "redux";
 import rootReducer from "./reducers/root";
 import createSagaMiddleware from "redux-saga";
 import logger from "redux-logger";
@@ -14,6 +14,6 @@ export const store = createStore<RootState, Actions, any, any>(
     applyMiddleware(sagaMiddleware, logger),
     devtoolsEnchancer ? devtoolsEnchancer() : (store: any) => store
   )
-);
+) as Store<RootState, Actions>;
 
 sagaMiddleware.run(rootSaga);

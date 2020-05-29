@@ -1,5 +1,5 @@
 import * as actionCreators from "./actions";
-import { ApiError } from "../api/user";
+import { ApiError } from "../api";
 
 export const mapState = (mapper: (state: RootState) => any) => mapper;
 
@@ -28,6 +28,7 @@ export interface UserState
   extends StateSchema<{
     username: string;
     avatarUrl: string;
+    token: string | null;
   }> {}
 export interface TestState {
   message: string;

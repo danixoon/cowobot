@@ -1,5 +1,5 @@
 import { ActionType } from "../types";
-import { ApiError } from "../../api/user";
+import { ApiError } from "../../api";
 
 export * from "./user";
 
