@@ -21,6 +21,9 @@
 
 .dialog-popup__content {
   z-index: 1;
+  background-color: $color-secondary;
+  border-radius: 5px;
+  padding: 2rem 0;
 }
 
 .dialog-popup_closed {

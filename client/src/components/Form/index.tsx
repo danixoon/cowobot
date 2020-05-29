@@ -9,7 +9,7 @@ type FormProps = React.HTMLAttributes<HTMLFormElement> & {
 const Form: React.FC<React.PropsWithChildren<FormProps>> = (
   props: FormProps
 ) => {
-  const { children, preventDefault, onSubmit, ...rest } = props;
+  const { children, preventDefault = true, onSubmit, ...rest } = props;
 
   const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (preventDefault) e.preventDefault();

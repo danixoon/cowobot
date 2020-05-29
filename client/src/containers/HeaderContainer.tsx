@@ -7,7 +7,7 @@ import AccountPanel from "../components/AccountPanel";
 import HeaderPanel, { HeaderPanelProps } from "../layout/HeaderPanel";
 
 const mapStateToProps = (state: RootState): HeaderPanelProps => ({
-  user: state.user,
+  user: state.user.data,
 });
 const mapDispatchToProps = {};
 

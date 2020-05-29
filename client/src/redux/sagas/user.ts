@@ -1,23 +1,22 @@
 import * as api from "../../api/user";
 import { put, call, takeLatest } from "redux-saga/effects";
 import { ActionTypes, ActionType, Action, Actions } from "../types";
-import { userLoginSuccess } from "../actions/user";
-import { apiError } from "../actions";
+import { userLoginSuccess, userLoginError } from "../actions/user";
 
 function* loginUser(action: Action<typeof ActionTypes.USER_LOGIN>) {
   const { username, password } = action.payload;
 
   try {
-    const request = yield call(api.loginUser, username, password);
-    yield put<Actions>(userLoginSuccess(request.data));
-  } catch (error) {
-    yield put<Actions>(apiError(ActionTypes.USER_LOGIN_ERROR, error));
-  }
+    const request = (yield call(
+      api.userLogin,
+      username,
+      password
+    )) as api.ApiSuccessReponse;
 
-  yield put<Actions>({
-    type: ActionTypes.TEST_HELLO,
-    payload: { message: "success" },
-  });
+    yield put<Actions>(userLoginSuccess({ ...request.data, username }));
+  } catch (error) {
+    yield put<Actions>(userLoginError(error.response.data.error));
+  }
 }
 
 export default function* watchSagas() {

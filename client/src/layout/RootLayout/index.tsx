@@ -4,21 +4,18 @@ import ContainerLayout from "../ContainerLayout";
 import HeaderContainer from "../../containers/HeaderContainer";
 import DialogPopup from "../../components/DialogPopup";
 import Form from "../../components/Form";
+import AuthPopupContainer from "../../containers/AuthPopupContainer";
 
 export interface RootLayoutProps {
-  login: boolean;
+  isAuth: boolean;
 }
 
 const RootLayout: React.FC<RootLayoutProps> = (props) => {
-  const { login } = props;
+  const { isAuth } = props;
   return (
     <>
       <ContainerLayout style={{ height: "100vh" }} direction="column">
-        <DialogPopup opened={!login}>
-          <Form>
-            <p> Войдите в аккаунт </p>
-          </Form>
-        </DialogPopup>
+        <AuthPopupContainer />
         <HeaderContainer />
         <ContainerLayout
           direction="column"

@@ -6,13 +6,17 @@ export const userLogin = (username: string, password: string) => ({
   payload: { username, password },
 });
 
-export const userLoginSuccess = (user: {
-  username: string;
-  avatarUrl: string;
+export const userLoginSuccess = (data: {
   token: string;
+  username: string;
 }) => ({
   type: ActionTypes.USER_LOGIN_SUCCESS,
-  payload: { user },
+  payload: { ...data },
+});
+
+export const userLoginError = (error: ApiError) => ({
+  type: ActionTypes.USER_LOGIN_ERROR,
+  payload: error
 });
 
 export const userLogout = () => {

@@ -36,14 +36,17 @@ export const generateHash = async (value: string) => {
 
 export const validator: express.RequestHandler = (req, res, next) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty())
+  if (!errors.isEmpty()) {
+    const param = errors.array()[0].param;
+    const message = errors.array()[0].msg;
     return res.status(400).send(
       createErrorData({
-        message: errors.array()[0].msg,
-        param: errors.array()[0].param,
+        message: `${message} <${param}>`,
+        param: param,
         statusCode: 400,
       })
     );
+  }
 
   next();
 };

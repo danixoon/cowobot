@@ -1,0 +1,17 @@
+@import "../../sass/theme.scss";
+
+.container-layout {
+  display: flex;
+}
+
+.container-layout_column {
+  flex-direction: column;
+}
+
+.container-layout_row {
+  flex-direction: row;
+}
+
+.container-layout_wrap {
+  flex-wrap: wrap;
+}

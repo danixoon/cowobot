@@ -1,4 +1,5 @@
 import * as actionCreators from "./actions";
+import { ApiError } from "../api/user";
 
 export const mapState = (mapper: (state: RootState) => any) => mapper;
 
@@ -17,12 +18,17 @@ export type Actions = ReturnType<
 >;
 
 export type Action<T extends ActionType> = Extract<Actions, { type: T }>;
+export type StateSchema<T> = {
+  data: T;
+  status: DataStatus;
+  error: ApiError | null;
+};
 
-export interface UserState {
-  username: string;
-  avatarUrl: string;
-  login: boolean;
-}
+export interface UserState
+  extends StateSchema<{
+    username: string;
+    avatarUrl: string;
+  }> {}
 export interface TestState {
   message: string;
 }
@@ -31,3 +37,5 @@ export interface RootState {
   user: UserState;
   test: TestState;
 }
+
+export type DataStatus = "idle" | "loading" | "success" | "error";

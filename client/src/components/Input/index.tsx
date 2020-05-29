@@ -35,7 +35,7 @@ const Input: React.FC<InputProps> = (props) => {
     dropdownOpened: false,
   }));
 
-  const inputValue = setInput ? input[name] : value;
+  const inputValue = (setInput ? input[name] : value) ?? "";
 
   let nextValue = inputValue;
   if (state.reset) {
