@@ -12,7 +12,7 @@ export const store = createStore<RootState, Actions, any, any>(
   rootReducer,
   compose(
     applyMiddleware(sagaMiddleware, logger),
-    devtoolsEnchancer && devtoolsEnchancer()
+    devtoolsEnchancer ? devtoolsEnchancer() : (store: any) => store
   )
 );
 
