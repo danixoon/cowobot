@@ -15,7 +15,7 @@ import { getClient } from "../../db";
 const router = express.Router();
 
 router.get(
-  "/auth",
+  "/user",
   access.auth,
 
   async (
