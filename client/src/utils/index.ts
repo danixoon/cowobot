@@ -6,12 +6,12 @@ export const mergeClassNames = (
 
 export const mergeProps = <T, P>(
   newProps: React.HTMLAttributes<T>,
-  props: P
+  props: P = {} as P
 ): React.HTMLAttributes<T> & P => {
   return {
     ...props,
     ...newProps,
-    className: `${newProps.className ?? ""}`,
+    className: mergeClassNames((props as any).className, newProps.className),
     style: { ...((props as any).style ?? {}), ...(newProps.style ?? {}) },
   };
 };

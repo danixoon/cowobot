@@ -15,9 +15,8 @@ import { getClient } from "../../db";
 const router = express.Router();
 
 router.get(
-  "/auth",
+  "/service",
   access.auth,
-
   async (
     req: SessionRequest,
     res: express.Response,
@@ -26,11 +25,15 @@ router.get(
     const { userId } = req.session;
     const result = await getClient(
       (client) =>
-        client.query(`SELECT "username" FROM "account" WHERE "id"='${userId}'`),
+        client.query(`
+        SELECT "service"."id", "service"."name" FROM "service"
+        INNER JOIN "service_type" ON "service_type"."id"="service"."id"
+        WHERE "service_type"."type" != 'messenger'
+        `),
       next
     );
 
-    res.send(createResponse({ ...result.rows[0] }))
+    res.send(createResponse({ services: result.rows }));
   }
 );
 

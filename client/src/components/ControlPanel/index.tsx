@@ -4,7 +4,7 @@ import "./styles.scss";
 import { PopupLayoutContext } from "../../providers/PopupLayoutProvider";
 import PopupProvider from "../../providers/PopupProvider";
 import AccountPanel from "../AccountPanel";
-import ContainerLayout from "../../layout/ContainerLayout";
+import Layout from "../Layout";
 import { mergeProps } from "../../utils";
 
 interface ControlPanelProps extends React.HTMLAttributes<HTMLDivElement> {}
