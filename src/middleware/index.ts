@@ -1,5 +1,7 @@
 import * as express from "express";
 import * as jwt from "jsonwebtoken";
+import * as bcrypt from "bcrypt";
+
 import { check, validationResult, ValidationChain } from "express-validator";
 import { getEnv } from "../config";
 
@@ -14,6 +16,13 @@ export const createError = ({
 };
 
 export const createResponse = (data: any) => ({ data });
+
+export const generateHash = async (value: string) => {
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(value, salt);
+
+  return hash;
+};
 
 export const validator: express.RequestHandler = (req, res, next) => {
   const errors = validationResult(req);
