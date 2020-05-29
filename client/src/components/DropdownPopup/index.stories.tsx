@@ -1,7 +1,6 @@
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import DropdownPopup from ".";
-import { InputWrapper } from "../../wrappers/InputWrapper";
 import { useInput } from "../../hooks/useInput";
 
 const items = ["aabbcc", "aaaacc", "aabbcd"];
