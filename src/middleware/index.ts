@@ -7,11 +7,21 @@ import { getEnv } from "../config";
 
 const { SECRET } = getEnv("SECRET");
 
-export const createError = ({
+type ApiError = Partial<{
+  message: string;
+  statusCode: number;
+  [key: string]: any;
+}>;
+
+export const createApiError = (error: ApiError) => ({
+  response: createErrorData(error),
+});
+
+export const createErrorData = ({
   message = "Error",
   statusCode = 400,
   ...rest
-}: Partial<{ message: string; statusCode: number; [key: string]: any }>) => {
+}: ApiError) => {
   return { error: { ...rest, message, statusCode } };
 };
 
@@ -28,7 +38,7 @@ export const validator: express.RequestHandler = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty())
     return res.status(400).send(
-      createError({
+      createErrorData({
         message: errors.array()[0].msg,
         param: errors.array()[0].param,
         statusCode: 400,
@@ -42,7 +52,7 @@ export type SessionRequest = express.Request & { session: { userId?: string } };
 
 const auth: express.RequestHandler = (req: SessionRequest, res, next) => {
   const token = req.header("Authorization");
-  const invalidTokenError = createError({
+  const invalidTokenError = createErrorData({
     message: "invalid token",
     statusCode: 403,
   });
@@ -58,7 +68,9 @@ const auth: express.RequestHandler = (req: SessionRequest, res, next) => {
 
 const guest: express.RequestHandler = (req, res, next) => {
   if (req.header("Authorization"))
-    return res.status(402).send(createError({ message: "You need to logout" }));
+    return res
+      .status(402)
+      .send(createErrorData({ message: "You need to logout" }));
   next();
 };
 

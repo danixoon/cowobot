@@ -7,17 +7,24 @@ import {
   validator,
   generateHash,
 } from "../../middleware";
+import { getClient } from "../../db";
 
 const router = express.Router();
 
 router.get("/test", (req, res, next) => {
   res.send({ ok: true });
-  next();
 });
 
 router.get("/test/auth", access.auth, (req: SessionRequest, res, next) => {
   res.send(createResponse({ userId: req.session.userId }));
-  next();
+});
+
+router.get("/test/users", async (req, res, next) => {
+  const data = await getClient(
+    (client) => client.query(`SELECT * FROM "account"`),
+    next
+  );
+  res.send(createResponse(data.rows));
 });
 
 router.get(
@@ -32,7 +39,6 @@ router.get(
     res.send(
       createResponse({ hash: await generateHash(req.query.password as string) })
     );
-    next();
   }
 );
 
