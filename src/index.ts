@@ -14,7 +14,7 @@ if (NODE_ENV === nodeEnvType.production) {
   app.use("/*", express.static(path.resolve(__dirname, "../client/build")));
 }
 
-app.use("/api", apiRouter);
+app.use(apiRouter);
 
 app.listen(PORT, () => {
   console.log("Server is listening on port " + PORT);
