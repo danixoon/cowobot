@@ -6,6 +6,7 @@ import DialogPopup from "../../components/DialogPopup";
 import Form from "../../components/Form";
 import AuthPopupContainer from "../../containers/AuthPopupContainer";
 import ServicesTreeContainer from "../../containers/ServicesTreeContainer";
+import ServiceNoticeContainer from "../../containers/ServiceNoticeContainer";
 
 export interface RootLayoutProps {
   isAuth: boolean;
@@ -23,7 +24,7 @@ const RootLayout: React.FC<RootLayoutProps> = (props) => {
             <ServicesTreeContainer />
           </Layout>
           <Layout bg direction="column" style={{ flex: "1" }}>
-            
+            <ServiceNoticeContainer />
           </Layout>
         </Layout>
       </Layout>

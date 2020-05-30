@@ -3,10 +3,13 @@ import { RootState } from "../redux/types";
 import { connect } from "react-redux";
 
 import ServicesTree, { ServicesTreeProps } from "../layout/ServicesTree";
+import { serviceSelect } from "../redux/actions";
 
-const mapStateToProps = (state: RootState): ServicesTreeProps => ({
+const mapStateToProps = (state: RootState) => ({
   services: state.service.data.services,
 });
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  onServiceSelect: serviceSelect
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServicesTree);

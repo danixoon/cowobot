@@ -11,6 +11,16 @@ export const ActionTypes = {
   SERVICE_FETCH: "SERVICE_FETCH" as const,
   SERVICE_FETCH_SUCCESS: "SERVICE_FETCH_SUCCESS" as const,
   SERVICE_FETCH_ERROR: "SERVICE_FETCH_ERROR" as const,
+  SERVICE_SELECT: "SERVICE_SELECT" as const,
+
+  SERVICE_CONFIG_FETCH: "SERVICE_CONFIG_FETCH" as const,
+  SERVICE_CONFIG_FETCH_SUCCESS: "SERVICE_CONFIG_FETCH_SUCCESS" as const,
+  SERVICE_CONFIG_FETCH_ERROR: "SERVICE_CONFIG_FETCH_ERROR" as const,
+
+  SERVICE_CONFIGS_FETCH: "SERVICE_CONFIGS_FETCH" as const,
+  SERVICE_CONFIGS_FETCH_SUCCESS: "SERVICE_CONFIGS_FETCH_SUCCESS" as const,
+  SERVICE_CONFIGS_FETCH_ERROR: "SERVICE_CONFIGS_FETCH_ERROR" as const,
+
   TEST_HELLO: "TEST_HELLO" as const,
 };
 
@@ -41,10 +51,10 @@ export type ServiceState = StateSchema<{
 
   selectedService: null | {
     id: string;
+    // Варианты событий (ревью не ревью)
     notices: { id: string; name: string }[];
     variables: {
       name: string;
-      value: string;
       defaultValue: string;
       isTarget: boolean;
     }[];

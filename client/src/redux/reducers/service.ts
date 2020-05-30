@@ -24,6 +24,15 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
           services: action.payload.services,
         },
       };
+    case ActionTypes.SERVICE_CONFIG_FETCH_SUCCESS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          // TODO
+          selectedService: { ...action.payload, id: action.payload.configId },
+        },
+      };
     default:
       return state;
   }
