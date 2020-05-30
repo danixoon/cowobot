@@ -49,6 +49,8 @@ export const configFetchSuccess = (data: {
   serviceId: number;
   config: null | {
     variables: {
+      id: number;
+      name: string;
       custom_key: string | null;
       default_key: string;
       type: string;
@@ -81,5 +83,20 @@ export const configCreateSuccess = (data: { configId: number }) => ({
 
 export const configCreateError = (error: ApiError) => ({
   type: ActionTypes.CONFIG_CREATE_ERROR,
+  payload: error,
+});
+
+export const configDelete = (configId: number) => ({
+  type: ActionTypes.CONFIG_DELETE,
+  payload: { configId },
+});
+
+export const configDeleteSuccess = (data: { configId: number }) => ({
+  type: ActionTypes.CONFIG_DELETE_SUCCESS,
+  payload: data,
+});
+
+export const configDeleteError = (error: ApiError) => ({
+  type: ActionTypes.CONFIG_DELETE_ERROR,
   payload: error,
 });

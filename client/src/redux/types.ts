@@ -24,9 +24,14 @@ export const ActionTypes = {
   CONFIG_FETCH_ERROR: "CONFIG_FETCH_ERROR" as const,
 
   // Создание конфигурации для сервиса
-  CONFIG_CREATE: "CONFIG_FETCH" as const,
+  CONFIG_CREATE: "CONFIG_CREATE" as const,
   CONFIG_CREATE_SUCCESS: "CONFIG_CREATE_SUCCESS" as const,
   CONFIG_CREATE_ERROR: "CONFIG_CREATE_ERROR" as const,
+
+  // Удаление конфигурации из сервиса
+  CONFIG_DELETE: "CONFIG_DELETE" as const,
+  CONFIG_DELETE_SUCCESS: "CONFIG_DELETE_SUCCESS" as const,
+  CONFIG_DELETE_ERROR: "CONFIG_DELETE_ERROR" as const,
 
   // // Получение идентификаторов известных конфигураций
   // CONFIG_IDS_FETCH: "CONFIG_IDS_FETCH" as const,
@@ -68,6 +73,8 @@ export type ServiceState = {
     // Варианты событий (ревью не ревью)
     actions: { id: number; name: string }[];
     variables: {
+      id: number;
+      name: string;
       customKey: string | null;
       defaultKey: string;
       isTarget: boolean;

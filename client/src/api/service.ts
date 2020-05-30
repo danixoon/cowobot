@@ -33,8 +33,18 @@ export const configFetch = async (configId: number) => {
 export const configCreate = async (serviceId: number) => {
   const token = window.localStorage.getItem("token");
   return (
-    await axios.post("/api/service/config", {
+    await axios.post("/api/service/config", undefined, {
       params: { serviceId },
+      headers: token ? { Authorization: token } : undefined,
+    })
+  ).data;
+};
+
+export const configDelete = async (configId: number) => {
+  const token = window.localStorage.getItem("token");
+  return (
+    await axios.delete("/api/service/config", {
+      params: { configId },
       headers: token ? { Authorization: token } : undefined,
     })
   ).data;

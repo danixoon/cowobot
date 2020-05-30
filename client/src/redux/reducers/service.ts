@@ -34,6 +34,11 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
       };
     case ActionTypes.CONFIG_FETCH:
       return { ...state, config: { ...state.config, status: "loading" } };
+    case ActionTypes.CONFIG_DELETE_SUCCESS:
+      return {
+        ...state,
+        config: { status: "success", error: null, data: null },
+      };
     case ActionTypes.CONFIG_FETCH_SUCCESS:
       return {
         ...state,
@@ -46,6 +51,8 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
               ? {
                   ...action.payload.config,
                   variables: action.payload.config.variables.map((v) => ({
+                    id: v.id,
+                    name: v.name,
                     customKey: v.custom_key,
                     defaultKey: v.default_key,
                     isTarget: v.isTarget,
