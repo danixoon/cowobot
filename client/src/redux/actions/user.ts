@@ -22,3 +22,7 @@ export const userLoginError = (error: ApiError) => ({
 export const userLogout = () => {
   return { type: ActionTypes.USER_LOGOUT, payload: {} };
 };
+
+export const userLogoutSuccess = () => {
+  return { type: ActionTypes.USER_LOGOUT_SUCCESS, payload: {} };
+};

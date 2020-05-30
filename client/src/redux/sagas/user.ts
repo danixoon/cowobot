@@ -2,7 +2,12 @@ import * as api from "../../api/user";
 import axios from "axios";
 import { put, call, takeLatest, take, fork } from "redux-saga/effects";
 import { ActionTypes, ActionType, Action, Actions } from "../types";
-import { userLoginSuccess, userLoginError, userLogout } from "../actions/user";
+import {
+  userLoginSuccess,
+  userLoginError,
+  userLogout,
+  userLogoutSuccess,
+} from "../actions/user";
 import { ApiSuccessReponse } from "../../api";
 
 function* loginUser(action: Action<typeof ActionTypes.USER_LOGIN>) {
@@ -24,17 +29,18 @@ function* loginUser(action: Action<typeof ActionTypes.USER_LOGIN>) {
 
 function* logoutUser() {
   window.localStorage.removeItem("token");
-  yield put(userLogout());
+  yield put(userLogoutSuccess());
 }
 
 export default function* userFlow() {
   const token = window.localStorage.getItem("token");
+  let isAuth = false;
   if (token) {
     try {
       const request = yield call(api.userFetchData);
       const { username } = request.data;
       yield put(userLoginSuccess({ token, username }));
-      yield take(ActionTypes.USER_LOGOUT);
+      isAuth = true;
     } catch (error) {
       console.log(error);
       yield fork(logoutUser);
@@ -42,10 +48,14 @@ export default function* userFlow() {
   }
 
   while (true) {
-    const data = (yield take(ActionTypes.USER_LOGIN)) as Action<
-      typeof ActionTypes.USER_LOGIN
-    >;
-    yield fork(loginUser, data);
+    if (!isAuth) {
+      const data = (yield take(ActionTypes.USER_LOGIN)) as Action<
+        typeof ActionTypes.USER_LOGIN
+      >;
+      yield fork(loginUser, data);
+    }
     yield take([ActionTypes.USER_LOGOUT, ActionTypes.USER_LOGIN_ERROR]);
+    yield logoutUser();
+    isAuth = false;
   }
 }

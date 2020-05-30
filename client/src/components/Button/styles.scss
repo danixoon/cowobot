@@ -2,22 +2,30 @@
 
 .btn {
   @include unselectable();
-  @include font-default();
 
   @include effect-hover();
 
   @include margin-default();
 
-  width: 160px;
-  height: 40px;
-
   background-color: $color-secondary;
-  padding: 0.5rem;
 
   &:active {
     border: 1px solid $color-secondary;
     background-color: $color-light-0;
   }
+}
+
+.btn_sm {
+  padding: 0rem;
+  padding: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.btn_md {
+  @include font-default();
+  padding: 0.5rem;
+  width: 160px;
+  height: 40px;
 }
 
 @each $color-name, $color-value in $colors {

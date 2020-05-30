@@ -4,5 +4,5 @@ import AccountPanel from ".";
 import avatarUrl from "../../images/avatar.png";
 
 storiesOf("Components/Account Panel", module).add("simple", () => (
-  <AccountPanel username="danixoon" avatarUrl={avatarUrl} />
+  <AccountPanel logout={() => {}} username="danixoon" avatarUrl={avatarUrl} />
 ));

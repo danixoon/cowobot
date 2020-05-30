@@ -42,6 +42,8 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
           },
         },
       };
+    case ActionTypes.USER_LOGOUT_SUCCESS:
+      return defaultState();
     default:
       return state;
   }

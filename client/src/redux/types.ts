@@ -8,6 +8,7 @@ export const ActionTypes = {
   USER_LOGIN_SUCCESS: "USER_LOGIN_SUCCESS" as const,
   USER_LOGIN_ERROR: "USER_LOGIN_ERROR" as const,
   USER_LOGOUT: "USER_LOGOUT" as const,
+  USER_LOGOUT_SUCCESS: "USER_LOGOUT_SUCCESS" as const,
 
   // Получение известных сервисов
   SERVICE_FETCH: "SERVICE_FETCH" as const,

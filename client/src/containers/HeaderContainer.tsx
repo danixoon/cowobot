@@ -5,10 +5,13 @@ import ControlPanel from "../components/ControlPanel";
 import Layout from "../components/Layout";
 import AccountPanel from "../components/AccountPanel";
 import HeaderPanel, { HeaderPanelProps } from "../layout/HeaderPanel";
+import { userLogout } from "../redux/actions";
 
-const mapStateToProps = (state: RootState): HeaderPanelProps => ({
+const mapStateToProps = (state: RootState) => ({
   user: state.user.data,
 });
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  logout: userLogout,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(HeaderPanel);
