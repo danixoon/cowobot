@@ -3,8 +3,8 @@ import "./styles.scss";
 import Tree from "../../components/Tree";
 
 export type ServicesTreeProps = React.HTMLAttributes<HTMLDivElement> & {
-  services: { name: string; id: string }[];
-  onServiceSelect: (serviceId: string) => void;
+  services: { name: string; id: number }[];
+  onServiceSelect: (serviceId: number) => void;
 };
 
 const ServicesTree: React.FC<ServicesTreeProps> = (props) => {
@@ -13,7 +13,8 @@ const ServicesTree: React.FC<ServicesTreeProps> = (props) => {
     <Tree
       onItemSelect={(item) => {
         const [serviceId] = item.split("_");
-        onServiceSelect(serviceId);
+        const id = Number(serviceId);
+        onServiceSelect(id);
       }}
       items={services.map((v) => ({
         content: v.name,

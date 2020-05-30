@@ -5,28 +5,28 @@ import Section from "../../components/Section";
 import Dropdown from "../../components/Dropdown";
 import { DataStatus } from "../../redux/types";
 
-export type ServiceNoticeProps = {
+export type ServiceConfigProps = {
   variables: {
-    name: string;
-    defaultValue: string;
+    defaultKey: string;
+    customKey: string | null;
     isTarget: boolean;
   }[];
-  notices: { id: string; name: string }[];
+  actions: { id: number; name: string }[];
   status: DataStatus;
 };
 
-const ServiceNoticeProps: React.FC<ServiceNoticeProps> = (props) => {
-  const { variables, notices, status } = props;
+const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
+  const { variables, actions, status } = props;
 
   return (
     <>
       {status === "success" && (
         <Section header="Действия">
-          <Dropdown items={notices.map((v) => v.name)} />
+          <Dropdown items={actions.map((v) => v.name)} />
         </Section>
       )}
     </>
   );
 };
 
-export default ServiceNoticeProps;
+export default ServiceConfig;

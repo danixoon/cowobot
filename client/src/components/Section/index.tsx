@@ -14,7 +14,7 @@ const Section: React.FC<SectionProps> = (props: SectionProps) => {
   return (
     <section className="section">
       <header style={{ textAlign }} className="section__header">
-        {header}
+        <h3 className="section__h">{header}</h3>
       </header>
       {children}
     </section>

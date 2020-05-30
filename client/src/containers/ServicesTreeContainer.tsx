@@ -7,9 +7,11 @@ import { serviceSelect } from "../redux/actions";
 
 const mapStateToProps = (state: RootState) => ({
   services: state.service.data.services,
+  selectedServiceId:
+    state.service.data.selectedServiceConfig?.serviceId ?? null,
 });
 const mapDispatchToProps = {
-  onServiceSelect: serviceSelect
+  onServiceSelect: serviceSelect,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServicesTree);

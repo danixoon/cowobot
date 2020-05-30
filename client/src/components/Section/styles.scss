@@ -1,7 +1,16 @@
 @import "../../sass/theme.scss";
 
+.section {
+  padding: 1rem;
+}
+
 .section__header {
-  padding-bottom: 1rem;
+  // padding-bottom: 1rem;
   margin-bottom: 1rem;
   border-bottom: 1px solid $color-grey-1;
+}
+
+.section__h {
+  font-weight: normal;
+  margin-top: 0;
 }

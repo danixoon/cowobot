@@ -8,18 +8,29 @@ export const ActionTypes = {
   USER_LOGIN_SUCCESS: "USER_LOGIN_SUCCESS" as const,
   USER_LOGIN_ERROR: "USER_LOGIN_ERROR" as const,
   USER_LOGOUT: "USER_LOGOUT" as const,
+
+  // Получение известных сервисов
   SERVICE_FETCH: "SERVICE_FETCH" as const,
   SERVICE_FETCH_SUCCESS: "SERVICE_FETCH_SUCCESS" as const,
   SERVICE_FETCH_ERROR: "SERVICE_FETCH_ERROR" as const,
+
+  // Выбор сервиса на дереве
   SERVICE_SELECT: "SERVICE_SELECT" as const,
 
-  SERVICE_CONFIG_FETCH: "SERVICE_CONFIG_FETCH" as const,
-  SERVICE_CONFIG_FETCH_SUCCESS: "SERVICE_CONFIG_FETCH_SUCCESS" as const,
-  SERVICE_CONFIG_FETCH_ERROR: "SERVICE_CONFIG_FETCH_ERROR" as const,
+  // Получение конфигурации по идентификатору
+  CONFIG_FETCH: "CONFIG_FETCH" as const,
+  CONFIG_FETCH_SUCCESS: "CONFIG_FETCH_SUCCESS" as const,
+  CONFIG_FETCH_ERROR: "CONFIG_FETCH_ERROR" as const,
 
-  SERVICE_CONFIGS_FETCH: "SERVICE_CONFIGS_FETCH" as const,
-  SERVICE_CONFIGS_FETCH_SUCCESS: "SERVICE_CONFIGS_FETCH_SUCCESS" as const,
-  SERVICE_CONFIGS_FETCH_ERROR: "SERVICE_CONFIGS_FETCH_ERROR" as const,
+  // Создание конфигурации для сервиса
+  CONFIG_CREATE: "CONFIG_FETCH" as const,
+  CONFIG_CREATE_SUCCESS: "CONFIG_CREATE_SUCCESS" as const,
+  CONFIG_CREATE_ERROR: "CONFIG_CREATE_ERROR" as const,
+
+  // // Получение идентификаторов известных конфигураций
+  // CONFIG_IDS_FETCH: "CONFIG_IDS_FETCH" as const,
+  // CONFIG_IDS_FETCH_SUCCESS: "CONFIG_IDS_FETCH_SUCCESS" as const,
+  // CONFIG_IDS_FETCH_ERROR: "CONFIG_IDS_FETCH_ERROR" as const,
 
   TEST_HELLO: "TEST_HELLO" as const,
 };
@@ -45,17 +56,18 @@ export type UserState = StateSchema<{
 
 export type ServiceState = StateSchema<{
   services: {
-    id: string;
+    id: number;
     name: string;
   }[];
 
-  selectedService: null | {
-    id: string;
+  selectedServiceConfig: null | {
+    configId: number;
+    serviceId: number;
     // Варианты событий (ревью не ревью)
-    notices: { id: string; name: string }[];
+    actions: { id: number; name: string }[];
     variables: {
-      name: string;
-      defaultValue: string;
+      customKey: string | null;
+      defaultKey: string;
       isTarget: boolean;
     }[];
   };

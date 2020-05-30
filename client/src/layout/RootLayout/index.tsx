@@ -6,7 +6,7 @@ import DialogPopup from "../../components/DialogPopup";
 import Form from "../../components/Form";
 import AuthPopupContainer from "../../containers/AuthPopupContainer";
 import ServicesTreeContainer from "../../containers/ServicesTreeContainer";
-import ServiceNoticeContainer from "../../containers/ServiceNoticeContainer";
+import ServiceNoticeContainer from "../../containers/ServiceConfigContainer";
 
 export interface RootLayoutProps {
   isAuth: boolean;

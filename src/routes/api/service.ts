@@ -15,7 +15,7 @@ import { getClient } from "../../db";
 const router = express.Router();
 
 router.get(
-  "/service",
+  "/services",
   access.auth,
   async (
     req: SessionRequest,
@@ -99,7 +99,13 @@ router.get(
     );
 
     return res.send(
-      createResponse({ variables: variables.rows, actions: actions.rows })
+      createResponse({
+        variables: variables.rows.map((v) => ({
+          ...v,
+          isTarget: v.type === "messenger",
+        })),
+        actions: actions.rows,
+      })
     );
   }
 );

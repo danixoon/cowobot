@@ -6,78 +6,93 @@ import {
   fork,
   race,
   all,
+  select,
+  cancel,
 } from "redux-saga/effects";
-import { ActionTypes, ActionType, Action, Actions } from "../types";
+import { ActionTypes, ActionType, Action, Actions, RootState } from "../types";
 import * as api from "../../api/service";
 import {
   serviceFetchError,
   serviceFetchSuccess,
-  serviceConfigsFetchSuccess,
-  serviceConfigFetchSuccess,
+  // configIdsFetchSuccess,
+  configFetchSuccess,
+  // configIdsFetch,
+  configFetch,
+  serviceFetch,
+  // configIdsFetchError,
 } from "../actions/service";
 
 function* fetchServices() {
-  const { data } = yield call(api.servicesFetch);
-  yield put(serviceFetchSuccess(data));
-}
-
-function* fetchServiceConfig(configId: string) {
-  // yield
-  const { data } = yield call(api.serviceConfigFetch, configId);
-  yield put(serviceConfigFetchSuccess({ ...data, configId }));
-}
-
-function* fetchServiceConfigs(serviceId: string) {
-  const { data } = yield call(api.serviceConfigsFetch, serviceId);
-  yield put(serviceConfigsFetchSuccess(data));
-}
-
-function* watchServiceFetch() {
-  while (true) {
-    try {
-      yield call(fetchServices);
-    } catch (error) {
-      yield put(serviceFetchError(error.response.data.error));
-    }
-
-    yield take(ActionTypes.SERVICE_FETCH);
+  try {
+    const { data } = yield call(api.servicesFetch);
+    yield put(serviceFetchSuccess(data));
+  } catch (error) {
+    yield put(serviceFetchError(error.response.data.error));
   }
 }
 
-// Обрабатывает выбор сервиса и выводит конфигурацию оповещений
-function* watchServiceSelect() {
-  while (true) {
-    // Сервис выбран
-    const {
-      payload: { serviceId },
-    } = (yield take(ActionTypes.SERVICE_SELECT)) as Action<
-      typeof ActionTypes.SERVICE_SELECT
-    >;
-
-    yield fork(fetchServiceConfigs, serviceId);
-
-    const { payload } = (yield take(
-      ActionTypes.SERVICE_CONFIGS_FETCH_SUCCESS
-    )) as Action<typeof ActionTypes.SERVICE_CONFIGS_FETCH_SUCCESS>;
-    if (payload.length === 0) continue;
-
-    const configId = payload[0].id;
-
-    try {
-      yield call(fetchServiceConfig, configId);
-    } catch (error) {
-      yield put(serviceFetchError(error.response.data.error));
-    }
+function* fetchServiceConfig(serviceId: number, configId: number) {
+  try {
+    const { data } = yield call(api.configFetch, configId);
+    yield put(configFetchSuccess({ ...data, configId, serviceId }));
+  } catch (error) {
+    yield put(serviceFetchError(error.response.data.error));
   }
+}
+
+// function* fetchConfigIds(serviceId: number) {
+//   yield put(configIdsFetch(serviceId));
+//   try {
+//     const { data } = yield call(api.configIdsFetch, serviceId);
+//     yield put(configIdsFetchSuccess(data));
+//   } catch (error) {
+//     yield put(configIdsFetchError(error.response.data.error));
+//   }
+// }
+
+// Обрабтка логики
+
+function* serviceSelectFlow(action: Action<typeof ActionTypes.SERVICE_SELECT>) {
+  const { serviceId } = action.payload;
+  const selectedServiceId = yield select(
+    (state: RootState) => state.service.data.selectedServiceConfig?.serviceId
+  );
+
+  // Если выбранный id сервиса не поменялся - ничего не делаем
+  if (selectedServiceId === serviceId) return;
+
+  // Запускаем получение идентификаторов конфига
+  const response = yield call(api.configIdsFetch, serviceId);
+  let configId = response.data[0]?.id;
+
+  // Если не пришло конфигураций - переключаем поведение на создание конфигурации
+  if (typeof configId !== "number")
+    configId = yield call(createServiceFlow, serviceId);
+
+  yield call(fetchServiceConfig, serviceId, configId);
+}
+
+function* createServiceFlow(serviceId: number) {
+  take();
 }
 
 export default function* serviceFlow() {
   while (true) {
     yield take(ActionTypes.USER_LOGIN_SUCCESS);
-    const { logout } = yield race({
-      watchers: race([call(watchServiceFetch), call(watchServiceSelect)]),
-      logout: take(ActionTypes.USER_LOGOUT),
-    });
-    if (!logout) console.error("saga terminated");
+
+    const fetchServicesTask = yield takeLatest(
+      ActionTypes.SERVICE_FETCH,
+      fetchServices
+    );
+    const serviceSelectTask = yield takeLatest(
+      ActionTypes.SERVICE_SELECT,
+      serviceSelectFlow
+    );
+
+    yield put(serviceFetch());
+
+    yield take(ActionTypes.USER_LOGOUT);
+
+    yield cancel([fetchServicesTask, serviceSelectTask]);
   }
 }

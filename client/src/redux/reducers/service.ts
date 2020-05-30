@@ -5,7 +5,7 @@ import avatarUrl from "../../images/avatar.png";
 const defaultState: () => ServiceState = () => ({
   status: "idle",
   error: null,
-  data: { selectedService: null, services: [] },
+  data: { selectedServiceConfig: null, services: [] },
 });
 
 export const serviceReducer: Reducer<ServiceState, Actions> = (
@@ -20,17 +20,26 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
         ...state,
         status: "success",
         data: {
-          selectedService: null,
+          selectedServiceConfig: null,
           services: action.payload.services,
         },
       };
-    case ActionTypes.SERVICE_CONFIG_FETCH_SUCCESS:
+    case ActionTypes.CONFIG_FETCH:
+      return { ...state, data: { ...state.data, selectedServiceConfig: null } };
+    case ActionTypes.CONFIG_FETCH_SUCCESS:
       return {
         ...state,
         data: {
           ...state.data,
-          // TODO
-          selectedService: { ...action.payload, id: action.payload.configId },
+          selectedServiceConfig: {
+            ...action.payload,
+            variables: action.payload.variables.map((v) => ({
+              customKey: v.custom_key,
+              defaultKey: v.default_key,
+              isTarget: v.isTarget,
+            })),
+            configId: action.payload.configId,
+          },
         },
       };
     default:
