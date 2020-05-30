@@ -1,0 +1,17 @@
+@import "../../sass/theme.scss";
+
+.label__container {
+  position: relative;
+  display: inline-block;
+
+  @include margin-default();
+}
+
+.label__text {
+  @include font-default($font-color-light);
+
+  display: block;
+
+  margin-bottom: 0.1rem;
+  padding-left: 0.25rem;
+}

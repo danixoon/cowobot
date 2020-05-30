@@ -2,6 +2,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import Input from ".";
 import { useInput } from "../../hooks/useInput";
+import Label from "../Label";
 
 storiesOf("Components/Input", module)
   .add("simple", () => <Input name="simple" input={{}} placeholder="текст" />)
@@ -33,13 +34,14 @@ storiesOf("Components/Input", module)
   .add("with label", () => {
     // const [input, bind, setInput] = useInput({});
     return (
-      <Input
-        name="revieverName"
-        input={{}}
-        defaultValue="BB_PR_REVIEWER"
-        placeholder="текст"
-        label="Имя ревьювера"
-      />
+      <Label text="Лейбл">
+        <Input
+          name="revieverName"
+          input={{}}
+          defaultValue="BB_PR_REVIEWER"
+          placeholder="текст"
+        />
+      </Label>
     );
   })
   .add("with dropdown", () => {
@@ -55,7 +57,6 @@ storiesOf("Components/Input", module)
         isResetable
         isDropdown
         dropdownItems={["Привет", "Пока", "Призрак"]}
-        label="Выпадающий список"
       />
     );
   });

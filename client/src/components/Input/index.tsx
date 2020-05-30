@@ -7,7 +7,6 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   isResetable?: boolean;
   isDropdown?: boolean;
   dropdownItems?: string[];
-  label?: string;
   setInput?: (input: any) => void;
 
   input: any;
@@ -24,7 +23,6 @@ const Input: React.FC<InputProps> = (props) => {
     name,
     isDropdown,
     dropdownItems,
-    label,
     defaultValue = "",
     value,
     ...rest
@@ -48,46 +46,43 @@ const Input: React.FC<InputProps> = (props) => {
   };
 
   return (
-    <span className="input__container">
-      {label && <label className="input__label">{label}</label>}
-      <div className="input__element-container">
-        <input
-          {...rest}
-          onFocus={() => handleInputFocus(true)}
-          onBlur={() => handleInputFocus(false)}
-          onChange={onChange}
-          value={nextValue}
-          name={name}
-          autoComplete={isDropdown ? "off" : undefined}
-          className={
-            "input__element" +
-            (isResetable ? "_reset" : "") +
-            (isDropdown ? " input__element_dropdown" : "")
-          }
+    <div className="input__element-container">
+      <input
+        {...rest}
+        onFocus={() => handleInputFocus(true)}
+        onBlur={() => handleInputFocus(false)}
+        onChange={onChange}
+        value={nextValue}
+        name={name}
+        autoComplete={isDropdown ? "off" : undefined}
+        className={
+          "input__element" +
+          (isResetable ? "_reset" : "") +
+          (isDropdown ? " input__element_dropdown" : "")
+        }
+      />
+      {isDropdown && (
+        <DropdownPopup
+          opened={state.dropdownOpened}
+          filter={inputValue?.toString() || ""}
+          items={dropdownItems || []}
+          onSelect={(item) => {
+            setInput && setInput({ ...input, [name]: item });
+          }}
         />
-        {isDropdown && (
-          <DropdownPopup
-            opened={state.dropdownOpened}
-            filter={inputValue?.toString() || ""}
-            items={dropdownItems || []}
-            onSelect={(item) => {
-              setInput && setInput({ ...input, [name]: item });
-            }}
-          />
-        )}
-        {isResetable && (
-          <span
-            onClick={() =>
-              setInput &&
-              setInput({ ...input, [name]: defaultValue?.toString() || "" })
-            }
-            className="input__reset"
-          >
-            <img src={resetIcon} />
-          </span>
-        )}
-      </div>
-    </span>
+      )}
+      {isResetable && (
+        <span
+          onClick={() =>
+            setInput &&
+            setInput({ ...input, [name]: defaultValue?.toString() || "" })
+          }
+          className="input__reset"
+        >
+          <img src={resetIcon} />
+        </span>
+      )}
+    </div>
   );
 };
 

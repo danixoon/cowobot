@@ -8,6 +8,7 @@ import Form from "../../components/Form";
 import Section from "../../components/Section";
 import Button from "../../components/Button";
 import { DataStatus } from "../../redux/types";
+import Label from "../../components/Label";
 
 export type AuthPopupProps = React.HTMLAttributes<HTMLDivElement> & {
   isAuth: boolean;
@@ -33,22 +34,24 @@ const AuthPopup: React.FC<AuthPopupProps> = (props) => {
     <DialogPopup opened={!isAuth}>
       <Section textAlign="center" header="Войдите в аккаунт">
         <Form onSubmit={handleOnSubmit} style={{ padding: "0 2rem" }}>
-          <Input
-            label="Имя пользователя"
-            name="username"
-            type="username"
-            {...bind}
-            input={input}
-            setInput={setInput}
-          />
-          <Input
-            label="Пароль"
-            name="password"
-            type="password"
-            {...bind}
-            input={input}
-            setInput={setInput}
-          />
+          <Label text="Имя пользователя">
+            <Input
+              name="username"
+              type="username"
+              {...bind}
+              input={input}
+              setInput={setInput}
+            />
+          </Label>
+          <Label text="Пароль">
+            <Input
+              name="password"
+              type="password"
+              {...bind}
+              input={input}
+              setInput={setInput}
+            />
+          </Label>
           <Button
             disabled={status === "loading"}
             type="submit"

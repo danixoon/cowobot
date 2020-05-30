@@ -8,6 +8,7 @@ import Button from "../../components/Button";
 import Layout from "../../components/Layout";
 import Input from "../../components/Input";
 import { useInput } from "../../hooks/useInput";
+import Label from "../../components/Label";
 
 export type ServiceConfigProps = {
   config: null | {
@@ -52,19 +53,25 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
           <Layout style={{ height: "100%" }} direction="column">
             <Section header="Переменные">
               <Layout direction="column">
-                {/* <Dropdown items={config.actions.map((v) => v.name)} /> */}
                 {config.variables.map((v) => (
-                  <Input
-                    key={v.id}
-                    input={changes}
-                    setInput={setChanges}
-                    {...bind}
-                    label={v.name}
-                    isResetable={true}
-                    name={v.id.toString()}
-                    defaultValue={v.defaultKey}
-                  />
+                  <Label key={v.id} text={v.name}>
+                    <Input
+                      input={changes}
+                      setInput={setChanges}
+                      {...bind}
+                      isResetable={true}
+                      name={v.id.toString()}
+                      defaultValue={v.defaultKey}
+                    />
+                  </Label>
                 ))}
+              </Layout>
+            </Section>
+            <Section header="Рассылки">
+              <Layout direction="row">
+                <Label text="Действие">
+                  <Dropdown items={config.actions.map((v) => v.name)} />
+                </Label>
               </Layout>
             </Section>
             <Section style={{ marginTop: "auto" }} header="Действия">

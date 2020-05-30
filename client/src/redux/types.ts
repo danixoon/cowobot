@@ -74,7 +74,7 @@ export type ServiceState = {
     actions: { id: number; name: string }[];
     variables: {
       id: number;
-      name: string;
+      name: string; 
       customKey: string | null;
       defaultKey: string;
       isTarget: boolean;
