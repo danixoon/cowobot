@@ -57,6 +57,13 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
                     defaultKey: v.default_key,
                     isTarget: v.isTarget,
                   })),
+                  notices: action.payload.config.notices.map((v) => ({
+                    actionId: v.action_id,
+                    messageTemplate: v.message_template,
+                    id: v.id,
+                    // id переменной назначения сообщения
+                    variableId: v.variable_id,
+                  })),
                   configId: action.payload.config.configId,
                 }
               : null,

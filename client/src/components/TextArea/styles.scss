@@ -3,6 +3,7 @@
 .editor {
   @include border-default();
   overflow: visible !important;
+  background-color: $color-secondary;
 }
 
 .editor__text-area {

@@ -3,5 +3,10 @@ import React from "react";
 import Dropdown from ".";
 
 storiesOf("Components/Dropdown", module).add("simple", () => (
-  <Dropdown items={["Ревью PR", "item2", "КОШКОДЕВоЧКА"]} />
+  <Dropdown
+    items={["Ревью PR", "item2", "КОШКОДЕВоЧКА"].map((v, i) => ({
+      id: i,
+      name: v,
+    }))}
+  />
 ));

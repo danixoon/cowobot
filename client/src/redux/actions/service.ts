@@ -56,6 +56,12 @@ export const configFetchSuccess = (data: {
       type: string;
       isTarget: boolean;
     }[];
+    notices: {
+      id: number;
+      message_template: string;
+      action_id: number;
+      variable_id: number;
+    }[];
     actions: { id: number; name: string }[];
     configId: number;
   };

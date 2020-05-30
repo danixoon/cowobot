@@ -1,12 +1,5 @@
 @import "../../sass/theme.scss";
 
-.input__container {
-  position: relative;
-  display: inline-block;
-
-  @include margin-default();
-}
-
 .input__element-container {
   position: relative;
 }
@@ -38,14 +31,6 @@
 .input__element_reset {
   @extend .input__element;
   padding-right: 1.75rem;
-}
-
-.input__label {
-  @include font-default($font-color-light);
-
-  display: block;
-
-  margin-bottom: 0.1rem;
 }
 
 .input__reset {

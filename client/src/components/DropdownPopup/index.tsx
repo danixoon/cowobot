@@ -2,11 +2,11 @@ import * as React from "react";
 import "./styles.scss";
 
 interface DropdownPopupProps {
-  items: string[];
+  items: { id: number; name: string }[];
   filter: string;
   opened?: boolean;
   focusOpen?: boolean;
-  onSelect: (item: string) => void;
+  onSelect: (id: number) => void;
 }
 
 export const DropdownPopup: React.FC<DropdownPopupProps> = ({
@@ -17,12 +17,14 @@ export const DropdownPopup: React.FC<DropdownPopupProps> = ({
 }) => {
   const sortedItems = items
     .filter((v) =>
-      filter === "" ? true : v.toLowerCase().startsWith(filter.toLowerCase())
+      filter === ""
+        ? true
+        : v.name.toLowerCase().startsWith(filter.toLowerCase())
     )
     .sort();
 
-  const handleSelect = (item: string) => {
-    onSelect(item);
+  const handleSelect = (id: number) => {
+    onSelect(id);
   };
 
   return (
@@ -35,15 +37,15 @@ export const DropdownPopup: React.FC<DropdownPopupProps> = ({
           return (
             <div
               onMouseDown={(e) => {
-                handleSelect(item);
+                handleSelect(item.id);
               }}
-              key={item}
+              key={item.id}
               className="dropdown-popup__item"
             >
-              {filtered ? item.substring(0, filter.length) : item}
+              {filtered ? item.name.substring(0, filter.length) : item.name}
               {filtered && (
                 <span className="col_muted">
-                  {item.substring(filter.length)}
+                  {item.name.substring(filter.length)}
                 </span>
               )}
             </div>

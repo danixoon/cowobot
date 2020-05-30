@@ -5,25 +5,30 @@ import reactStringReplace from "react-string-replace";
 import "./styles.scss";
 import DropdownPopup from "../DropdownPopup";
 
-interface TextAreaProps
-  extends React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>> {
+export type TextAreaProps = React.PropsWithChildren<
+  React.HTMLAttributes<HTMLDivElement>
+> & {
   value: string;
-}
+  variables: { id: number; name: string }[];
+  onInputChange?: (value: string) => void;
+};
 
 interface TextVariableProps {
   value: string;
-  onChange: (value: string) => void;
+  items: { id: number; name: string }[];
+  onChange: (id: number) => void;
 }
 const TextVariable: React.FC<TextVariableProps> = ({
   value,
+  items,
   onChange,
   ...rest
 }) => {
   const [opened, setOpened] = React.useState(() => false);
 
-  const handleOnSelect = (value: string) => {
+  const handleOnSelect = (id: number) => {
     setOpened(false);
-    onChange(value);
+    onChange(id);
   };
 
   return (
@@ -39,14 +44,14 @@ const TextVariable: React.FC<TextVariableProps> = ({
         opened={opened}
         filter={""}
         onSelect={handleOnSelect}
-        items={["BB_PR_REQUEST", "BB_PR_OWO"]}
+        items={items}
       />
     </span>
   );
 };
 
 const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
-  const { children, value } = props;
+  const { children, onInputChange, variables, value, ...rest } = props;
 
   const [input, setInput] = React.useState(() => value);
   const [edit, setEdit] = React.useState(() => false);
@@ -75,7 +80,12 @@ const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
             {"${"}
             {reactStringReplace(match, /(.+)/, (match, i) => (
               <TextVariable
-                onChange={(value) => handleVariableSelect(match, value, offset)}
+                onChange={(id) => {
+                  const variable = variables.find((v) => v.id === id);
+                  if (variable)
+                    handleVariableSelect(match, variable.name, offset);
+                }}
+                items={variables}
                 value={match}
                 key={i}
               />
@@ -90,6 +100,8 @@ const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
 
   return (
     <Editor
+      // style={{ height: "4rem" }}
+      style={rest.style}
       padding="0.25rem"
       className="editor"
       textareaId="editor__text-area"
@@ -98,6 +110,7 @@ const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
       highlight={formatContent}
       onValueChange={(value) => {
         setInput(value);
+        if (onInputChange) onInputChange(value);
       }}
       value={input || ""}
     />

@@ -3,7 +3,10 @@ import React from "react";
 import DropdownPopup from ".";
 import { useInput } from "../../hooks/useInput";
 
-const items = ["aabbcc", "aaaacc", "aabbcd"];
+const items = ["aabbcc", "aaaacc", "aabbcd"].map((v, i) => ({
+  id: i,
+  name: v,
+}));
 
 storiesOf("Components/DropdownPopup", module)
   .add("opened", () => (

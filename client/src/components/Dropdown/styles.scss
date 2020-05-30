@@ -25,6 +25,9 @@
   @include effect-hover();
   border-radius: 5px;
 
+  text-overflow: ellipsis;
+  overflow: hidden;
+
   cursor: pointer;
 
   outline: none;
@@ -32,9 +35,12 @@
   background-color: $color-light-0;
 
   padding: 0.1rem 0.3rem;
+  padding-right: 1.5rem;
   &::after {
     content: url("../../icons/wideArrow.svg");
-    float: right;
+    position: absolute;
+    right: 0.25rem;
+    top: 0.1rem;
 
     transition: transform 0.15s ease-in-out;
   }
@@ -60,6 +66,7 @@
 
   visibility: hidden;
   opacity: 0;
+  z-index: 1;
 
   width: 100%;
   transition: opacity 0.2s ease-in-out;

@@ -1,7 +1,9 @@
 import * as actionCreators from "./actions";
 import { ApiError } from "../api";
 
-export const mapState = (mapper: (state: RootState) => any) => mapper;
+export type ArrayElement<
+  ArrayType extends readonly unknown[]
+> = ArrayType[number];
 
 export const ActionTypes = {
   USER_LOGIN: "USER_LOGIN" as const,
@@ -74,10 +76,16 @@ export type ServiceState = {
     actions: { id: number; name: string }[];
     variables: {
       id: number;
-      name: string; 
+      name: string;
       customKey: string | null;
       defaultKey: string;
       isTarget: boolean;
+    }[];
+    notices: {
+      id: number;
+      messageTemplate: string;
+      actionId: number;
+      variableId: number;
     }[];
   }>;
 };
