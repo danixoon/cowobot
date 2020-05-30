@@ -3,6 +3,7 @@ import { ActionTypes, Actions, UserState, ServiceState } from "../types";
 import avatarUrl from "../../images/avatar.png";
 
 const defaultState: () => ServiceState = () => ({
+  serviceId: null,
   services: {
     status: "idle",
     error: null,
@@ -36,18 +37,20 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
     case ActionTypes.CONFIG_FETCH_SUCCESS:
       return {
         ...state,
+        serviceId: action.payload?.serviceId ?? null,
         config: {
           ...state.config,
+          status: "success",
           data:
-            action.payload !== null
+            action.payload.config !== null
               ? {
-                  ...action.payload,
-                  variables: action.payload.variables.map((v) => ({
+                  ...action.payload.config,
+                  variables: action.payload.config.variables.map((v) => ({
                     customKey: v.custom_key,
                     defaultKey: v.default_key,
                     isTarget: v.isTarget,
                   })),
-                  configId: action.payload.configId,
+                  configId: action.payload.config.configId,
                 }
               : null,
         },

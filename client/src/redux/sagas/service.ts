@@ -55,7 +55,7 @@ function* fetchServiceConfig(serviceId: number, configId: number) {
 function* serviceSelectFlow(action: Action<typeof ActionTypes.SERVICE_SELECT>) {
   const { serviceId } = action.payload;
   const selectedServiceId = yield select(
-    (state: RootState) => state.service.config.data?.serviceId
+    (state: RootState) => state.service?.serviceId
   );
 
   // Если выбранный id сервиса не поменялся - ничего не делаем
@@ -66,7 +66,8 @@ function* serviceSelectFlow(action: Action<typeof ActionTypes.SERVICE_SELECT>) {
   let configId = response.data[0]?.id;
 
   // Если не пришло конфигураций - переключаем поведение на создание конфигурации
-  if (typeof configId !== "number") yield put(configFetchSuccess(null));
+  if (typeof configId !== "number")
+    yield put(configFetchSuccess({ config: null, serviceId }));
   else yield call(fetchServiceConfig, serviceId, configId);
 }
 

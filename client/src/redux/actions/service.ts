@@ -45,8 +45,9 @@ export const configFetch = (configId: number) => ({
   payload: { configId },
 });
 
-export const configFetchSuccess = (
-  data: null | {
+export const configFetchSuccess = (data: {
+  serviceId: number;
+  config: null | {
     variables: {
       custom_key: string | null;
       default_key: string;
@@ -55,9 +56,8 @@ export const configFetchSuccess = (
     }[];
     actions: { id: number; name: string }[];
     configId: number;
-    serviceId: number;
-  }
-) => ({
+  };
+}) => ({
   type: ActionTypes.CONFIG_FETCH_SUCCESS,
   payload: data,
 });

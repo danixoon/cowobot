@@ -7,7 +7,7 @@ import { serviceSelect } from "../redux/actions";
 
 const mapStateToProps = (state: RootState) => ({
   services: state.service.services.data ?? [],
-  selectedServiceId: state.service.config.data?.serviceId ?? null,
+  selectedServiceId: state.service.serviceId,
 });
 const mapDispatchToProps = {
   onServiceSelect: serviceSelect,

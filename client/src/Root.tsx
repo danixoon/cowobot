@@ -8,6 +8,8 @@ import PopupLayoutProvider from "./providers/PopupLayoutProvider";
 import { RootState } from "./redux/types";
 import RootContainer from "./containers/RootContainer";
 
+import "./sass/default.scss";
+
 export type RootContainerProps = {};
 
 const Root: React.FC<RootContainerProps> = (props) => (

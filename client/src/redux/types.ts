@@ -55,6 +55,7 @@ export type UserState = StateSchema<{
 }>;
 
 export type ServiceState = {
+  serviceId: number | null;
   services: StateSchema<
     {
       id: number;
@@ -63,7 +64,7 @@ export type ServiceState = {
   >;
   config: StateSchema<{
     configId: number;
-    serviceId: number;
+
     // Варианты событий (ревью не ревью)
     actions: { id: number; name: string }[];
     variables: {
