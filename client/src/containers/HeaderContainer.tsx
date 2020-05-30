@@ -8,7 +8,7 @@ import HeaderPanel, { HeaderPanelProps } from "../layout/HeaderPanel";
 import { userLogout } from "../redux/actions";
 
 const mapStateToProps = (state: RootState) => ({
-  user: state.user.data,
+  user: state.user.data ?? { username: "" },
 });
 const mapDispatchToProps = {
   logout: userLogout,

@@ -4,7 +4,7 @@ import ControlPanel from "../../components/ControlPanel";
 import AccountPanel from "../../components/AccountPanel";
 
 export interface HeaderPanelProps {
-  user: { username: string; avatarUrl: string };
+  user: { username: string };
   logout: () => void;
 }
 
@@ -17,7 +17,7 @@ const HeaderPanel: React.FC<HeaderPanelProps> = (props) => {
         logout={logout}
         style={{ width: "220px" }}
         username={user.username}
-        avatarUrl={user.avatarUrl}
+        avatarUrl={""}
       />
     </Layout>
   );

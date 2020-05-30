@@ -3,9 +3,9 @@ import { ActionTypes, Actions, UserState } from "../types";
 import avatarUrl from "../../images/avatar.png";
 
 const defaultState: () => UserState = () => ({
-  data: { avatarUrl, username: "", token: null },
   status: window.localStorage.getItem("token") ? "success" : "idle",
   error: null,
+  data: { token: null, username: "" },
 });
 
 export const userReducer: Reducer<UserState, Actions> = (
@@ -22,10 +22,7 @@ export const userReducer: Reducer<UserState, Actions> = (
         ...state,
         error: null,
         status: "success",
-        data: {
-          ...state.data,
-          ...action.payload,
-        },
+        data: action.payload,
       };
     case ActionTypes.USER_LOGOUT_SUCCESS:
       return defaultState();

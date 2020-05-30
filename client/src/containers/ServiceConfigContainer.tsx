@@ -4,9 +4,9 @@ import { connect } from "react-redux";
 import ServiceConfig, { ServiceConfigProps } from "../layout/ServiceConfig";
 
 const mapStateToProps = (state: RootState): ServiceConfigProps => ({
-  actions: state.service.data.selectedServiceConfig?.actions ?? [],
-  variables: state.service.data.selectedServiceConfig?.variables ?? [],
-  status: state.service.data.selectedServiceConfig ? "success" : "idle",
+  actions: state.service.config.data?.actions ?? [],
+  variables: state.service.config.data?.variables ?? [],
+  status: state.service.config.status,
 });
 const mapDispatchToProps = {};
 

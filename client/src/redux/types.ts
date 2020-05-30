@@ -44,24 +44,24 @@ export type Actions = ReturnType<
 
 export type Action<T extends ActionType> = Extract<Actions, { type: T }>;
 export type StateSchema<T> = {
-  data: T;
   status: DataStatus;
   error: ApiError | null;
+  data: T | null;
 };
 
 export type UserState = StateSchema<{
   username: string;
-  avatarUrl: string;
   token: string | null;
 }>;
 
-export type ServiceState = StateSchema<{
-  services: {
-    id: number;
-    name: string;
-  }[];
-
-  selectedServiceConfig: null | {
+export type ServiceState = {
+  services: StateSchema<
+    {
+      id: number;
+      name: string;
+    }[]
+  >;
+  config: StateSchema<{
     configId: number;
     serviceId: number;
     // Варианты событий (ревью не ревью)
@@ -71,8 +71,8 @@ export type ServiceState = StateSchema<{
       defaultKey: string;
       isTarget: boolean;
     }[];
-  };
-}>;
+  }>;
+};
 
 export interface TestState {
   message: string;

@@ -45,17 +45,19 @@ export const configFetch = (configId: number) => ({
   payload: { configId },
 });
 
-export const configFetchSuccess = (data: {
-  variables: {
-    custom_key: string | null;
-    default_key: string;
-    type: string;
-    isTarget: boolean;
-  }[];
-  actions: { id: number; name: string }[];
-  configId: number;
-  serviceId: number;
-}) => ({
+export const configFetchSuccess = (
+  data: null | {
+    variables: {
+      custom_key: string | null;
+      default_key: string;
+      type: string;
+      isTarget: boolean;
+    }[];
+    actions: { id: number; name: string }[];
+    configId: number;
+    serviceId: number;
+  }
+) => ({
   type: ActionTypes.CONFIG_FETCH_SUCCESS,
   payload: data,
 });
