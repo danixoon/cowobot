@@ -2,7 +2,12 @@ import * as React from "react";
 import { RootState } from "../redux/types";
 import { connect } from "react-redux";
 import ServiceConfig, { ServiceConfigProps } from "../layout/ServiceConfig";
-import { configCreate, configDelete } from "../redux/actions";
+import {
+  configCreate,
+  configDelete,
+  configSaveSuccess,
+  configSave,
+} from "../redux/actions";
 
 const mapStateToProps = (state: RootState) => ({
   config: state.service.config.data,
@@ -15,6 +20,7 @@ const mapStateToProps = (state: RootState) => ({
 const mapDispatchToProps = {
   createConfig: configCreate,
   deleteConfig: configDelete,
+  saveConfig: configSave,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ServiceConfig);

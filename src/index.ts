@@ -1,5 +1,6 @@
 import * as express from "express";
 import * as path from "path";
+import * as bodyParser from "body-parser";
 import * as pg from "pg";
 import { loadConfig, getEnv, nodeEnvType } from "./config";
 
@@ -42,6 +43,7 @@ const init = async () => {
     app.use("/*", express.static(path.resolve(__dirname, "../client/build")));
   }
 
+  app.use(bodyParser.json());
   app.use(apiRouter);
   app.use(errorRequestHandler);
 

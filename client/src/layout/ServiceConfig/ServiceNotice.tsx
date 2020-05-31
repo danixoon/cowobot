@@ -6,20 +6,18 @@ import Dropdown from "../../components/Dropdown";
 import Button from "../../components/Button";
 import TextArea from "../../components/TextArea";
 
-export type Notice = ArrayElement<
-  NonNullable<ServiceConfigProps["config"]>["notices"]
->;
-export type UnsavedNotice = Omit<Notice, "noticeId"> & {
-  noticeId: number | null;
-  localId: string;
-};
+export interface Notice extends ApiResponseData.Service.Notice {
+  noticeId: number;
+  localId: string | null;
+  modified: null | "delete" | "update" | "create";
+}
 
 const ServiceNotice: React.FC<{
-  notice: Notice | UnsavedNotice;
+  notice: Notice;
   actions: NonNullable<ServiceConfigProps["config"]>["actions"];
   variables: NonNullable<ServiceConfigProps["config"]>["variables"];
-  onDelete: (notice: Notice | UnsavedNotice) => void;
-  onChange: (changes: Partial<Notice | UnsavedNotice>) => void;
+  onDelete: (notice: Notice) => void;
+  onChange: (changes: Partial<Notice>) => void;
 }> = ({ notice, actions, variables, onDelete, onChange }) => {
   const [updatedNotice, updateNotice] = React.useState<Partial<typeof notice>>(
     () => ({})

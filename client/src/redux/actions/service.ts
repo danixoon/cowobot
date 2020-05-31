@@ -96,7 +96,17 @@ export const configDeleteError = (error: ApiError) => ({
   payload: error,
 });
 
-export const configSave = (changes: any) => ({
+export const configSave = (data: ApiRequestData.PUT["/service/config"]) => ({
   type: ActionTypes.CONFIG_SAVE,
-  payload: changes,
+  payload: data,
+});
+
+export const configSaveSuccess = () => ({
+  type: ActionTypes.CONFIG_SAVE_SUCCESS,
+  payload: {},
+});
+
+export const configSaveError = (error: ApiError) => ({
+  type: ActionTypes.CONFIG_SAVE_ERROR,
+  payload: error,
 });

@@ -23,6 +23,8 @@ import {
   configCreateError,
   configDeleteSuccess,
   configDeleteError,
+  configSaveSuccess,
+  configSaveError,
   // configIdsFetchError,
 } from "../actions/service";
 
@@ -114,6 +116,17 @@ function* deleteConfig(
   }
 }
 
+// Создание конфигурации для сервиса для пользователя
+function* saveConfig(action: ActionMap.Action<typeof ActionTypes.CONFIG_SAVE>) {
+  const data = action.payload;
+  try {
+    yield call(api.configSave, data);
+    yield put(configSaveSuccess());
+  } catch (error) {
+    yield put(configSaveError(error.response?.data.error ?? error));
+  }
+}
+
 function* watchService() {}
 
 export default function* serviceFlow() {
@@ -125,9 +138,20 @@ export default function* serviceFlow() {
         yield call(createConfig, yield take(ActionTypes.CONFIG_CREATE));
     });
 
-    const configFetchTash = yield fork(function* () {
+    const configFetchTask = yield fork(function* () {
       while (true)
         yield call(fetchServiceConfig, yield take(ActionTypes.CONFIG_FETCH));
+    });
+
+    const configSaveTask = yield fork(function* () {
+      while (true) {
+        yield call(saveConfig, yield take(ActionTypes.CONFIG_SAVE));
+        const { configId, serviceId } = yield select((state: RootState) => ({
+          serviceId: state.service.serviceId,
+          configId: state.service.config.data?.configId,
+        }));
+        yield put(configFetch(configId, serviceId));
+      }
     });
 
     const fetchServicesTask = yield fork(function* () {
@@ -154,6 +178,8 @@ export default function* serviceFlow() {
     yield cancel([
       fetchServicesTask,
       serviceSelectTask,
+      configSaveTask,
+      configFetchTask,
       configCreateTask,
       configDeleteTask,
     ]);

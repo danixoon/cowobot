@@ -1,6 +1,11 @@
 import * as express from "express";
 
-import { query, validationResult, ValidationChain } from "express-validator";
+import {
+  query,
+  validationResult,
+  ValidationChain,
+  body,
+} from "express-validator";
 import {
   validator,
   createResponse,
@@ -8,6 +13,7 @@ import {
   createErrorData,
   createApiError,
   mapData,
+  mapKeyToColumn,
 } from "../../middleware";
 
 import { getClient } from "../../db";
@@ -79,11 +85,11 @@ router.get(
     const variables = await getClient(
       (client) =>
         client.query(`
-        SELECT "service_variable"."id" as "variable_id", "service_variable"."name", "service_configuration_variable"."custom_key", "service_variable"."default_key", "service_variable_role"."type" FROM "service_variable"
-        INNER JOIN "service_configuration" ON "service_configuration"."service_id"="service_variable"."service_id"
+        SELECT "service_configuration_variable"."id" as "variable_id", "service_variable"."name", "service_configuration_variable"."custom_key", "service_variable"."default_key", "service_variable_role"."type" FROM "service_configuration_variable"
+        INNER JOIN "service_variable" ON "service_variable"."id"="service_configuration_variable"."variable_id"
         INNER JOIN "service_variable_role" ON "service_variable_role"."id"="service_variable"."role_id"
-        LEFT JOIN "service_configuration_variable" ON "service_configuration_variable"."configuration_id"="service_configuration"."id"
-        WHERE "service_configuration"."account_id"='${userId}' AND "service_configuration"."id"='${configId}'`),
+        WHERE "service_configuration_variable"."configuration_id"='${configId}'
+        `),
       next
     );
 
@@ -120,6 +126,123 @@ router.get(
         notices: mapData(notices.rows),
       })
     );
+  }
+);
+
+router.put(
+  "/service/config",
+  access.auth,
+  access.configOwner,
+  [query("configId").exists(), body("changes").exists()],
+  validator,
+  async (
+    req: SessionRequest,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    const { changes, configId } = {
+      ...req.body,
+      configId: req.query.configId,
+    } as ApiRequestData.PUT["/service/config"];
+
+    const queries: string[] = [];
+
+    if (changes.variables) {
+      changes.variables.forEach((c) => {
+        if (c.customKey == null || c.variableId == null) return;
+        queries.push(
+          `UPDATE "service_configuration_variable" SET "custom_key"='${c.customKey}' WHERE "id"='${c.variableId}'`
+        );
+      });
+    }
+
+    if (changes.notices) {
+      let values = changes.notices
+        .filter((v) => v.modified === "delete")
+        .map((v) => `'${v.noticeId}'`) as any;
+
+      // Если не предан noticeId - баг
+      if (values.length !== 0)
+        queries.push(
+          `DELETE FROM "service_notification" WHERE "id" IN (${values})`
+        );
+
+      if (
+        changes.notices.find(
+          (c) =>
+            c.modified === "create" &&
+            ["actionId", "messageTemplate", "variableId"].find((p) => {
+              return (c as any)[p] == null;
+            })
+        )
+      )
+        return next(
+          createApiError({ message: `Invalid notice create values` })
+        );
+
+      const updateOrCreateNotices = changes.notices.filter(
+        (n) => n.modified === "create" || n.modified === "update"
+      );
+
+      if (updateOrCreateNotices.length > 0) {
+        const query = `
+        SELECT COUNT(*) AS "amount" FROM "service_variable_role"
+        INNER JOIN "service_variable" ON "service_variable"."role_id"="service_variable_role"."id"
+        WHERE "service_variable_role"."type"!='messenger' AND "service_variable"."id" IN (${updateOrCreateNotices
+          .map((v) => `'${v.variableId}'`)
+          .join()})
+    `;
+
+        const invalidVariables = await getClient(
+          (client) => client.query(query),
+          next
+        );
+
+        if (Number(invalidVariables.rows[0].amount) !== 0)
+          return next(
+            createApiError({
+              message: "Invalid variableId on some notices",
+            })
+          );
+      }
+
+      values = changes.notices
+        .filter((v) => v.modified === "create")
+        .map(
+          (v) =>
+            `('${v.actionId}', '${v.messageTemplate}', '${v.variableId}', '${configId}')`
+        );
+
+      if (values.length !== 0)
+        queries.push(
+          `INSERT INTO "service_notification" ("action_id", "message_template", "variable_id", "configuration_id") VALUES ${values.join()}`
+        );
+
+      changes.notices
+        .filter((v) => v.modified === "update")
+        .forEach((change) => {
+          const keys = Object.keys(change).filter((c) =>
+            ["messageTemplate", "variableId", "actionId"].includes(c)
+          );
+          if (keys.length !== 0)
+            queries.push(
+              `UPDATE "service_notification" SET ${keys
+                .map((v) => `"${mapKeyToColumn(v)}"='${(change as any)[v]}'`)
+                .join()}`
+            );
+        });
+    }
+
+    // res.send(queries);
+
+    const response = await getClient(
+      (client) => client.query(queries.join("; ")),
+      next
+    );
+
+    res.send();
+
+    // const insertQuery = `INSERT INTO variables`
   }
 );
 
@@ -184,6 +307,17 @@ router.post(
         (DEFAULT, NULL, NULL, '${userId}', '${serviceId}')
         RETURNING "id"
        `),
+      next
+    );
+
+    await getClient(
+      (client) =>
+        client.query(`
+        INSERT INTO "service_configuration_variable" ("configuration_id", "variable_id")
+        SELECT '${response.rows[0].id}', "service_variable"."id"
+        FROM "service_variable"
+        WHERE "service_variable"."service_id"='${serviceId}'
+    `),
       next
     );
 

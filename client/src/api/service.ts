@@ -49,3 +49,15 @@ export const configDelete = async (configId: number) => {
     })
   ).data as ApiMap.DELETE["/service/config"];
 };
+
+export const configSave = async (
+  data: ApiRequestData.PUT["/service/config"]
+) => {
+  const token = window.localStorage.getItem("token");
+  return (
+    await axios.put("/api/service/config", data, {
+      params: { configId: data.configId },
+      headers: token ? { Authorization: token } : undefined,
+    })
+  ).data;
+};

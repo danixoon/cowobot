@@ -4,8 +4,15 @@ import * as bcrypt from "bcrypt";
 
 import { check, validationResult, ValidationChain } from "express-validator";
 import { getEnv } from "../config";
+import { getClient } from "../db";
 
 const { SECRET } = getEnv("SECRET");
+
+export const mapKeyToColumn = (key: string) =>
+  key
+    .split("")
+    .map((v) => (v.toUpperCase() === v ? `_${v.toLowerCase()}` : v))
+    .join("");
 
 export const mapData = <T = any>(data: T): T => {
   if (Array.isArray(data)) return data.map((v) => mapData(v)) as any;
@@ -74,6 +81,36 @@ const auth: express.RequestHandler = (req: SessionRequest, res, next) => {
   }
 };
 
+const configOwner: express.RequestHandler = async (
+  req: SessionRequest,
+  res,
+  next
+) => {
+  const { configId } = req.query;
+  const { userId } = req.session;
+
+  if (configId == null)
+    return next(
+      createApiError({
+        message: "Invalid configId",
+        statusCode: 400,
+        param: "configId",
+      })
+    );
+
+  const config = await getClient(
+    (client) =>
+      client.query(
+        `SELECT "account_id" FROM "service_configuration" WHERE "id"='${configId}' AND "account_id"='${userId}'`
+      ),
+    next
+  );
+
+  if (config.rowCount === 0)
+    return next(createApiError({ message: "Access denied", statusCode: 402 }));
+  next();
+};
+
 const guest: express.RequestHandler = (req, res, next) => {
   if (req.header("Authorization"))
     return res
@@ -82,4 +119,4 @@ const guest: express.RequestHandler = (req, res, next) => {
   next();
 };
 
-export const access = { guest, auth };
+export const access = { guest, configOwner, auth };

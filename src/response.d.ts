@@ -52,6 +52,23 @@ declare namespace ApiMap {
   };
 }
 
+declare namespace ApiRequestData {
+  export type PUT = {
+    "/service/config": {
+      configId: number;
+      changes: {
+        variables?: Pick<
+          ApiResponseData.Service.Variable,
+          "variableId" | "customKey"
+        >[];
+        notices?: (ApiResponseData.Service.Notice & {
+          modified: "create" | "delete" | "update";
+        })[];
+      };
+    };
+  };
+}
+
 declare type ApiError = Partial<{
   message: string;
   statusCode: number;

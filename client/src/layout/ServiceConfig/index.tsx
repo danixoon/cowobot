@@ -11,7 +11,8 @@ import Input from "../../components/Input";
 import { useInput } from "../../hooks/useInput";
 import Label from "../../components/Label";
 import TextArea from "../../components/TextArea";
-import ServiceNotice, { UnsavedNotice, Notice } from "./ServiceNotice";
+import ServiceNotice, { Notice } from "./ServiceNotice";
+import { configSave } from "../../redux/actions";
 
 export type ServiceConfigProps = {
   config: ServiceState["config"]["data"];
@@ -19,26 +20,41 @@ export type ServiceConfigProps = {
   status: DataStatus;
   createConfig: (serviceId: number) => void;
   deleteConfig: (configId: number) => void;
+  saveConfig: typeof configSave;
 };
 
 const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
-  const { config, status, service, createConfig, deleteConfig } = props;
-  const [changes, bind, setChanges] = useInput({});
-  const [unsavedNotices, setUnsavedNotices] = React.useState<UnsavedNotice[]>(
-    () => []
+  const {
+    config,
+    status,
+    service,
+    createConfig,
+    deleteConfig,
+    saveConfig,
+  } = props;
+  const [variableChanges, bindVariables, setVariableChanges] = useInput(
+    {} as any
   );
+  const [localNotices, updateNotices] = React.useState<Notice[]>(() => []);
 
   React.useEffect(() => {
-    if (config)
-      setChanges(
+    if (config) {
+      updateNotices(
+        config.notices.map((notice) => ({
+          ...notice,
+          modified: null,
+          localId: null,
+        }))
+      );
+      setVariableChanges(
         config.variables.reduce(
-          (c, v) => ({ ...c, [v.variableId]: v.defaultKey }),
+          (c, v) => ({ ...c, [v.variableId]: v.customKey || v.defaultKey }),
           {}
         )
       );
-    else {
+    } else {
       console.log("notices cleared");
-      setUnsavedNotices([]);
+      updateNotices([]);
     }
   }, [config]);
 
@@ -53,46 +69,72 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
       return alert(
         "У выбранного сервиса отсутствуют возможные переменные получателей"
       );
-    const notices = [
-      ...unsavedNotices,
-      {
-        actionId: config.actions[0].actionId,
-        messageTemplate: `Привет, \${${target.customKey || target.defaultKey}}`,
-        variableId: target.variableId,
-        localId: uuid(),
-        noticeId: null,
-      },
-    ];
+    const notice: Notice = {
+      actionId: config.actions[0].actionId,
+      messageTemplate: `Привет, \${${target.customKey || target.defaultKey}}`,
+      variableId: target.variableId,
+      localId: uuid(),
+      modified: "create",
+      noticeId: 0,
+    };
 
-    setUnsavedNotices(notices);
+    const notices = [...localNotices, notice];
+    updateNotices(notices);
   };
 
-  const handleDeleteNotice = (notice: Notice | UnsavedNotice) => {
+  const handleDeleteNotice = (notice: Notice) => {
     // Проверка на локальные изменения
-    if ((notice as UnsavedNotice).localId) {
-      const filtered = unsavedNotices.filter(
-        (n) => n.localId !== (notice as UnsavedNotice).localId
-      );
-      setUnsavedNotices(filtered);
+    if (notice.localId) {
+      const filtered = localNotices.filter((n) => n.localId !== notice.localId);
+      updateNotices(filtered);
     } else {
-      // TODO удаление с сервера
-    }
-  };
-
-  const handleChangeNotice = (
-    notice: Notice | UnsavedNotice,
-    changes: Partial<Notice | UnsavedNotice>
-  ) => {
-    if ((notice as UnsavedNotice).localId) {
-      const localId = (notice as UnsavedNotice).localId;
-      const modified = unsavedNotices.map((v) =>
-        v.localId === localId ? { ...v, ...changes } : v
+      updateNotices(
+        localNotices.map((n) =>
+          n.noticeId !== notice.noticeId ? n : { ...n, modified: "delete" }
+        )
       );
-      setUnsavedNotices(modified);
     }
   };
 
-  const handleApplyChanges = () => {};
+  const handleChangeNotice = (notice: Notice, changes: Partial<Notice>) => {
+    // if (notice.localId) {
+    //   const localId = notice.localId;
+    //   const modified = localNotices.map((v) =>
+    //     v.localId === localId ? { ...v, ...changes } : v
+    //   );
+
+    const n = notice.localId
+      ? localNotices.find((n) => n.localId === notice.localId)
+      : localNotices.find((n) => n.noticeId === notice.noticeId);
+
+    Object.assign(n, {
+      ...changes,
+      modified: notice.localId ? notice.modified : "update",
+    });
+    updateNotices(localNotices);
+    // }
+  };
+
+  const handleSaveConfig = () => {
+    if (!config) return;
+
+    const notices = localNotices.filter(
+      (notice) => typeof notice.modified === "string"
+    ) as ApiRequestData.PUT["/service/config"]["changes"]["notices"];
+
+    const variables = config.variables.map((v) => ({
+      variableId: v.variableId,
+      customKey: variableChanges[v.variableId] || null,
+    }));
+
+    saveConfig({
+      configId: config.configId,
+      changes: {
+        notices,
+        variables,
+      },
+    });
+  };
 
   return (
     <>
@@ -104,9 +146,9 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
                 {config.variables.map((v) => (
                   <Label key={v.variableId} text={v.name}>
                     <Input
-                      input={changes}
-                      setInput={setChanges}
-                      {...bind}
+                      input={variableChanges}
+                      setInput={setVariableChanges}
+                      {...bindVariables}
                       isResetable={true}
                       name={v.variableId.toString()}
                       defaultValue={v.defaultKey}
@@ -117,24 +159,20 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
             </Section>
             <Section header="Рассылки" style={{ flex: 1 }}>
               <Layout direction="column">
-                {[
-                  ...unsavedNotices,
-                  ...config.notices.filter((notice) =>
-                    unsavedNotices.find((n) => n.noticeId !== notice.noticeId)
-                  ),
-                ].map((notice) => (
-                  <ServiceNotice
-                    key={
-                      (notice as Notice).noticeId ||
-                      (notice as UnsavedNotice).localId
-                    }
-                    variables={config.variables.filter((v) => v.isTarget)}
-                    actions={config.actions}
-                    notice={notice}
-                    onDelete={handleDeleteNotice}
-                    onChange={(changes) => handleChangeNotice(notice, changes)}
-                  />
-                ))}
+                {localNotices
+                  .filter((notice) => notice.modified !== "delete")
+                  .map((notice) => (
+                    <ServiceNotice
+                      key={notice.localId ?? notice.noticeId}
+                      variables={config.variables.filter((v) => v.isTarget)}
+                      actions={config.actions}
+                      notice={notice}
+                      onDelete={handleDeleteNotice}
+                      onChange={(changes) =>
+                        handleChangeNotice(notice, changes)
+                      }
+                    />
+                  ))}
               </Layout>
               <Button onClick={handleAddNotice} style={{ width: "100%" }}>
                 Добавить рассылку
@@ -152,7 +190,9 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
                 >
                   Тест
                 </Button>
-                <Button color="primary">Сохранить</Button>
+                <Button onClick={handleSaveConfig} color="primary">
+                  Сохранить
+                </Button>
               </Layout>
             </Section>
           </Layout>
