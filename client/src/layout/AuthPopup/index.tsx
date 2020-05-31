@@ -7,7 +7,6 @@ import { useInput } from "../../hooks/useInput";
 import Form from "../../components/Form";
 import Section from "../../components/Section";
 import Button from "../../components/Button";
-import { DataStatus } from "../../redux/types";
 import Label from "../../components/Label";
 
 export type AuthPopupProps = React.HTMLAttributes<HTMLDivElement> & {

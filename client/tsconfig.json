@@ -16,6 +16,5 @@
     "isolatedModules": true,
     "jsx": "react"
   },
-  "files": ["src/typings.d.ts"],
-  "include": ["src", "stories/button.stories.tsx"]
+  "include": ["src", "stories/button.stories.tsx", "../src/response.d.ts"]
 }

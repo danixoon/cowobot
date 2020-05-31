@@ -3,7 +3,7 @@ import "./styles.scss";
 import Tree from "../../components/Tree";
 
 export type ServicesTreeProps = React.HTMLAttributes<HTMLDivElement> & {
-  services: { name: string; id: number }[];
+  services: ApiResponseData.Service.Service[];
   onServiceSelect: (serviceId: number) => void;
 };
 
@@ -19,8 +19,8 @@ const ServicesTree: React.FC<ServicesTreeProps> = (props) => {
       items={services.map((v) => ({
         content: v.name,
         items: [
-          { id: `${v.id}_notice`, content: "Оповещения" },
-          { id: `${v.id}_config`, content: "Подключение" },
+          { id: `${v.serviceId}_notice`, content: "Оповещения" },
+          { id: `${v.serviceId}_config`, content: "Подключение" },
         ],
       }))}
     />

@@ -1,5 +1,5 @@
 import { Reducer } from "redux";
-import { ActionTypes, Actions, UserState } from "../types";
+import { ActionTypes, UserState } from "../types";
 import avatarUrl from "../../images/avatar.png";
 
 const defaultState: () => UserState = () => ({
@@ -8,7 +8,7 @@ const defaultState: () => UserState = () => ({
   data: { token: null, username: "" },
 });
 
-export const userReducer: Reducer<UserState, Actions> = (
+export const userReducer: Reducer<UserState, ActionMap.Actions> = (
   state = defaultState(),
   action
 ) => {

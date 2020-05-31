@@ -9,7 +9,7 @@ import {
   select,
   cancel,
 } from "redux-saga/effects";
-import { ActionTypes, ActionType, Action, Actions, RootState } from "../types";
+import { ActionTypes, RootState } from "../types";
 import * as api from "../../api/service";
 import {
   serviceFetchError,
@@ -35,10 +35,17 @@ function* fetchServices() {
   }
 }
 
-function* fetchServiceConfig(serviceId: number, configId: number) {
+function* fetchServiceConfig(
+  action: ActionMap.Action<typeof ActionTypes.CONFIG_FETCH>
+) {
   try {
-    const { data } = yield call(api.configFetch, configId);
-    yield put(configFetchSuccess({ config: { ...data, configId }, serviceId }));
+    const { data } = yield call(api.configFetch, action.payload.configId);
+    yield put(
+      configFetchSuccess({
+        config: { ...data },
+        serviceId: action.payload.serviceId,
+      })
+    );
   } catch (error) {
     yield put(serviceFetchError(error.response?.data.error ?? error));
   }
@@ -56,7 +63,9 @@ function* fetchServiceConfig(serviceId: number, configId: number) {
 
 // Обрабтка логики
 
-function* serviceSelectFlow(action: Action<typeof ActionTypes.SERVICE_SELECT>) {
+function* serviceSelectFlow(
+  action: ActionMap.Action<typeof ActionTypes.SERVICE_SELECT>
+) {
   const { serviceId } = action.payload;
   const selectedServiceId = yield select(
     (state: RootState) => state.service?.serviceId
@@ -67,30 +76,35 @@ function* serviceSelectFlow(action: Action<typeof ActionTypes.SERVICE_SELECT>) {
 
   // Запускаем получение идентификаторов конфига
   const response = yield call(api.configIdsFetch, serviceId);
-  let configId = response.data[0]?.id;
+  let configId = response.data.length > 0 ? response.data[0] : null;
 
   // Если не пришло конфигураций - переключаем поведение на создание конфигурации
   if (typeof configId !== "number") {
     yield put(configFetchSuccess({ config: null, serviceId }));
   } else {
-    yield call(fetchServiceConfig, serviceId, configId);
+    yield put(configFetch(configId, serviceId));
+    // yield call(fetchServiceConfig, serviceId, configId);
   }
 }
 
 // Создание конфигурации для сервиса для пользователя
-function* createConfig(action: Action<typeof ActionTypes.CONFIG_CREATE>) {
+function* createConfig(
+  action: ActionMap.Action<typeof ActionTypes.CONFIG_CREATE>
+) {
   const { serviceId } = action.payload;
   try {
     const { data } = yield call(api.configCreate, serviceId);
     yield put(configCreateSuccess({ configId: data.id }));
-    yield call(fetchServiceConfig, serviceId, data.id);
+    yield put(configFetch(data.id, serviceId));
   } catch (error) {
     yield put(configCreateError(error.response?.data.error ?? error));
   }
 }
 
 // Создание конфигурации для сервиса для пользователя
-function* deleteConfig(action: Action<typeof ActionTypes.CONFIG_DELETE>) {
+function* deleteConfig(
+  action: ActionMap.Action<typeof ActionTypes.CONFIG_DELETE>
+) {
   const { configId } = action.payload;
   try {
     const { data } = yield call(api.configDelete, configId);
@@ -109,6 +123,11 @@ export default function* serviceFlow() {
     const configCreateTask = yield fork(function* () {
       while (true)
         yield call(createConfig, yield take(ActionTypes.CONFIG_CREATE));
+    });
+
+    const configFetchTash = yield fork(function* () {
+      while (true)
+        yield call(fetchServiceConfig, yield take(ActionTypes.CONFIG_FETCH));
     });
 
     const fetchServicesTask = yield fork(function* () {

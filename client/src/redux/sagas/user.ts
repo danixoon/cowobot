@@ -1,16 +1,15 @@
 import * as api from "../../api/user";
 import axios from "axios";
 import { put, call, takeLatest, take, fork } from "redux-saga/effects";
-import { ActionTypes, ActionType, Action, Actions } from "../types";
+import { ActionTypes } from "../types";
 import {
   userLoginSuccess,
   userLoginError,
   userLogout,
   userLogoutSuccess,
 } from "../actions/user";
-import { ApiSuccessReponse } from "../../api";
 
-function* loginUser(action: Action<typeof ActionTypes.USER_LOGIN>) {
+function* loginUser(action: ActionMap.Action<typeof ActionTypes.USER_LOGIN>) {
   const { username, password } = action.payload;
 
   try {
@@ -21,9 +20,11 @@ function* loginUser(action: Action<typeof ActionTypes.USER_LOGIN>) {
     )) as ApiSuccessReponse<ReturnType<typeof userLoginSuccess>["payload"]>;
 
     window.localStorage.setItem("token", request.data.token);
-    yield put<Actions>(userLoginSuccess({ ...request.data, username }));
+    yield put<ActionMap.Actions>(
+      userLoginSuccess({ ...request.data, username })
+    );
   } catch (error) {
-    yield put<Actions>(userLoginError(error.response.data.error));
+    yield put<ActionMap.Actions>(userLoginError(error.response.data.error));
   }
 }
 
@@ -49,7 +50,7 @@ export default function* userFlow() {
 
   while (true) {
     if (!isAuth) {
-      const data = (yield take(ActionTypes.USER_LOGIN)) as Action<
+      const data = (yield take(ActionTypes.USER_LOGIN)) as ActionMap.Action<
         typeof ActionTypes.USER_LOGIN
       >;
       yield fork(loginUser, data);

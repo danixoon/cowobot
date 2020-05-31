@@ -1,9 +1,4 @@
 import * as actionCreators from "./actions";
-import { ApiError } from "../api";
-
-export type ArrayElement<
-  ArrayType extends readonly unknown[]
-> = ArrayType[number];
 
 export const ActionTypes = {
   USER_LOGIN: "USER_LOGIN" as const,
@@ -35,6 +30,12 @@ export const ActionTypes = {
   CONFIG_DELETE_SUCCESS: "CONFIG_DELETE_SUCCESS" as const,
   CONFIG_DELETE_ERROR: "CONFIG_DELETE_ERROR" as const,
 
+  // Сохранение конфигурации
+
+  CONFIG_SAVE: "CONFIG_SAVE" as const,
+  CONFIG_SAVE_SUCCESS: "CONFIG_SAVE_SUCCESS" as const,
+  CONFIG_SAVE_ERROR: "CONFIG_SAVE_ERROR" as const,
+
   // // Получение идентификаторов известных конфигураций
   // CONFIG_IDS_FETCH: "CONFIG_IDS_FETCH" as const,
   // CONFIG_IDS_FETCH_SUCCESS: "CONFIG_IDS_FETCH_SUCCESS" as const,
@@ -43,18 +44,8 @@ export const ActionTypes = {
   TEST_HELLO: "TEST_HELLO" as const,
 };
 
-export type ActionType = typeof ActionTypes[keyof typeof ActionTypes];
-
-export type Actions = ReturnType<
-  typeof actionCreators[keyof typeof actionCreators]
->;
-
-export type Action<T extends ActionType> = Extract<Actions, { type: T }>;
-export type StateSchema<T> = {
-  status: DataStatus;
-  error: ApiError | null;
-  data: T | null;
-};
+export type ActionCreators = typeof actionCreators;
+export type ActionNames = typeof ActionTypes;
 
 export type UserState = StateSchema<{
   username: string;
@@ -63,30 +54,13 @@ export type UserState = StateSchema<{
 
 export type ServiceState = {
   serviceId: number | null;
-  services: StateSchema<
-    {
-      id: number;
-      name: string;
-    }[]
-  >;
+  services: StateSchema<ApiResponseData.Service.Service[]>;
   config: StateSchema<{
     configId: number;
-
     // Варианты событий (ревью не ревью)
-    actions: { id: number; name: string }[];
-    variables: {
-      id: number;
-      name: string;
-      customKey: string | null;
-      defaultKey: string;
-      isTarget: boolean;
-    }[];
-    notices: {
-      id: number;
-      messageTemplate: string;
-      actionId: number;
-      variableId: number;
-    }[];
+    actions: ApiResponseData.Service.Action[];
+    variables: ApiResponseData.Service.Variable[];
+    notices: ApiResponseData.Service.Notice[];
   }>;
 };
 
@@ -99,5 +73,3 @@ export interface RootState {
   test: TestState;
   service: ServiceState;
 }
-
-export type DataStatus = "idle" | "loading" | "success" | "error";

@@ -7,7 +7,7 @@ export const servicesFetch = async () => {
     await axios.get("/api/services", {
       headers: token ? { Authorization: token } : undefined,
     })
-  ).data;
+  ).data as ApiMap.GET["/services"];
 };
 
 export const configIdsFetch = async (serviceId: number) => {
@@ -17,7 +17,7 @@ export const configIdsFetch = async (serviceId: number) => {
       params: { serviceId },
       headers: token ? { Authorization: token } : undefined,
     })
-  ).data;
+  ).data as ApiMap.GET["/service/configs"];
 };
 
 export const configFetch = async (configId: number) => {
@@ -27,7 +27,7 @@ export const configFetch = async (configId: number) => {
       params: { configId },
       headers: token ? { Authorization: token } : undefined,
     })
-  ).data;
+  ).data as ApiMap.GET["/service/config"];
 };
 
 export const configCreate = async (serviceId: number) => {
@@ -37,7 +37,7 @@ export const configCreate = async (serviceId: number) => {
       params: { serviceId },
       headers: token ? { Authorization: token } : undefined,
     })
-  ).data;
+  ).data as ApiMap.POST["/service/config"];
 };
 
 export const configDelete = async (configId: number) => {
@@ -47,5 +47,5 @@ export const configDelete = async (configId: number) => {
       params: { configId },
       headers: token ? { Authorization: token } : undefined,
     })
-  ).data;
+  ).data as ApiMap.DELETE["/service/config"];
 };

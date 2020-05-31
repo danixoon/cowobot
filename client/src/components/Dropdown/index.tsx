@@ -1,6 +1,5 @@
 import * as React from "react";
 import "./styles.scss";
-import { ArrayElement } from "../../redux/types";
 
 interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   items: { name: string; id: number }[];

@@ -1,5 +1,5 @@
 import { Reducer } from "redux";
-import { ActionTypes, Actions, UserState, ServiceState } from "../types";
+import { ActionTypes, UserState, ServiceState } from "../types";
 import avatarUrl from "../../images/avatar.png";
 
 const defaultState: () => ServiceState = () => ({
@@ -16,7 +16,7 @@ const defaultState: () => ServiceState = () => ({
   },
 });
 
-export const serviceReducer: Reducer<ServiceState, Actions> = (
+export const serviceReducer: Reducer<ServiceState, ActionMap.Actions> = (
   state = defaultState(),
   action
 ) => {
@@ -33,7 +33,10 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
         },
       };
     case ActionTypes.CONFIG_FETCH:
-      return { ...state, config: { ...state.config, status: "loading" } };
+      return {
+        ...state,
+        config: { data: null, error: null, status: "loading" },
+      };
     case ActionTypes.CONFIG_DELETE_SUCCESS:
       return {
         ...state,
@@ -46,27 +49,7 @@ export const serviceReducer: Reducer<ServiceState, Actions> = (
         config: {
           ...state.config,
           status: "success",
-          data:
-            action.payload.config !== null
-              ? {
-                  ...action.payload.config,
-                  variables: action.payload.config.variables.map((v) => ({
-                    id: v.id,
-                    name: v.name,
-                    customKey: v.custom_key,
-                    defaultKey: v.default_key,
-                    isTarget: v.isTarget,
-                  })),
-                  notices: action.payload.config.notices.map((v) => ({
-                    actionId: v.action_id,
-                    messageTemplate: v.message_template,
-                    id: v.id,
-                    // id переменной назначения сообщения
-                    variableId: v.variable_id,
-                  })),
-                  configId: action.payload.config.configId,
-                }
-              : null,
+          data: action.payload.config !== null ? action.payload.config : null,
         },
       };
     case ActionTypes.USER_LOGOUT_SUCCESS:

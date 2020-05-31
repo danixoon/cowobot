@@ -1,5 +1,4 @@
 import { ActionTypes, ServiceState } from "../types";
-import { ApiError } from "../../api";
 
 export const serviceSelect = (serviceId: number) => ({
   type: ActionTypes.SERVICE_SELECT,
@@ -12,7 +11,7 @@ export const serviceFetch = () => ({
 });
 
 export const serviceFetchSuccess = (data: {
-  services: { name: string; id: number }[];
+  services: ApiResponseData.Service.Service[];
 }) => ({
   type: ActionTypes.SERVICE_FETCH_SUCCESS,
   payload: data,
@@ -40,29 +39,17 @@ export const serviceFetchError = (error: ApiError) => ({
 
 // Configs
 
-export const configFetch = (configId: number) => ({
+export const configFetch = (configId: number, serviceId: number) => ({
   type: ActionTypes.CONFIG_FETCH,
-  payload: { configId },
+  payload: { configId, serviceId },
 });
 
 export const configFetchSuccess = (data: {
   serviceId: number;
   config: null | {
-    variables: {
-      id: number;
-      name: string;
-      custom_key: string | null;
-      default_key: string;
-      type: string;
-      isTarget: boolean;
-    }[];
-    notices: {
-      id: number;
-      message_template: string;
-      action_id: number;
-      variable_id: number;
-    }[];
-    actions: { id: number; name: string }[];
+    variables: ApiResponseData.Service.Variable[];
+    notices: ApiResponseData.Service.Notice[];
+    actions: ApiResponseData.Service.Action[];
     configId: number;
   };
 }) => ({
@@ -82,7 +69,7 @@ export const configCreate = (serviceId: number) => ({
   payload: { serviceId },
 });
 
-export const configCreateSuccess = (data: { configId: number }) => ({
+export const configCreateSuccess = (data: ApiMap.POST["/service/config"]) => ({
   type: ActionTypes.CONFIG_CREATE_SUCCESS,
   payload: data,
 });
@@ -97,7 +84,9 @@ export const configDelete = (configId: number) => ({
   payload: { configId },
 });
 
-export const configDeleteSuccess = (data: { configId: number }) => ({
+export const configDeleteSuccess = (
+  data: ApiMap.DELETE["/service/config"]
+) => ({
   type: ActionTypes.CONFIG_DELETE_SUCCESS,
   payload: data,
 });
@@ -105,4 +94,9 @@ export const configDeleteSuccess = (data: { configId: number }) => ({
 export const configDeleteError = (error: ApiError) => ({
   type: ActionTypes.CONFIG_DELETE_ERROR,
   payload: error,
+});
+
+export const configSave = (changes: any) => ({
+  type: ActionTypes.CONFIG_SAVE,
+  payload: changes,
 });

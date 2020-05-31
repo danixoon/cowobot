@@ -1,5 +1,4 @@
 import { ActionTypes } from "../types";
-import { ApiError } from "../../api";
 
 export const userLogin = (username: string, password: string) => ({
   type: ActionTypes.USER_LOGIN,

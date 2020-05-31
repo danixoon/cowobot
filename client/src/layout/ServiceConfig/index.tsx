@@ -4,81 +4,14 @@ import "./styles.scss";
 import Tree from "../../components/Tree";
 import Section from "../../components/Section";
 import Dropdown from "../../components/Dropdown";
-import { DataStatus, ServiceState, ArrayElement } from "../../redux/types";
+import { ServiceState } from "../../redux/types";
 import Button from "../../components/Button";
 import Layout from "../../components/Layout";
 import Input from "../../components/Input";
 import { useInput } from "../../hooks/useInput";
 import Label from "../../components/Label";
 import TextArea from "../../components/TextArea";
-
-type Notice = ArrayElement<
-  NonNullable<ServiceConfigProps["config"]>["notices"]
->;
-type UnsavedNotice = Omit<Notice, "id"> & {
-  id: number | null;
-  localId: string;
-};
-
-const ServiceNotice: React.FC<{
-  notice: Notice | UnsavedNotice;
-  actions: NonNullable<ServiceConfigProps["config"]>["actions"];
-  variables: NonNullable<ServiceConfigProps["config"]>["variables"];
-  onDelete: (notice: Notice | UnsavedNotice) => void;
-  onChange: (changes: Partial<Notice | UnsavedNotice>) => void;
-}> = ({ notice, actions, variables, onDelete, onChange }) => {
-  const [updatedNotice, updateNotice] = React.useState<Partial<typeof notice>>(
-    () => ({})
-  );
-
-  const handleOnChange = (updated: typeof updatedNotice) => {
-    const nextNotice = { ...updatedNotice, ...updated };
-    updateNotice(nextNotice);
-    onChange(nextNotice);
-  };
-
-  return (
-    <Layout style={{ padding: "1rem 0" }} direction="row">
-      <Layout direction="column" style={{ flexBasis: "200px" }}>
-        <Label text="Событие">
-          <Dropdown
-            defaultSelectedId={notice.actionId}
-            onItemSelect={(actionId) => handleOnChange({ actionId })}
-            items={actions.map((v) => ({ name: v.name, id: v.id }))}
-          />
-        </Label>
-        <Label text="Получатель сообщения">
-          <Dropdown
-            onItemSelect={(variableId) => handleOnChange({ variableId })}
-            defaultSelectedId={notice.variableId}
-            items={variables.map((v) => ({
-              id: v.id,
-              name: v.customKey || v.defaultKey,
-            }))}
-          />
-        </Label>
-        <Button onClick={() => onDelete(notice)} size="sm">
-          Удалить рассылку
-        </Button>
-      </Layout>
-      <Layout direction="column" style={{ flex: 1 }}>
-        <Label text="Шаблон сообщения">
-          <TextArea
-            variables={variables.map((v) => ({
-              id: v.id,
-              name: v.customKey || v.defaultKey,
-            }))}
-            value={notice.messageTemplate}
-            onInputChange={(input) => {
-              handleOnChange({ messageTemplate: input });
-            }}
-            style={{ minHeight: "150px" }}
-          />
-        </Label>
-      </Layout>
-    </Layout>
-  );
-};
+import ServiceNotice, { UnsavedNotice, Notice } from "./ServiceNotice";
 
 export type ServiceConfigProps = {
   config: ServiceState["config"]["data"];
@@ -98,15 +31,19 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
   React.useEffect(() => {
     if (config)
       setChanges(
-        config.variables.reduce((c, v) => ({ ...c, [v.id]: v.defaultKey }), {})
+        config.variables.reduce(
+          (c, v) => ({ ...c, [v.variableId]: v.defaultKey }),
+          {}
+        )
       );
     else {
+      console.log("notices cleared");
       setUnsavedNotices([]);
     }
   }, [config]);
 
   const handleCreateConfig = () => {
-    if (service) createConfig(service?.id);
+    if (service) createConfig(service?.serviceId);
   };
 
   const handleAddNotice = () => {
@@ -119,11 +56,11 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
     const notices = [
       ...unsavedNotices,
       {
-        actionId: config.actions[0].id,
+        actionId: config.actions[0].actionId,
         messageTemplate: `Привет, \${${target.customKey || target.defaultKey}}`,
-        variableId: target.id,
+        variableId: target.variableId,
         localId: uuid(),
-        id: null,
+        noticeId: null,
       },
     ];
 
@@ -155,6 +92,8 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
     }
   };
 
+  const handleApplyChanges = () => {};
+
   return (
     <>
       {status === "success" &&
@@ -163,13 +102,13 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
             <Section header="Переменные">
               <Layout direction="column">
                 {config.variables.map((v) => (
-                  <Label key={v.id} text={v.name}>
+                  <Label key={v.variableId} text={v.name}>
                     <Input
                       input={changes}
                       setInput={setChanges}
                       {...bind}
                       isResetable={true}
-                      name={v.id.toString()}
+                      name={v.variableId.toString()}
                       defaultValue={v.defaultKey}
                     />
                   </Label>
@@ -181,12 +120,13 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
                 {[
                   ...unsavedNotices,
                   ...config.notices.filter((notice) =>
-                    unsavedNotices.find((n) => n.id !== notice.id)
+                    unsavedNotices.find((n) => n.noticeId !== notice.noticeId)
                   ),
                 ].map((notice) => (
                   <ServiceNotice
                     key={
-                      (notice as Notice).id || (notice as UnsavedNotice).localId
+                      (notice as Notice).noticeId ||
+                      (notice as UnsavedNotice).localId
                     }
                     variables={config.variables.filter((v) => v.isTarget)}
                     actions={config.actions}
