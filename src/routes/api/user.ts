@@ -5,7 +5,6 @@ import {
   validator,
   createResponse,
   access,
-  SessionRequest,
   createErrorData,
   createApiError,
 } from "../../middleware";
@@ -30,7 +29,7 @@ router.get(
       next
     );
 
-    res.send(createResponse({ ...result.rows[0] }))
+    res.send(createResponse({ ...result.rows[0] }));
   }
 );
 

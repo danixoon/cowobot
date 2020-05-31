@@ -7,11 +7,18 @@ import { getEnv } from "../config";
 
 const { SECRET } = getEnv("SECRET");
 
-type ApiError = Partial<{
-  message: string;
-  statusCode: number;
-  [key: string]: any;
-}>;
+export const mapData = <T = any>(data: T): T => {
+  if (Array.isArray(data)) return data.map((v) => mapData(v)) as any;
+  const mapped = {} as any;
+  for (let p in data) {
+    const key = p
+      .split("_")
+      .map((v, i) => (i === 0 ? v : `${v[0].toUpperCase()}${v.substring(1)}`))
+      .join("");
+    mapped[key] = data[p];
+  }
+  return mapped;
+};
 
 export const createApiError = (error: ApiError) => ({
   response: createErrorData(error),
@@ -50,8 +57,6 @@ export const validator: express.RequestHandler = (req, res, next) => {
 
   next();
 };
-
-export type SessionRequest = express.Request & { session: { userId?: string } };
 
 const auth: express.RequestHandler = (req: SessionRequest, res, next) => {
   const token = req.header("Authorization");

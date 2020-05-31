@@ -5,9 +5,9 @@ import {
   validator,
   createResponse,
   access,
-  SessionRequest,
   createErrorData,
   createApiError,
+  mapData,
 } from "../../middleware";
 
 import { getClient } from "../../db";
@@ -26,14 +26,14 @@ router.get(
     const result = await getClient(
       (client) =>
         client.query(`
-        SELECT "service"."id", "service"."name" FROM "service"
+        SELECT "service"."id" AS "service_id", "service"."name" FROM "service"
         INNER JOIN "service_type" ON "service_type"."id"="service"."id"
         WHERE "service_type"."type" != 'messenger'
         `),
       next
     );
 
-    res.send(createResponse({ services: result.rows }));
+    res.send(createResponse({ services: mapData(result.rows) }));
   }
 );
 
@@ -59,7 +59,7 @@ router.get(
       next
     );
 
-    return res.send(createResponse(configIds.rows));
+    return res.send(createResponse(configIds.rows.map((v) => v.id)));
   }
 );
 
@@ -79,7 +79,7 @@ router.get(
     const variables = await getClient(
       (client) =>
         client.query(`
-        SELECT "service_configuration_variable"."custom_key", "service_variable"."default_key", "service_variable_role"."type" FROM "service_variable"
+        SELECT "service_variable"."id" as "variable_id", "service_variable"."name", "service_configuration_variable"."custom_key", "service_variable"."default_key", "service_variable_role"."type" FROM "service_variable"
         INNER JOIN "service_configuration" ON "service_configuration"."service_id"="service_variable"."service_id"
         INNER JOIN "service_variable_role" ON "service_variable_role"."id"="service_variable"."role_id"
         LEFT JOIN "service_configuration_variable" ON "service_configuration_variable"."configuration_id"="service_configuration"."id"
@@ -87,10 +87,19 @@ router.get(
       next
     );
 
+    const notices = await getClient(
+      (client) =>
+        client.query(`
+        SELECT "id" AS "notice_id", "variable_id", "message_template", "action_id" FROM "service_notification"
+        WHERE "configuration_id"='${configId}'
+    `),
+      next
+    );
+
     const actions = await getClient(
       (client) =>
         client.query(`
-        SELECT "service_action"."id", "service_action"."name" FROM "service_action"
+        SELECT "service_action"."id" AS "action_id", "service_action"."name" FROM "service_action"
         INNER JOIN "service" ON "service"."type_id"="service_action"."type_id"
         INNER JOIN "service_configuration" ON "service_configuration"."service_id"="service"."id"
         WHERE "service_configuration"."id"='${configId}'
@@ -100,11 +109,15 @@ router.get(
 
     return res.send(
       createResponse({
-        variables: variables.rows.map((v) => ({
-          ...v,
-          isTarget: v.type === "messenger",
-        })),
-        actions: actions.rows,
+        configId,
+        variables: mapData(
+          variables.rows.map((v) => ({
+            ...v,
+            isTarget: v.type === "messenger",
+          }))
+        ),
+        actions: mapData(actions.rows),
+        notices: mapData(notices.rows),
       })
     );
   }
@@ -122,6 +135,21 @@ router.post(
   ) => {
     const { userId } = req.session;
     const { serviceId } = req.query;
+
+    const {
+      rows: [{ amount: configAmount }],
+    } = await getClient(
+      (client) =>
+        client.query(
+          `SELECT COUNT(*) AS "amount" FROM "service_configuration" WHERE "account_id"='${userId}' AND "service_id"='${serviceId}'`
+        ),
+      next
+    );
+
+    if (Number(configAmount) >= 1)
+      return next(
+        createApiError({ message: "Sorry, only one config per service" })
+      );
 
     const serviceTypeResponse = await getClient(
       (client) =>
@@ -153,13 +181,41 @@ router.post(
       (client) =>
         client.query(`
         INSERT INTO "service_configuration" VALUES 
-        (DEFAULT, NULL, NULL, '${userId}', '${serviceId}', NULL)
+        (DEFAULT, NULL, NULL, '${userId}', '${serviceId}')
         RETURNING "id"
        `),
       next
     );
 
-    return res.send(createResponse(response.rows[0]));
+    return res.send(createResponse(mapData(response.rows[0])));
+  }
+);
+
+router.delete(
+  "/service/config",
+  access.auth,
+  [query("configId").exists()],
+  validator,
+  async (
+    req: SessionRequest,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    const { userId } = req.session;
+    const { configId } = req.query;
+
+    const config = await getClient(
+      (client) =>
+        client.query(`
+        DELETE FROM "service_configuration" WHERE "account_id"='${userId}' AND "id"='${configId}'
+      `),
+      next
+    );
+
+    if (config.rowCount === 0)
+      return next(createApiError({ message: "Invalid configId" }));
+
+    return res.send(createResponse({ id: configId }));
   }
 );
 

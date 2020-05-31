@@ -26,8 +26,7 @@ const errorRequestHandler: express.ErrorRequestHandler = (
   res
     .status(statusCode)
     .send(
-      err.response ??
-        createErrorData({ message: "Internal error", statusCode })
+      err.response ?? createErrorData({ message: "Internal error", statusCode })
     );
 };
 

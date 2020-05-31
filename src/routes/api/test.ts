@@ -2,10 +2,10 @@ import * as express from "express";
 import { query, validationResult, ValidationChain } from "express-validator";
 import {
   access,
-  SessionRequest,
   createResponse,
   validator,
   generateHash,
+  mapData,
 } from "../../middleware";
 import { getClient } from "../../db";
 
@@ -17,6 +17,13 @@ router.get("/test", (req, res, next) => {
 
 router.get("/test/auth", access.auth, (req: SessionRequest, res, next) => {
   res.send(createResponse({ userId: req.session.userId }));
+});
+
+router.get("/test/data", (req, res, next) => {
+  const sampleData = mapData({ id: 0, test_id: 1, test_key: "key" });
+  const sampleArray = mapData([{ id: 0, test_id: 1, test_key: "key" }]);
+
+  res.send(createResponse({ sampleArray, sampleData }));
 });
 
 router.get("/test/users", async (req, res, next) => {

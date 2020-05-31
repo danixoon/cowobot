@@ -6,7 +6,6 @@ import {
   validator,
   createResponse,
   access,
-  SessionRequest,
   createErrorData,
   createApiError,
 } from "../../middleware";
