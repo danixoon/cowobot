@@ -188,11 +188,12 @@ router.put(
         const query = `
         SELECT COUNT(*) AS "amount" FROM "service_variable_role"
         INNER JOIN "service_variable" ON "service_variable"."role_id"="service_variable_role"."id"
-        WHERE "service_variable_role"."type"!='messenger' AND "service_variable"."id" IN (${updateOrCreateNotices
-          .map((v) => `'${v.variableId}'`)
-          .join()})
+        INNER JOIN "service_configuration_variable" ON "service_configuration_variable"."variable_id"="service_variable"."id"
+        WHERE "service_variable_role"."type"!='messenger' AND "service_configuration_variable"."id" IN 
+ (${updateOrCreateNotices.map((v) => `'${v.variableId}'`).join()})
     `;
 
+        console.log(query);
         const invalidVariables = await getClient(
           (client) => client.query(query),
           next
@@ -304,20 +305,9 @@ router.post(
       (client) =>
         client.query(`
         INSERT INTO "service_configuration" VALUES 
-        (DEFAULT, NULL, NULL, '${userId}', '${serviceId}')
+        (DEFAULT, NULL, '${userId}', '${serviceId}')
         RETURNING "id"
        `),
-      next
-    );
-
-    await getClient(
-      (client) =>
-        client.query(`
-        INSERT INTO "service_configuration_variable" ("configuration_id", "variable_id")
-        SELECT '${response.rows[0].id}', "service_variable"."id"
-        FROM "service_variable"
-        WHERE "service_variable"."service_id"='${serviceId}'
-    `),
       next
     );
 

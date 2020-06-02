@@ -138,8 +138,8 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
 
   return (
     <>
-      {status === "success" &&
-        (config !== null ? (
+      {status === "success" ? (
+        config !== null ? (
           <Layout style={{ height: "100%" }} direction="column">
             <Section header="Переменные">
               <Layout direction="column">
@@ -164,7 +164,12 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
                   .map((notice) => (
                     <ServiceNotice
                       key={notice.localId ?? notice.noticeId}
-                      variables={config.variables.filter((v) => v.isTarget)}
+                      variables={config.variables
+                        .filter((v) => v.isTarget)
+                        .map((v) => ({
+                          ...v,
+                          customKey: variableChanges[v.variableId],
+                        }))}
                       actions={config.actions}
                       notice={notice}
                       onDelete={handleDeleteNotice}
@@ -207,7 +212,17 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
             </p>
             <Button onClick={handleCreateConfig}>Создать бота</Button>
           </Layout>
-        ))}
+        )
+      ) : status === "idle" ? (
+        <Layout
+          direction="column"
+          style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
+        >
+          Добро пожаловать! Выберите сервис для конфигурирования
+        </Layout>
+      ) : (
+        <div>загрузка..</div>
+      )}
     </>
   );
 };
