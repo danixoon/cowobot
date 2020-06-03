@@ -9,47 +9,40 @@ import {
   select,
   cancel,
 } from "redux-saga/effects";
-import { ActionTypes, RootState } from "../types";
+import { ActionTypes, RootState, getAction } from "../types";
 import * as api from "../../api/service";
-import {
-  serviceFetchError,
-  serviceFetchSuccess,
-  // configIdsFetchSuccess,
-  configFetchSuccess,
-  // configIdsFetch,
-  configFetch,
-  serviceFetch,
-  configCreateSuccess,
-  configCreateError,
-  configDeleteSuccess,
-  configDeleteError,
-  configSaveSuccess,
-  configSaveError,
-  // configIdsFetchError,
-} from "../actions/service";
 
 function* fetchServices() {
   try {
     const { data } = yield call(api.servicesFetch);
-    yield put(serviceFetchSuccess(data));
+    yield put(getAction(ActionTypes.SERVICE_FETCH_SUCCESS, data));
   } catch (error) {
-    yield put(serviceFetchError(error.response?.data.error ?? error));
+    yield put(
+      getAction(
+        ActionTypes.SERVICE_FETCH_ERROR,
+        error.response?.data.error ?? error
+      )
+    );
+    // yield put(serviceFetchError(error.response?.data.error ?? error));
   }
 }
 
-function* fetchServiceConfig(
-  action: ActionMap.Action<typeof ActionTypes.CONFIG_FETCH>
-) {
+function* fetchServiceConfig(action: Action<typeof ActionTypes.CONFIG_FETCH>) {
   try {
     const { data } = yield call(api.configFetch, action.payload.configId);
     yield put(
-      configFetchSuccess({
+      getAction(ActionTypes.CONFIG_FETCH_SUCCESS, {
         config: { ...data },
         serviceId: action.payload.serviceId,
       })
     );
   } catch (error) {
-    yield put(serviceFetchError(error.response?.data.error ?? error));
+    yield put(
+      getAction(
+        ActionTypes.SERVICE_FETCH_ERROR,
+        error.response?.data.error ?? error
+      )
+    );
   }
 }
 
@@ -65,9 +58,7 @@ function* fetchServiceConfig(
 
 // Обрабтка логики
 
-function* serviceSelectFlow(
-  action: ActionMap.Action<typeof ActionTypes.SERVICE_SELECT>
-) {
+function* serviceSelectFlow(action: Action<typeof ActionTypes.SERVICE_SELECT>) {
   const { serviceId } = action.payload;
   const selectedServiceId = yield select(
     (state: RootState) => state.service?.serviceId
@@ -82,48 +73,67 @@ function* serviceSelectFlow(
 
   // Если не пришло конфигураций - переключаем поведение на создание конфигурации
   if (typeof configId !== "number") {
-    yield put(configFetchSuccess({ config: null, serviceId }));
+    yield put(
+      getAction(ActionTypes.CONFIG_FETCH_SUCCESS, { config: null, serviceId })
+    );
   } else {
-    yield put(configFetch(configId, serviceId));
+    yield put(getAction(ActionTypes.CONFIG_FETCH, { configId, serviceId }));
     // yield call(fetchServiceConfig, serviceId, configId);
   }
 }
 
 // Создание конфигурации для сервиса для пользователя
-function* createConfig(
-  action: ActionMap.Action<typeof ActionTypes.CONFIG_CREATE>
-) {
+function* createConfig(action: Action<typeof ActionTypes.CONFIG_CREATE>) {
   const { serviceId } = action.payload;
   try {
     const { data } = yield call(api.configCreate, serviceId);
-    yield put(configCreateSuccess({ configId: data.id }));
-    yield put(configFetch(data.id, serviceId));
+    yield put(
+      getAction(ActionTypes.CONFIG_CREATE_SUCCESS, { configId: data.id })
+    );
+    yield put(
+      getAction(ActionTypes.CONFIG_FETCH, { configId: data.id, serviceId })
+    );
   } catch (error) {
-    yield put(configCreateError(error.response?.data.error ?? error));
+    yield put(
+      getAction(
+        ActionTypes.CONFIG_CREATE_ERROR,
+        error.response?.data.error ?? error
+      )
+    );
   }
 }
 
 // Создание конфигурации для сервиса для пользователя
-function* deleteConfig(
-  action: ActionMap.Action<typeof ActionTypes.CONFIG_DELETE>
-) {
+function* deleteConfig(action: Action<typeof ActionTypes.CONFIG_DELETE>) {
   const { configId } = action.payload;
   try {
     const { data } = yield call(api.configDelete, configId);
-    yield put(configDeleteSuccess({ configId: data.id }));
+    yield put(
+      getAction(ActionTypes.CONFIG_DELETE_SUCCESS, { configId: data.id })
+    );
   } catch (error) {
-    yield put(configDeleteError(error.response?.data.error ?? error));
+    yield put(
+      getAction(
+        ActionTypes.CONFIG_DELETE_ERROR,
+        error.response?.data.error ?? error
+      )
+    );
   }
 }
 
 // Создание конфигурации для сервиса для пользователя
-function* saveConfig(action: ActionMap.Action<typeof ActionTypes.CONFIG_SAVE>) {
+function* saveConfig(action: Action<typeof ActionTypes.CONFIG_SAVE>) {
   const data = action.payload;
   try {
     yield call(api.configSave, data);
-    yield put(configSaveSuccess());
+    yield put(getAction(ActionTypes.CONFIG_SAVE_SUCCESS));
   } catch (error) {
-    yield put(configSaveError(error.response?.data.error ?? error));
+    yield put(
+      getAction(
+        ActionTypes.CONFIG_SAVE_ERROR,
+        error.response?.data.error ?? error
+      )
+    );
   }
 }
 
@@ -150,7 +160,7 @@ export default function* serviceFlow() {
           serviceId: state.service.serviceId,
           configId: state.service.config.data?.configId,
         }));
-        yield put(configFetch(configId, serviceId));
+        yield put(getAction(ActionTypes.CONFIG_FETCH, { configId, serviceId }));
       }
     });
 
@@ -171,7 +181,7 @@ export default function* serviceFlow() {
         yield call(deleteConfig, yield take(ActionTypes.CONFIG_DELETE));
     });
 
-    yield put(serviceFetch());
+    yield put(getAction(ActionTypes.SERVICE_FETCH));
 
     yield take(ActionTypes.USER_LOGOUT);
 

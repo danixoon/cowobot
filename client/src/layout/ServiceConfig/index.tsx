@@ -12,17 +12,11 @@ import { useInput } from "../../hooks/useInput";
 import Label from "../../components/Label";
 import TextArea from "../../components/TextArea";
 import ServiceNotice, { Notice } from "./ServiceNotice";
-import { configSave } from "../../redux/actions";
+import ServiceConnection from "./ServiceConnection";
+import { serviceConfigEnchancer } from "../../containers/ServiceConfigContainer";
+import { ConnectedProps } from "react-redux";
 
-export type ServiceConfigProps = {
-  config: ServiceState["config"]["data"];
-  service: null | ArrayElement<NonNullable<ServiceState["services"]["data"]>>;
-  status: DataStatus;
-  createConfig: (serviceId: number) => void;
-  deleteConfig: (configId: number) => void;
-  saveConfig: typeof configSave;
-};
-
+export type ServiceConfigProps = ConnectedProps<typeof serviceConfigEnchancer>;
 const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
   const {
     config,
@@ -31,6 +25,7 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
     createConfig,
     deleteConfig,
     saveConfig,
+    serviceView,
   } = props;
   const [variableChanges, bindVariables, setVariableChanges] = useInput(
     {} as any
@@ -59,7 +54,7 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
   }, [config]);
 
   const handleCreateConfig = () => {
-    if (service) createConfig(service?.serviceId);
+    if (service) createConfig({ serviceId: service?.serviceId });
   };
 
   const handleAddNotice = () => {
@@ -97,12 +92,6 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
   };
 
   const handleChangeNotice = (notice: Notice, changes: Partial<Notice>) => {
-    // if (notice.localId) {
-    //   const localId = notice.localId;
-    //   const modified = localNotices.map((v) =>
-    //     v.localId === localId ? { ...v, ...changes } : v
-    //   );
-
     const n = notice.localId
       ? localNotices.find((n) => n.localId === notice.localId)
       : localNotices.find((n) => n.noticeId === notice.noticeId);
@@ -136,95 +125,116 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
     });
   };
 
-  return (
-    <>
-      {status === "success" ? (
-        config !== null ? (
-          <Layout style={{ height: "100%" }} direction="column">
-            <Section header="Переменные">
-              <Layout direction="column">
-                {config.variables.map((v) => (
-                  <Label key={v.variableId} text={v.name}>
-                    <Input
-                      input={variableChanges}
-                      setInput={setVariableChanges}
-                      {...bindVariables}
-                      isResetable={true}
-                      name={v.variableId.toString()}
-                      defaultValue={v.defaultKey}
-                    />
-                  </Label>
-                ))}
-              </Layout>
-            </Section>
-            <Section header="Рассылки" style={{ flex: 1 }}>
-              <Layout direction="column">
-                {localNotices
-                  .filter((notice) => notice.modified !== "delete")
-                  .map((notice) => (
-                    <ServiceNotice
-                      key={notice.localId ?? notice.noticeId}
-                      variables={config.variables
-                        .filter((v) => v.isTarget)
-                        .map((v) => ({
-                          ...v,
-                          customKey: variableChanges[v.variableId],
-                        }))}
-                      actions={config.actions}
-                      notice={notice}
-                      onDelete={handleDeleteNotice}
-                      onChange={(changes) =>
-                        handleChangeNotice(notice, changes)
-                      }
-                    />
-                  ))}
-              </Layout>
-              <Button onClick={handleAddNotice} style={{ width: "100%" }}>
-                Добавить рассылку
-              </Button>
-            </Section>
-            <Section style={{ marginTop: "auto" }} header="Действия">
-              <Layout direction="row">
-                <Button onClick={() => config && deleteConfig(config.configId)}>
-                  Удалить конфигурацию
-                </Button>
-                <Button
+  const renderView = () => {
+    switch (serviceView) {
+      case "connection":
+        return <ServiceConnection />;
+      case "configuration":
+        return (
+          <>
+            {status === "success" ? (
+              config !== null ? (
+                <Layout style={{ height: "100%" }} direction="column">
+                  <Section header="Переменные">
+                    <Layout direction="column">
+                      {config.variables.map((v) => (
+                        <Label key={v.variableId} text={v.name}>
+                          <Input
+                            input={variableChanges}
+                            setInput={setVariableChanges}
+                            {...bindVariables}
+                            isResetable={true}
+                            name={v.variableId.toString()}
+                            defaultValue={v.defaultKey}
+                          />
+                        </Label>
+                      ))}
+                    </Layout>
+                  </Section>
+                  <Section header="Рассылки" style={{ flex: 1 }}>
+                    <Layout direction="column">
+                      {localNotices
+                        .filter((notice) => notice.modified !== "delete")
+                        .map((notice) => (
+                          <ServiceNotice
+                            key={notice.localId ?? notice.noticeId}
+                            variables={config.variables
+                              .filter((v) => v.isTarget)
+                              .map((v) => ({
+                                ...v,
+                                customKey: variableChanges[v.variableId],
+                              }))}
+                            actions={config.actions}
+                            notice={notice}
+                            onDelete={handleDeleteNotice}
+                            onChange={(changes) =>
+                              handleChangeNotice(notice, changes)
+                            }
+                          />
+                        ))}
+                    </Layout>
+                    <Button onClick={handleAddNotice} style={{ width: "100%" }}>
+                      Добавить рассылку
+                    </Button>
+                  </Section>
+                  <Section style={{ marginTop: "auto" }} header="Действия">
+                    <Layout direction="row">
+                      <Button
+                        onClick={() =>
+                          config && deleteConfig({ configId: config.configId })
+                        }
+                      >
+                        Удалить конфигурацию
+                      </Button>
+                      <Button
+                        style={{
+                          marginLeft: "auto",
+                        }}
+                      >
+                        Тест
+                      </Button>
+                      <Button onClick={handleSaveConfig} color="primary">
+                        Сохранить
+                      </Button>
+                    </Layout>
+                  </Section>
+                </Layout>
+              ) : (
+                <Layout
+                  direction="column"
                   style={{
-                    marginLeft: "auto",
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  Тест
-                </Button>
-                <Button onClick={handleSaveConfig} color="primary">
-                  Сохранить
-                </Button>
+                  <p style={{ textAlign: "center" }}>
+                    Бот отсутствует для сервиса "{service?.name}" <br />
+                    Вы можете создать его.
+                  </p>
+                  <Button onClick={handleCreateConfig}>Создать бота</Button>
+                </Layout>
+              )
+            ) : status === "idle" ? (
+              <Layout
+                direction="column"
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flex: 1,
+                }}
+              >
+                Добро пожаловать! Выберите сервис для конфигурирования
               </Layout>
-            </Section>
-          </Layout>
-        ) : (
-          <Layout
-            direction="column"
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <p style={{ textAlign: "center" }}>
-              Бот отсутствует для сервиса "{service?.name}" <br />
-              Вы можете создать его.
-            </p>
-            <Button onClick={handleCreateConfig}>Создать бота</Button>
-          </Layout>
-        )
-      ) : status === "idle" ? (
-        <Layout
-          direction="column"
-          style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
-        >
-          Добро пожаловать! Выберите сервис для конфигурирования
-        </Layout>
-      ) : (
-        <div>загрузка..</div>
-      )}
-    </>
-  );
+            ) : (
+              <div>загрузка..</div>
+            )}
+          </>
+        );
+    }
+  };
+
+  return renderView();
 };
 
 export default ServiceConfig;

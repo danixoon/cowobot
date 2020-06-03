@@ -1,36 +1,28 @@
 import * as api from "../../api/user";
 import axios from "axios";
 import { put, call, takeLatest, take, fork } from "redux-saga/effects";
-import { ActionTypes } from "../types";
-import {
-  userLoginSuccess,
-  userLoginError,
-  userLogout,
-  userLogoutSuccess,
-} from "../actions/user";
+import { ActionTypes, getAction } from "../types";
 
-function* loginUser(action: ActionMap.Action<typeof ActionTypes.USER_LOGIN>) {
+function* loginUser(action: Action<typeof ActionTypes.USER_LOGIN>) {
   const { username, password } = action.payload;
 
   try {
-    const request = (yield call(
-      api.userLogin,
-      username,
-      password
-    )) as ApiSuccessReponse<ReturnType<typeof userLoginSuccess>["payload"]>;
-
+    // TODO бахнуть типизации
+    const request = yield call(api.userLogin, username, password);
     window.localStorage.setItem("token", request.data.token);
-    yield put<ActionMap.Actions>(
-      userLoginSuccess({ ...request.data, username })
+    yield put(
+      getAction(ActionTypes.USER_LOGIN_SUCCESS, { ...request.data, username })
     );
   } catch (error) {
-    yield put<ActionMap.Actions>(userLoginError(error.response.data.error));
+    yield put(
+      getAction(ActionTypes.USER_LOGIN_ERROR, error.response.data.error)
+    );
   }
 }
 
 function* logoutUser() {
   window.localStorage.removeItem("token");
-  yield put(userLogoutSuccess());
+  yield put(getAction(ActionTypes.USER_LOGOUT_SUCCESS));
 }
 
 export default function* userFlow() {
@@ -40,7 +32,7 @@ export default function* userFlow() {
     try {
       const request = yield call(api.userFetchData);
       const { username } = request.data;
-      yield put(userLoginSuccess({ token, username }));
+      yield put(getAction(ActionTypes.USER_LOGIN_SUCCESS, { token, username }));
       isAuth = true;
     } catch (error) {
       console.log(error);
@@ -50,7 +42,7 @@ export default function* userFlow() {
 
   while (true) {
     if (!isAuth) {
-      const data = (yield take(ActionTypes.USER_LOGIN)) as ActionMap.Action<
+      const data = (yield take(ActionTypes.USER_LOGIN)) as Action<
         typeof ActionTypes.USER_LOGIN
       >;
       yield fork(loginUser, data);

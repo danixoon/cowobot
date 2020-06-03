@@ -8,7 +8,7 @@ const defaultState: () => UserState = () => ({
   data: { token: null, username: "" },
 });
 
-export const userReducer: Reducer<UserState, ActionMap.Actions> = (
+export const userReducer: Reducer<UserState, Action> = (
   state = defaultState(),
   action
 ) => {

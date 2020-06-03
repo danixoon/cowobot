@@ -1,8 +1,7 @@
 import * as React from "react";
-import { RootState } from "../redux/types";
+import { RootState, getActionCreator, ActionTypes } from "../redux/types";
 import { connect } from "react-redux";
 import AuthPopup from "../layout/AuthPopup";
-import { userLogin } from "../redux/actions";
 
 const mapStateToProps = (state: RootState) => ({
   isAuth: state.user.status === "success",
@@ -10,7 +9,9 @@ const mapStateToProps = (state: RootState) => ({
   error: state.user.error?.message ?? "",
 });
 const mapDispatchToProps = {
-  login: userLogin,
+  login: getActionCreator(ActionTypes.USER_LOGIN),
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AuthPopup);
+export const authPopupEnchancer = connect(mapStateToProps, mapDispatchToProps);
+
+export default authPopupEnchancer(AuthPopup);

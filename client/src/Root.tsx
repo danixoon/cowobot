@@ -10,6 +10,11 @@ import RootContainer from "./containers/RootContainer";
 
 import "./sass/default.scss";
 
+// const createAction = <T extends keyof ActionMap.ActionPayload>(
+//   type: T,
+//   payload: ActionMap.ActionPayload[T]
+// ): ActionMap.Action<T> => ({ type, payload });
+
 export type RootContainerProps = {};
 
 const Root: React.FC<RootContainerProps> = (props) => (

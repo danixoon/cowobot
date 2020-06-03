@@ -4,6 +4,7 @@ import avatarUrl from "../../images/avatar.png";
 
 const defaultState: () => ServiceState = () => ({
   serviceId: null,
+  serviceView: "configuration",
   services: {
     status: "idle",
     error: null,
@@ -16,11 +17,13 @@ const defaultState: () => ServiceState = () => ({
   },
 });
 
-export const serviceReducer: Reducer<ServiceState, ActionMap.Actions> = (
+export const serviceReducer: Reducer<ServiceState, Action> = (
   state = defaultState(),
   action
 ) => {
   switch (action.type) {
+    case ActionTypes.SERVICE_SELECT:
+      return { ...state, serviceView: action.payload.serviceView };
     case ActionTypes.SERVICE_FETCH:
       return { ...state, services: { ...state.services, status: "loading" } };
     case ActionTypes.SERVICE_FETCH_SUCCESS:
@@ -37,11 +40,6 @@ export const serviceReducer: Reducer<ServiceState, ActionMap.Actions> = (
         ...state,
         config: { data: null, error: null, status: "loading" },
       };
-    case ActionTypes.CONFIG_DELETE_SUCCESS:
-      return {
-        ...state,
-        config: { status: "success", error: null, data: null },
-      };
     case ActionTypes.CONFIG_FETCH_SUCCESS:
       return {
         ...state,
@@ -52,6 +50,12 @@ export const serviceReducer: Reducer<ServiceState, ActionMap.Actions> = (
           data: action.payload.config !== null ? action.payload.config : null,
         },
       };
+    case ActionTypes.CONFIG_DELETE_SUCCESS:
+      return {
+        ...state,
+        config: { status: "success", error: null, data: null },
+      };
+
     case ActionTypes.USER_LOGOUT_SUCCESS:
       return defaultState();
     default:

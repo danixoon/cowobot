@@ -8,13 +8,11 @@ import Form from "../../components/Form";
 import Section from "../../components/Section";
 import Button from "../../components/Button";
 import Label from "../../components/Label";
+import { ConnectedProps } from "react-redux";
+import { authPopupEnchancer } from "../../containers/AuthPopupContainer";
 
-export type AuthPopupProps = React.HTMLAttributes<HTMLDivElement> & {
-  isAuth: boolean;
-  status: DataStatus;
-  error: string;
-  login: (username: string, password: string) => void;
-};
+export type AuthPopupProps = React.HTMLAttributes<HTMLDivElement> &
+  ConnectedProps<typeof authPopupEnchancer>;
 
 const AuthPopup: React.FC<AuthPopupProps> = (props) => {
   const { isAuth, login, status, error } = props;
@@ -22,7 +20,7 @@ const AuthPopup: React.FC<AuthPopupProps> = (props) => {
   // const mergedProps = mergeProps({}, rest);
 
   const handleOnSubmit = () => {
-    login(input.username, input.password);
+    login({ username: input.username, password: input.password });
   };
 
   React.useEffect(() => {

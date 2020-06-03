@@ -5,7 +5,7 @@ import { userReducer } from "./user";
 import { serviceReducer } from "./service";
 import { testReducer } from "./test";
 
-const rootReducer: Reducer<RootState, ActionMap.Actions> = combineReducers({
+const rootReducer: Reducer<RootState, Action> = combineReducers({
   user: userReducer,
   test: testReducer,
   service: serviceReducer,
