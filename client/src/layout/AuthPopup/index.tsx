@@ -16,7 +16,8 @@ export type AuthPopupProps = React.HTMLAttributes<HTMLDivElement> &
 
 const AuthPopup: React.FC<AuthPopupProps> = (props) => {
   const { isAuth, login, status, error } = props;
-  const [input, bind, setInput] = useInput({} as any);
+  const bindInput = useInput({} as any);
+  const { input } = bindInput;
   // const mergedProps = mergeProps({}, rest);
 
   const handleOnSubmit = () => {
@@ -32,22 +33,10 @@ const AuthPopup: React.FC<AuthPopupProps> = (props) => {
       <Section textAlign="center" header="Войдите в аккаунт">
         <Form onSubmit={handleOnSubmit} style={{ padding: "0 2rem" }}>
           <Label text="Имя пользователя">
-            <Input
-              name="username"
-              type="username"
-              {...bind}
-              input={input}
-              setInput={setInput}
-            />
+            <Input name="username" type="username" {...bindInput} />
           </Label>
           <Label text="Пароль">
-            <Input
-              name="password"
-              type="password"
-              {...bind}
-              input={input}
-              setInput={setInput}
-            />
+            <Input name="password" type="password" {...bindInput} />
           </Label>
           <Button
             disabled={status === "loading"}

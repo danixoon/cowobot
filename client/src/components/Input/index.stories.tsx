@@ -7,27 +7,18 @@ import Label from "../Label";
 storiesOf("Components/Input", module)
   .add("simple", () => <Input name="simple" input={{}} placeholder="текст" />)
   .add("with reset", () => {
-    const [input, bind, setInput] = useInput();
+    const bindInput = useInput();
     return (
       <>
         <Input
+          {...bindInput}
           name="resetable"
-          setInput={setInput}
-          input={input}
-          {...bind}
           isResetable
           placeholder="текст"
           defaultValue="BB_PR_REVIEWER"
         />
 
-        <Input
-          name="text2"
-          setInput={setInput}
-          input={input}
-          {...bind}
-          isResetable
-          placeholder="текст"
-        />
+        <Input {...bindInput} name="text2" isResetable placeholder="текст" />
       </>
     );
   })
@@ -45,13 +36,11 @@ storiesOf("Components/Input", module)
     );
   })
   .add("with dropdown", () => {
-    const [input, bind, setInput] = useInput({ dropdown: "при" });
+    const bindInput = useInput({ dropdown: "при" });
     return (
       <Input
-        {...bind}
+        {...bindInput}
         name="dropdown"
-        setInput={setInput}
-        input={input}
         defaultValue="прив"
         placeholder="текст"
         isResetable
