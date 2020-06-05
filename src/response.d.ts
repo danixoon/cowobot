@@ -1,3 +1,58 @@
+
+
+declare interface IService {
+  id: number;
+  key: string;
+  name: string;
+  role: number;
+}
+
+declare interface IAction {
+  id: number;
+  name: string;
+  key: string;
+  serviceId: number;
+}
+
+declare interface IAccount {
+  id: number;
+  username: string;
+  // password: string;
+  nickname: string;
+  serviceId: number;
+}
+
+declare interface IConfig {
+  id: number;
+  token: string;
+  accountId: number;
+  serviceId: number;
+}
+
+declare interface INotice {
+  id: number;
+  messageTemplate: string;
+  configId: number;
+  actionId: number;
+  serviceId: number;
+}
+
+declare interface INoticeValue {
+  id: number;
+  name: string;
+  key: string;
+  value: string;
+  noticeId: number;
+}
+
+declare interface INoticeQuery {
+  id: number;
+  name: string;
+  key: string;
+  customKey: string;
+  noticeId: number;
+}
+
 declare namespace ApiResponseData {
   export namespace Service {
     export type Service = {

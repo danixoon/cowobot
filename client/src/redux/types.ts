@@ -55,22 +55,26 @@ export const ActionTypes: { [K in keyof ActionPayload]: K } = {
 
 export type UserState = StateSchema<{
   username: string;
-  token: string | null;
 }>;
 
-export type ServiceState = {
-  serviceId: number | null;
-  serviceView: ServiceConfigView;
-  services: StateSchema<ApiResponseData.Service.Service[]>;
-  config: StateSchema<{
-    token: string;
-    configId: number;
-    // Варианты событий (ревью не ревью)
-    actions: ApiResponseData.Service.Action[];
-    variables: ApiResponseData.Service.Variable[];
-    notices: ApiResponseData.Service.Notice[];
-  }>;
-};
+export type ServiceState = StateSchema<{
+  serviceId: number;
+  services: IService[];
+}>;
+
+// export type ServiceState = {
+//   serviceId: number | null;
+//   serviceView: ServiceConfigView;
+//   services: StateSchema<ApiResponseData.Service.Service[]>;
+//   config: StateSchema<{
+//     token: string;
+//     configId: number;
+//     // Варианты событий (ревью не ревью)
+//     actions: ApiResponseData.Service.Action[];
+//     variables: ApiResponseData.Service.Variable[];
+//     notices: ApiResponseData.Service.Notice[];
+//   }>;
+// };
 
 export interface TestState {
   message: string;

@@ -2,7 +2,9 @@ import * as express from "express";
 
 import authRouter from "./auth";
 import userRouter from "./user";
+import configRouter from "./config";
 import serviceRouter from "./service";
+import noticeRouter from "./notice";
 import testRouter from "./test";
 import { createErrorData } from "../../middleware";
 
@@ -19,6 +21,8 @@ router.use(
   authRouter,
   userRouter,
   serviceRouter,
+  configRouter,
+  noticeRouter,
   testRouter,
   handleNotFound
 );

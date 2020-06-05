@@ -8,6 +8,36 @@ import { getClient } from "../db";
 
 const { SECRET } = getEnv("SECRET");
 
+export const handleRequest: (
+  requestHandler: (
+    req: SessionRequest,
+    res: express.Response
+    // next: express.NextFunction
+  ) => Promise<void> | void,
+  errorHandler?: (error: any) => ApiError | null | false | undefined
+) => express.RequestHandler = (requestHandler, errorHandler) => async (
+  req,
+  res,
+  next
+) => {
+  try {
+    await requestHandler(req as SessionRequest, res);
+  } catch (error) {
+    let result = null;
+    if (errorHandler) result = errorHandler(error);
+    if (result != null) {
+      // res.send(result);
+      next(result);
+    } else {
+      if (error.response) next(error.response);
+      else next(error);
+      console.error("Request error: ", error);
+    }
+
+    // else throw error;
+  }
+};
+
 export const mapKeyToColumn = (key: string) =>
   key
     .split("")
@@ -39,7 +69,7 @@ export const createErrorData = ({
   return { error: { ...rest, message, statusCode } };
 };
 
-export const createResponse = (data: any) => ({ data });
+export const createResponse = (data: any) => ({ data: data ?? null });
 
 export const generateHash = async (value: string) => {
   const salt = await bcrypt.genSalt(10);
