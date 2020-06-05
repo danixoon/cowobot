@@ -4,7 +4,7 @@ import RootLayout, { RootLayoutProps } from "../layout/RootLayout";
 import { connect } from "react-redux";
 
 const mapStateToProps = (state: RootState) => ({
-  isAuth: state.user.status === "success",
+  isAuth: state.user.isAuth,
 });
 
 const mapDispatchToProps = {};

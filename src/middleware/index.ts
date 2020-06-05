@@ -144,7 +144,7 @@ const configOwner: express.RequestHandler = async (
 const guest: express.RequestHandler = (req, res, next) => {
   if (req.header("Authorization"))
     return res
-      .status(402)
+      .status(403)
       .send(createErrorData({ message: "You need to logout" }));
   next();
 };

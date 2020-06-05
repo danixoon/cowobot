@@ -67,7 +67,7 @@ router.post(
 
 // Запрос получения оповещения
 router.get(
-  "/notice",
+  "/notice/data",
   access.auth,
   [query("noticeId").isNumeric()],
   validator,

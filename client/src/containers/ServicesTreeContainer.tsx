@@ -5,8 +5,8 @@ import { connect } from "react-redux";
 import ServicesTree, { ServicesTreeProps } from "../layout/ServicesTree";
 
 const mapStateToProps = (state: RootState) => ({
-  services: state.service.services.data ?? [],
-  selectedServiceId: state.service.serviceId,
+  services: state.service.services,
+  selectedServiceId: state.config.serviceId,
 });
 const mapDispatchToProps = {
   onServiceSelect: getActionCreator(ActionTypes.SERVICE_SELECT),

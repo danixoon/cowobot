@@ -15,7 +15,7 @@ export type AuthPopupProps = React.HTMLAttributes<HTMLDivElement> &
   ConnectedProps<typeof authPopupEnchancer>;
 
 const AuthPopup: React.FC<AuthPopupProps> = (props) => {
-  const { isAuth, login, status, error } = props;
+  const { login, error, isAuth } = props;
   const bindInput = useInput({} as any);
   const { input } = bindInput;
   // const mergedProps = mergeProps({}, rest);
@@ -23,6 +23,8 @@ const AuthPopup: React.FC<AuthPopupProps> = (props) => {
   const handleOnSubmit = () => {
     login({ username: input.username, password: input.password });
   };
+
+  // React.useEffect(() => {}, []);
 
   React.useEffect(() => {
     if (status === "error" && error) alert(error);

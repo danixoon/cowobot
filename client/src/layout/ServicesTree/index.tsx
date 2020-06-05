@@ -22,8 +22,8 @@ const ServicesTree: React.FC<ServicesTreeProps> = (props) => {
       items={services.map((v) => ({
         content: v.name,
         items: [
-          { id: `${v.serviceId}_configuration`, content: "Оповещения" },
-          { id: `${v.serviceId}_connection`, content: "Подключение" },
+          { id: `${v.id}_configuration`, content: "Оповещения" },
+          { id: `${v.id}_connection`, content: "Подключение" },
         ],
       }))}
     />

@@ -16,4 +16,16 @@ export const store = createStore<RootState, Action, any, any>(
   )
 ) as Store<RootState, Action>;
 
+export const setAction = <T extends string | null = null>(
+  action: T = null as T
+) => ({
+  action,
+  error: null,
+});
+
+export const setError = (error: ApiError) => ({
+  action: null,
+  error,
+});
+
 sagaMiddleware.run(rootSaga);

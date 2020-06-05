@@ -8,6 +8,7 @@ import {
   access,
   createErrorData,
   createApiError,
+  handleRequest,
 } from "../../middleware";
 import { getEnv } from "../../config";
 import { getClient } from "../../db";
@@ -15,6 +16,13 @@ import { getClient } from "../../db";
 const { SECRET } = getEnv("SECRET");
 
 const router = express.Router();
+
+router.get(
+  "/auth/check",
+  handleRequest((req, res) => {
+    res.send(createResponse({ token: req.header("Authorization") }));
+  })
+);
 
 router.get(
   "/auth",
@@ -34,14 +42,14 @@ router.get(
     const result = await getClient(
       (client) =>
         client.query(
-          `SELECT "id", "password_hash" FROM "account" WHERE "username"='${username}'`
+          `SELECT "id", "password" FROM "account" WHERE "username"='${username}'`
         ),
       next
     );
 
     if (result.rowCount === 0) return next(invalidCredintalsError);
-    const [{ password_hash, id }] = result.rows;
-    const correct = await bcrypt.compare(password, password_hash);
+    const [{ password: hash, id }] = result.rows;
+    const correct = await bcrypt.compare(password, hash);
     if (!correct) return next(invalidCredintalsError);
 
     const token = jwt.sign(id, SECRET);

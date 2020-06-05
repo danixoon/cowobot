@@ -1,5 +1,3 @@
-
-
 declare interface IService {
   id: number;
   key: string;
@@ -91,7 +89,7 @@ declare namespace ApiResponseData {
 
   export namespace Account {
     export type User = {
-      usename: string;
+      username: string;
     };
   }
 }
@@ -140,6 +138,7 @@ declare type ApiError = Partial<{
   message: string;
   statusCode: number;
   param: string;
+  randomId?: string;
   [key: string]: any;
 }>;
 

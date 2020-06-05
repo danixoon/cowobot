@@ -6,7 +6,6 @@
 import { take, all, fork, cancel, race, put, call } from "redux-saga/effects";
 import { ActionTypes, getAction } from "../types";
 import * as api from "../../api";
-import { fetchApi } from ".";
 
 // function* loginUser(action: Action<typeof ActionTypes.USER_LOGIN>) {
 //   const { username, password } = action.payload;
@@ -66,31 +65,35 @@ import { fetchApi } from ".";
 // }
 
 export default function* watchSagas() {
+  let token = localStorage.getItem("token");
+  if (token) {
+    try {
+      const data = yield call(api.request, "/auth/check", "GET");
+      if (data.token)
+        yield put(getAction(ActionTypes.USER_LOGIN_SUCCESS, { token }));
+    } catch (err) {
+      localStorage.removeItem("token");
+    }
+  }
+
   while (true) {
-    yield take(ActionTypes.USER_LOGIN_SUCCESS);
-    const tasks = yield all([
-      fork(watchUserFetch),
-      // fork(watchServicesFetch),
-    ]);
-    yield put(getAction(ActionTypes.USER_FETCH));
-    yield take(ActionTypes.USER_LOGOUT_SUCCESS);
-    yield cancel(tasks);
+    const action = (yield take(ActionTypes.USER_LOGIN)) as Action<"USER_LOGIN">;
+    try {
+      yield put(getAction(ActionTypes.USER_LOGIN_LOADING));
+      const { token } = yield call(api.request, "/auth", "GET", {
+        params: {
+          password: action.payload.password,
+          username: action.payload.username,
+        },
+      });
+      localStorage.setItem("token", token);
+      yield put(getAction(ActionTypes.USER_LOGIN_SUCCESS, { token }));
+    } catch (err) {
+      getAction(ActionTypes.USER_LOGIN_ERROR, err);
+    }
   }
 }
 
-function* userFetch() {
-  yield fetchApi(
-    ActionTypes.USER_FETCH_LOADING,
-    ActionTypes.USER_FETCH_SUCCESS,
-    ActionTypes.USER_FETCH_ERROR,
-    () => call(api.request, "/user", "GET")
-  );
-}
-
-function* watchUserFetch() {
-  while (true) {
-    yield take(ActionTypes.USER_FETCH);
-    yield call(userFetch);
-  }
+function* watchActions() {
   // yield takeLatest(ActionTypes.SERVICES_FETCH)
 }

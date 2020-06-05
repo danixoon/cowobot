@@ -8,6 +8,10 @@ declare module "*.png" {
   export default content;
 }
 
+declare type WithRandomId = {
+  randomId?: string;
+};
+
 declare type ArrayElement<
   ArrayType extends readonly unknown[]
 > = ArrayType[number];
@@ -15,8 +19,18 @@ declare type ArrayElement<
 declare type ActionPayload = {
   USER_LOGIN: { username: string; password: string };
   USER_LOGIN_LOADING: {};
-  USER_LOGIN_SUCCESS: { token: string; username: string };
+  USER_LOGIN_SUCCESS: { token: string };
   USER_LOGIN_ERROR: ApiError;
+
+  USER_FETCH: {};
+  USER_FETCH_LOADING: {};
+  USER_FETCH_SUCCESS: {
+    id: number;
+    username: string;
+    nickname: string;
+    serviceId: number;
+  };
+  USER_FETCH_ERROR: ApiError;
 
   USER_LOGOUT: {};
   USER_LOGOUT_SUCCESS: {};
@@ -24,7 +38,7 @@ declare type ActionPayload = {
   SERVICES_FETCH: {};
   SERVICES_FETCH_LOADING: {};
   SERVICES_FETCH_SUCCESS: IService[];
-  SERVICES_FETCH_SUCCESS: ApiError;
+  SERVICES_FETCH_ERROR: ApiError;
 
   SERVICE_SELECT: { serviceId: number; serviceView: ServiceConfigView };
 
@@ -33,28 +47,48 @@ declare type ActionPayload = {
   CONFIG_FETCH_SUCCESS: IConfig;
   CONFIG_FETCH_ERROR: ApiError;
 
+  CONFIG_UPDATE: { configId: number; token: string };
+  CONFIG_UPDATE_LOADING: {};
+  CONFIG_UPDATE_SUCCESS: { id: number };
+  CONFIG_UPDATE_ERROR: ApiError;
+
   CONFIG_CREATE: { accountId: number; serviceId: number };
   CONFIG_CREATE_LOADING: {};
   CONFIG_CREATE_SUCCESS: { id: number };
   CONFIG_CREATE_ERROR: ApiError;
+
+  CONFIG_DELETE: { configId: number };
+  CONFIG_DELETE_LOADING: {};
+  CONFIG_DELETE_SUCCESS: { id: number };
+  CONFIG_DELETE_ERROR: ApiError;
 
   NOTICES_FETCH: { configId: number };
   NOTICES_FETCH_LOADING: {};
   NOTICES_FETCH_SUCCESS: INotice[];
   NOTICES_FETCH_ERROR: ApiError;
 
-  NOTICE_FETCH: { noticeId: number };
-  NOTICE_FETCH_LOADING: {};
-  NOTICE_FETCH_SUCCESS: INotice & {
+  NOTICE_FETCH_DATA: { noticeId: number };
+  NOTICE_FETCH_DATA_LOADING: {};
+  NOTICE_FETCH_DATA_SUCCESS: {
     values: INoticeValue[];
     queries: INoticeQuery[];
   };
-  NOTICE_FETCH_ERROR: {};
+  NOTICE_FETCH_DATA_ERROR: ApiError;
 
   NOTICE_DELETE: { noticeId: number };
   NOTICE_DELETE_LOADING: {};
   NOTICE_DELETE_SUCCESS: { id: number };
   NOTICE_DELETE_ERROR: ApiError;
+
+  NOTICE_ADD: INotice & WithRandomId;
+  NOTICE_ADD_LOADING: {};
+  NOTICE_ADD_SUCCESS: INotice & WithRandomId;
+  NOTICE_ADD_ERROR: ApiError;
+
+  NOTICE_SAVE: INotice & { values: INoticeValue; queries: INoticeQuery };
+  NOTICE_SAVE_LOADING: {};
+  NOTICE_SAVE_SUCCESS: {};
+  NOTICE_SAVE_ERROR: ApiError;
 
   // // Получение известных сервисов
   // SERVICE_FETCH: {};
@@ -116,11 +150,10 @@ declare type Action<
 // export type Actions = ReturnType<ActionCreators[keyof ActionCreators]>;
 // export type Action<T extends ActionType> = Extract<Actions, { type: T }>;
 
-declare type StateSchema<T> = {
-  status: DataStatus;
+declare type StateSchema<T, A extends string = null> = {
+  action: A | null;
   error: ApiError | null;
-  data: T | null;
-};
+} & T;
 
 declare type DataStatus = "idle" | "loading" | "success" | "error";
 declare type ServiceConfigView = "connection" | "configuration";

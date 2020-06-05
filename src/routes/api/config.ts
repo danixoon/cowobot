@@ -17,7 +17,7 @@ import {
   handleRequest,
 } from "../../middleware";
 
-import { getClient, fetchConfig, createConfig } from "../../db";
+import { getClient, fetchConfig, createConfig, updateConfig } from "../../db";
 
 const router = express.Router();
 
@@ -34,6 +34,18 @@ router.get(
     const result = await fetchConfig(req.query.configId as any);
     res.send(createResponse(result));
   }
+);
+
+router.put(
+  "/config",
+  access.auth,
+  [query("configId").isNumeric(), query("token").isNumeric()],
+  validator,
+  handleRequest(async (req, res) => {
+    const { configId, token } = req.query as any;
+    const result = await updateConfig(configId, token);
+    res.send(createResponse({ id: result }));
+  })
 );
 
 router.post(

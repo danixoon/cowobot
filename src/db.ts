@@ -5,7 +5,6 @@ import { createErrorData, mapData, createApiError } from "./middleware";
 import * as fs from "fs";
 import * as util from "util";
 import * as path from "path";
-import { ServiceRole } from "./response";
 
 const { DATABASE_URL } = getEnv("DATABASE_URL");
 
@@ -271,11 +270,11 @@ export const deleteNotice = async (noticeId: number) => {
 
 // Возвращает данные по оповещению
 export const fetchNoticeData = async (noticeId: number) => {
-  const notice = (
-    await getAllColumnsByCondition("notice", `"id"='${noticeId}'`)
-  )[0];
+  // const notice = (
+  //   await getAllColumnsByCondition("notice", `"id"='${noticeId}'`)
+  // )[0];
 
-  if (!notice) return null;
+  // if (!notice) return null;
 
   const [values, queries] = (await Promise.all([
     getAllColumnsByCondition("notice_value", `"notice_id"='${noticeId}'`),
@@ -285,7 +284,7 @@ export const fetchNoticeData = async (noticeId: number) => {
   const action = await getActionByNoticeId(noticeId);
 
   return {
-    ...mapData(notice),
+    // ...mapData(notice),
     values: mapData(mergeByKey(action.values, values)),
     queries: mapData(mergeByKey(action.queries, queries)),
   };
@@ -317,14 +316,6 @@ export const createNotice = async (
     )
   ).rows[0];
   return notice.id;
-};
-
-export const updateConfig = async (configId: number, token: string) => {
-  await getClient((client) =>
-    client.query(
-      `UPDATE "config" SET "token"='${token}' WHERE "id"='${configId}'`
-    )
-  );
 };
 
 export const updateNotice = async (
@@ -402,6 +393,17 @@ export const createConfig = async (accountId: number, serviceId: number) => {
         getInsertQuery("config", [
           `DEFAULT, NULL, '${accountId}', '${serviceId}'`,
         ])
+      )
+    )
+  ).rows[0];
+  return config.id;
+};
+
+export const updateConfig = async (configId: number, token: string) => {
+  const config = (
+    await getClient((client) =>
+      client.query(
+        `UPDATE "config" SET "token"='${token}' WHERE "id"='${configId}'`
       )
     )
   ).rows[0];

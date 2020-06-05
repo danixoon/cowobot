@@ -4,9 +4,11 @@ import { connect } from "react-redux";
 import AuthPopup from "../layout/AuthPopup";
 
 const mapStateToProps = (state: RootState) => ({
-  isAuth: state.user.status === "success",
-  status: state.user.status,
-  error: state.user.error?.message ?? "",
+  isAuth: state.user.isAuth,
+  // status: state.user.status,
+  // error: state.user.error?.message ?? "",
+
+  error: state.user.error,
 });
 const mapDispatchToProps = {
   login: getActionCreator(ActionTypes.USER_LOGIN),
