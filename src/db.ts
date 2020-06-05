@@ -255,6 +255,18 @@ export const fetchNotices = async (configId: number) => {
   return notices;
 };
 
+export const fetchServiceConfig = async (
+  accountId: number,
+  serviceId: number
+) => {
+  return (
+    await getAllColumnsByCondition(
+      "config",
+      `"account_id"='${accountId}' AND "service_id"='${serviceId}'`
+    )
+  )[0];
+};
+
 // Возвращает конфигурацию по ид.
 export const fetchConfig = async (configId: number) => {
   const config = await getAllColumnsByCondition("config", `"id"='${configId}'`);

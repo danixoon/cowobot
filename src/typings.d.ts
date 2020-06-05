@@ -1,3 +1,3 @@
 declare type SessionRequest = import("express").Request & {
-  session: { userId?: string };
+  session: { userId?: number };
 };

@@ -5,13 +5,12 @@ import { setAction, setError } from "../store";
 
 const defaultState: () => ConfigState = () => ({
   action: null,
-  status: "idle",
   error: null,
-
   accountId: 0,
   configId: 0,
   serviceId: 0,
   token: "",
+  isEmpty: false,
 });
 
 export const configReducer: Reducer<ConfigState, Action> = (
@@ -29,7 +28,12 @@ export const configReducer: Reducer<ConfigState, Action> = (
     case ActionTypes.CONFIG_FETCH_LOADING:
       return { ...state, ...setAction("fetch") };
     case ActionTypes.CONFIG_FETCH_SUCCESS:
-      return { ...state, ...setAction(), ...action.payload };
+      return {
+        ...state,
+        ...setAction(),
+        isEmpty: action.payload == null,
+        ...action.payload,
+      };
     case ActionTypes.CONFIG_FETCH_ERROR:
       return { ...state, ...setError(action.payload) };
 

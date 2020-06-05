@@ -22,33 +22,38 @@ import { fetchApi } from ".";
 //   }
 // }
 
-function* fetchServices() {
-  yield call(
-    fetchApi,
-    ActionTypes.SERVICES_FETCH_LOADING,
-    ActionTypes.SERVICES_FETCH_SUCCESS,
-    ActionTypes.SERVICES_FETCH_ERROR,
-    () => call(api.request, "/services", "GET")
-  );
-}
+function* fetchServices() {}
 
 function* watchServiceSelect() {
   while (true) {
+    const oldServiceId = yield select(
+      (state: RootState) => state.service.serviceId
+    );
     const {
       payload: { serviceId, serviceView },
     } = (yield take(ActionTypes.SERVICE_SELECT)) as Action<"SERVICE_SELECT">;
-    const currentServiceId = (yield select(
-      (state: RootState) => state.config.serviceId
-    )) as number;
 
-    if (serviceId === currentServiceId) continue;
+    if (serviceId === oldServiceId) continue;
+
+    const config = yield fetchApi(
+      ActionTypes.CONFIG_FETCH_LOADING,
+      ActionTypes.CONFIG_FETCH_SUCCESS,
+      ActionTypes.CONFIG_FETCH_ERROR,
+      () =>
+        call(api.request, "/service/config", "GET", { params: { serviceId } })
+    );
   }
 }
 
 function* watchServicesFetch() {
   while (true) {
     yield take(ActionTypes.SERVICES_FETCH);
-    yield call(fetchServices);
+    yield fetchApi(
+      ActionTypes.SERVICES_FETCH_LOADING,
+      ActionTypes.SERVICES_FETCH_SUCCESS,
+      ActionTypes.SERVICES_FETCH_ERROR,
+      () => call(api.request, "/services", "GET")
+    );
   }
 }
 

@@ -19,6 +19,7 @@ export function* fetchApi(
   try {
     const result = yield cb();
     yield put(getAction(succes, result));
+    return result;
   } catch (e) {
     yield put(getAction(error, e));
   }

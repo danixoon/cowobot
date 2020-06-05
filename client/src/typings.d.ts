@@ -44,7 +44,7 @@ declare type ActionPayload = {
 
   CONFIG_FETCH: { configId: number };
   CONFIG_FETCH_LOADING: {};
-  CONFIG_FETCH_SUCCESS: IConfig;
+  CONFIG_FETCH_SUCCESS: IConfig | null;
   CONFIG_FETCH_ERROR: ApiError;
 
   CONFIG_UPDATE: { configId: number; token: string };

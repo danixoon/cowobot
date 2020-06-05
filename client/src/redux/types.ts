@@ -97,6 +97,7 @@ export type ConfigState = StateSchema<
     token: string;
     accountId: number;
     serviceId: number;
+    isEmpty: boolean;
   },
   "create" | "delete" | "fetch"
 >;

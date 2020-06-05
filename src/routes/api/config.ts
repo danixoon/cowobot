@@ -17,7 +17,13 @@ import {
   handleRequest,
 } from "../../middleware";
 
-import { getClient, fetchConfig, createConfig, updateConfig } from "../../db";
+import {
+  getClient,
+  fetchConfig,
+  createConfig,
+  updateConfig,
+  fetchServiceConfig,
+} from "../../db";
 
 const router = express.Router();
 
@@ -35,6 +41,7 @@ router.get(
     res.send(createResponse(result));
   }
 );
+
 
 router.put(
   "/config",

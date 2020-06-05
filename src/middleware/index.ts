@@ -104,12 +104,12 @@ const auth: express.RequestHandler = (req: SessionRequest, res, next) => {
   if (!token) return res.status(403).send(invalidTokenError);
   try {
     const userId = jwt.verify(token, SECRET) as string;
-    if (!req.session) req.session = { userId };
+    if (!req.session) req.session = { userId: Number(userId) };
     next();
   } catch (error) {
     return res.status(403).send(invalidTokenError);
   }
-};
+};``
 
 const configOwner: express.RequestHandler = async (
   req: SessionRequest,

@@ -17,7 +17,7 @@ import {
   handleRequest,
 } from "../../middleware";
 
-import { getClient, fetchServices } from "../../db";
+import { getClient, fetchServices, fetchServiceConfig } from "../../db";
 
 const router = express.Router();
 
@@ -31,5 +31,19 @@ router.get(
   handleRequest(async (req, res) => {
     const services = await fetchServices();
     res.send(createResponse(services));
+  })
+);
+
+router.get(
+  "/service/config",
+  access.auth,
+  [query("serviceId")],
+  validator,
+  handleRequest(async (req, res) => {
+    const { serviceId } = req.query as any;
+    const { userId } = req.session;
+
+    const config = await fetchServiceConfig(userId, serviceId);
+    res.send(createResponse(config));
   })
 );
