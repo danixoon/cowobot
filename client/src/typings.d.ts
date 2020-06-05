@@ -40,6 +40,7 @@ declare type ActionPayload = {
   CONFIG_FETCH_SUCCESS: {
     serviceId: number;
     config: null | {
+      token: string;
       variables: ApiResponseData.Service.Variable[];
       notices: ApiResponseData.Service.Notice[];
       actions: ApiResponseData.Service.Action[];
@@ -63,6 +64,8 @@ declare type ActionPayload = {
   CONFIG_SAVE: ApiRequestData.PUT["/service/config"];
   CONFIG_SAVE_SUCCESS: {};
   CONFIG_SAVE_ERROR: { error: ApiError };
+
+  CONFIG_TOKEN_CHANGE: { token: string };
 
   // // Получение идентификаторов известных конфигураций
   // CONFIG_IDS_FETCH: "CONF,

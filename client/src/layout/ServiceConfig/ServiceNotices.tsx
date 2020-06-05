@@ -30,8 +30,6 @@ const ServiceNotices: React.FC<ServiceNoticesProps> = (props) => {
     handleDeleteNotice,
     handleChangeNotice,
     handleAddNotice,
-    handleSaveConfig,
-    handleDeleteConfig,
   } = props;
   return (
     <>
@@ -56,12 +54,10 @@ const ServiceNotices: React.FC<ServiceNoticesProps> = (props) => {
             .map((notice) => (
               <ServiceNotice
                 key={notice.localId ?? notice.noticeId}
-                variables={config.variables
-                  .filter((v) => v.isTarget)
-                  .map((v) => ({
-                    ...v,
-                    customKey: variableChanges[v.variableId],
-                  }))}
+                variables={config.variables.map((v) => ({
+                  ...v,
+                  customKey: variableChanges[v.variableId],
+                }))}
                 actions={config.actions}
                 notice={notice}
                 onDelete={handleDeleteNotice}
@@ -72,23 +68,6 @@ const ServiceNotices: React.FC<ServiceNoticesProps> = (props) => {
         <Button onClick={handleAddNotice} style={{ width: "100%" }}>
           Добавить рассылку
         </Button>
-      </Section>
-      <Section style={{ marginTop: "auto" }} header="Действия">
-        <Layout direction="row">
-          <Button onClick={() => config && handleDeleteConfig(config.configId)}>
-            Удалить конфигурацию
-          </Button>
-          <Button
-            style={{
-              marginLeft: "auto",
-            }}
-          >
-            Тест
-          </Button>
-          <Button onClick={handleSaveConfig} color="primary">
-            Сохранить
-          </Button>
-        </Layout>
       </Section>
     </>
   );

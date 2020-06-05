@@ -32,10 +32,7 @@ router.get(
     const result = await getClient(
       (client) =>
         client.query(`
-        SELECT "service"."id" AS "service_id", "service"."name" FROM "service"
-        INNER JOIN "service_type" ON "service_type"."id"="service"."id"
-        WHERE "service_type"."type" != 'messenger'
-        `),
+        SELECT "service"."id" AS "service_id", "service"."name" FROM "service"`),
       next
     );
 
@@ -106,12 +103,32 @@ router.get(
       (client) =>
         client.query(`
         SELECT "service_action"."id" AS "action_id", "service_action"."name" FROM "service_action"
-        INNER JOIN "service" ON "service"."type_id"="service_action"."type_id"
+        INNER JOIN "service" ON "service"."id"="service_action"."service_id"
         INNER JOIN "service_configuration" ON "service_configuration"."service_id"="service"."id"
         WHERE "service_configuration"."id"='${configId}'
     `),
       next
     );
+
+    const actionIds = actions.rows.map((v) => v.action_id);
+
+    const actionVariables = await getClient(
+      (client) =>
+        client.query(`
+        SELECT "service_action_variable"."id" AS "variable_id", "service_action_variable"."name", "service_action_variable"."action_id", "service_notification_variable"."value"
+        FROM "service_action_variable"
+        LEFT JOIN "service_notification_variable" ON "service_notification_variable"."variable_id"="service_action_variable"."id"
+        WHERE "action_id" IN (${actionIds.join()})
+    `),
+      next
+    );
+
+    const actionsWithVariables = actions.rows.map((v) => ({
+      ...v,
+      variables: mapData(
+        actionVariables.rows.filter((r) => r.action_id === v.action_id)
+      ),
+    }));
 
     return res.send(
       createResponse({
@@ -122,8 +139,17 @@ router.get(
             isTarget: v.type === "messenger",
           }))
         ),
-        actions: mapData(actions.rows),
+        actions: mapData(actionsWithVariables),
         notices: mapData(notices.rows),
+        token: (
+          await getClient(
+            (client) =>
+              client.query(
+                `SELECT "token" FROM "service_configuration" WHERE "id"='${configId}'`
+              ),
+            next
+          )
+        ).rows[0].token,
       })
     );
   }
@@ -193,7 +219,6 @@ router.put(
  (${updateOrCreateNotices.map((v) => `'${v.variableId}'`).join()})
     `;
 
-        console.log(query);
         const invalidVariables = await getClient(
           (client) => client.query(query),
           next
@@ -207,17 +232,26 @@ router.put(
           );
       }
 
-      values = changes.notices
+      const addedNotices = changes.notices
         .filter((v) => v.modified === "create")
         .map(
           (v) =>
             `('${v.actionId}', '${v.messageTemplate}', '${v.variableId}', '${configId}')`
         );
 
-      if (values.length !== 0)
-        queries.push(
-          `INSERT INTO "service_notification" ("action_id", "message_template", "variable_id", "configuration_id") VALUES ${values.join()}`
+      // let noticeIds = [];
+
+      if (addedNotices.length !== 0) {
+        // queries.push(
+        let query = `INSERT INTO "service_notification" ("action_id", "message_template", "variable_id", "configuration_id") VALUES ${addedNotices.join()} RETURNING "service_notification"."id"`;
+        console.log(query);
+        (
+          await getClient((client) => client.query(query), next)
+        ).rows.forEach((row) =>
+          changes.notices.forEach((notice) => (notice.noticeId = row["id"]))
         );
+        // );
+      }
 
       changes.notices
         .filter((v) => v.modified === "update")
@@ -229,17 +263,55 @@ router.put(
             queries.push(
               `UPDATE "service_notification" SET ${keys
                 .map((v) => `"${mapKeyToColumn(v)}"='${(change as any)[v]}'`)
-                .join()}`
+                .join()} WHERE "id"='${change.noticeId}'`
             );
         });
     }
 
-    // res.send(queries);
+    {
+      // const values = changes.notices
+      //   .filter((v) => v.modified === "create")
+      //   .map((v) => {});
+      // const query = `
+      // INSERT INTO "service_notification_variable" ("variable_id", "notification_id", "value")
+      // SELECT "service_action_variable"."id", NEW."id",
+      //  FROM "service_action_variable"
+      //  WHERE "service_action_variable"."action_id"=NEW."action_id";`;
+    }
 
-    const response = await getClient(
-      (client) => client.query(queries.join("; ")),
-      next
-    );
+    const noticeVariablesQueries = changes.notices
+      .filter((n) => n.modified === "create" || n.modified === "update")
+      .reduce(
+        (arr, notice) =>
+          arr.concat(
+            notice.variables.map(
+              (v) =>
+                `
+                UPDATE "service_notification_variable"
+                SET "value"='${v.value || ""}', "variable_id"='${
+                  v.variableId
+                }', "notification_id"='${notice.noticeId}'
+                `
+            )
+          ),
+        [] as string[]
+      );
+
+    queries.push(...noticeVariablesQueries);
+    // Сохранение токена
+    {
+      if (changes.token) {
+        queries.push(
+          `UPDATE "service_configuration" SET "token"='${changes.token}' WHERE "id"='${configId}'`
+        );
+      }
+    }
+
+    const query = queries.join("; ");
+
+    // res.send(queries);
+    console.log(query);
+    const response = await getClient((client) => client.query(query), next);
 
     res.send();
 
@@ -275,31 +347,31 @@ router.post(
         createApiError({ message: "Sorry, only one config per service" })
       );
 
-    const serviceTypeResponse = await getClient(
-      (client) =>
-        client.query(`
-        SELECT "service_type"."type" FROM "service_type"
-        INNER JOIN "service" ON "service"."type_id"="service_type"."id"
-        WHERE "service"."id"='${serviceId}'
-        `),
-      next
-    );
+    // const serviceTypeResponse = await getClient(
+    //   (client) =>
+    //     client.query(`
+    //     SELECT "service_type"."type" FROM "service_type"
+    //     INNER JOIN "service" ON "service"."type_id"="service_type"."id"
+    //     WHERE "service"."id"='${serviceId}'
+    //     `),
+    //   next
+    // );
 
-    if (serviceTypeResponse.rowCount === 0)
-      return next(
-        createApiError({
-          message: `Service with <${serviceId}> not exists`,
-          statusCode: 404,
-        })
-      );
+    // if (serviceTypeResponse.rowCount === 0)
+    //   return next(
+    //     createApiError({
+    //       message: `Service with <${serviceId}> not exists`,
+    //       statusCode: 404,
+    //     })
+    //   );
 
-    if (serviceTypeResponse.rows[0].type === "messenger")
-      return next(
-        createApiError({
-          message: `Creating config for messenger services not allowed`,
-          statusCode: 400,
-        })
-      );
+    // if (serviceTypeResponse.rows[0].type === "messenger")
+    //   return next(
+    //     createApiError({
+    //       message: `Creating config for messenger services not allowed`,
+    //       statusCode: 400,
+    //     })
+    //   );
 
     const response = await getClient(
       (client) =>

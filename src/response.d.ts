@@ -15,6 +15,13 @@ declare namespace ApiResponseData {
     export type Action = {
       actionId: number;
       name: string;
+      variables: {
+        variableId: number;
+        localId?: string;
+        actionId: number;
+        value: string;
+        name: string;
+      }[];
     };
 
     export type Variable = {
@@ -57,12 +64,17 @@ declare namespace ApiRequestData {
     "/service/config": {
       configId: number;
       changes: {
-        variables?: Pick<
+        token: string;
+        variables: Pick<
           ApiResponseData.Service.Variable,
           "variableId" | "customKey"
         >[];
-        notices?: (ApiResponseData.Service.Notice & {
+        notices: (ApiResponseData.Service.Notice & {
           modified: "create" | "delete" | "update";
+          variables: {
+            variableId: number;
+            value: string;
+          }[];
         })[];
       };
     };

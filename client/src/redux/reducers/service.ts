@@ -55,7 +55,17 @@ export const serviceReducer: Reducer<ServiceState, Action> = (
         ...state,
         config: { status: "success", error: null, data: null },
       };
-
+    case ActionTypes.CONFIG_TOKEN_CHANGE:
+      return {
+        ...state,
+        config: {
+          ...state.config,
+          data:
+            state.config.data == null
+              ? null
+              : { ...state.config.data, token: action.payload.token },
+        },
+      };
     case ActionTypes.USER_LOGOUT_SUCCESS:
       return defaultState();
     default:

@@ -18,6 +18,34 @@ import { ConnectedProps } from "react-redux";
 import StatusSwitcher from "../../components/StatusSwitcher";
 import ServiceNotices from "./ServiceNotices";
 
+const ControlPanel = (props: {
+  config: ServiceConfigProps["config"];
+  handleDeleteConfig: (configId: number) => void;
+  handleSaveConfig: () => void;
+}) => (
+  <Section style={{ marginTop: "auto" }} header="Действия">
+    <Layout direction="row">
+      <Button
+        onClick={() =>
+          props.config && props.handleDeleteConfig(props.config.configId)
+        }
+      >
+        Удалить конфигурацию
+      </Button>
+      <Button
+        style={{
+          marginLeft: "auto",
+        }}
+      >
+        Тест
+      </Button>
+      <Button onClick={props.handleSaveConfig} color="primary">
+        Сохранить
+      </Button>
+    </Layout>
+  </Section>
+);
+
 export type ServiceConfigProps = ConnectedProps<typeof serviceConfigEnchancer>;
 const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
   const {
@@ -45,6 +73,7 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
           ...notice,
           modified: null,
           localId: null,
+          variables: [],
         }))
       );
       setVariableChanges(
@@ -70,11 +99,16 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
       return alert(
         "У выбранного сервиса отсутствуют возможные переменные получателей"
       );
+    const action = config.actions[0];
     const notice: Notice = {
-      actionId: config.actions[0].actionId,
+      actionId: action.actionId,
       messageTemplate: `Привет, \${${target.customKey || target.defaultKey}}`,
-      variableId: target.variableId,
+      variableId: target.variableId || 0,
       localId: uuid(),
+      variables: action.variables.map((v) => ({
+        ...v,
+        localId: uuid() as string,
+      })),
       modified: "create",
       noticeId: 0,
     };
@@ -125,8 +159,13 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
     saveConfig({
       configId: config.configId,
       changes: {
-        notices,
+        notices: notices.map((v) => ({
+          ...v,
+          variables: localNotices.flatMap((v) => v.variables),
+        })),
         variables,
+        token: config.token,
+        // noticeVariables: ,
       },
     });
   };
@@ -135,8 +174,8 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
     deleteConfig({ configId });
   };
 
-  const renderView = () => {
-    return (
+  return (
+    <Layout style={{ height: "100%" }} direction="column">
       <StatusSwitcher
         status={
           status === "success"
@@ -157,19 +196,35 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
             Добро пожаловать! Выберите сервис для конфигурирования
           </Layout>
         }
-        connection={<ServiceConnection />}
+        connection={
+          <>
+            <ServiceConnection />
+            <ControlPanel
+              config={config}
+              handleDeleteConfig={handleDeleteConfig}
+              handleSaveConfig={handleSaveConfig}
+            />
+          </>
+        }
         configuration={
-          <ServiceNotices
-            localNotices={localNotices}
-            handleSaveConfig={handleSaveConfig}
-            handleDeleteNotice={handleDeleteNotice}
-            handleDeleteConfig={handleDeleteConfig}
-            handleChangeNotice={handleChangeNotice}
-            handleAddNotice={handleAddNotice}
-            bindVariablesInput={bindVariablesInput}
-            variableChanges={variableChanges}
-            config={config as NonNullable<typeof config>}
-          />
+          <>
+            <ServiceNotices
+              localNotices={localNotices}
+              handleSaveConfig={handleSaveConfig}
+              handleDeleteNotice={handleDeleteNotice}
+              handleDeleteConfig={handleDeleteConfig}
+              handleChangeNotice={handleChangeNotice}
+              handleAddNotice={handleAddNotice}
+              bindVariablesInput={bindVariablesInput}
+              variableChanges={variableChanges}
+              config={config as NonNullable<typeof config>}
+            />
+            <ControlPanel
+              config={config}
+              handleDeleteConfig={handleDeleteConfig}
+              handleSaveConfig={handleSaveConfig}
+            />
+          </>
         }
         createBot={
           <Layout
@@ -188,12 +243,6 @@ const ServiceConfig: React.FC<ServiceConfigProps> = (props) => {
           </Layout>
         }
       />
-    );
-  };
-
-  return (
-    <Layout style={{ height: "100%" }} direction="column">
-      <StatusSwitcher status={status}>{renderView()}</StatusSwitcher>
     </Layout>
   );
 };

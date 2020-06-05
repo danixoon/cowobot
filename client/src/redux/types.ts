@@ -43,6 +43,8 @@ export const ActionTypes: { [K in keyof ActionPayload]: K } = {
   CONFIG_SAVE_SUCCESS: "CONFIG_SAVE_SUCCESS",
   CONFIG_SAVE_ERROR: "CONFIG_SAVE_ERROR",
 
+  CONFIG_TOKEN_CHANGE: "CONFIG_TOKEN_CHANGE",
+
   // // Получение идентификаторов известных конфигураций
   // CONFIG_IDS_FETCH: "CONFIG_IDS_FETCH" ,
   // CONFIG_IDS_FETCH_SUCCESS: "CONFIG_IDS_FETCH_SUCCESS" ,
@@ -61,6 +63,7 @@ export type ServiceState = {
   serviceView: ServiceConfigView;
   services: StateSchema<ApiResponseData.Service.Service[]>;
   config: StateSchema<{
+    token: string;
     configId: number;
     // Варианты событий (ревью не ревью)
     actions: ApiResponseData.Service.Action[];

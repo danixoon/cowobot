@@ -1,7 +1,7 @@
 @import "../../sass/theme.scss";
 .loader {
-  border: 4px solid $color-light-1; /* Light grey */
-  border-top: 4px solid $color-primary; /* Blue */
+  border: 4px solid $color-dark-1; /* Light grey */
+  border-top: 4px solid $color-secondary; /* Blue */
   border-radius: 50%;
   width: 16px;
   height: 16px;
