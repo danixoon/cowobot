@@ -12,6 +12,9 @@ declare type WithRandomId = {
   randomId?: string;
 };
 
+declare type INoticeWithData = WithRandomId &
+  INotice & { values: INoticeValue[]; queries: INoticeQuery[] };
+
 declare type ArrayElement<
   ArrayType extends readonly unknown[]
 > = ArrayType[number];
@@ -42,9 +45,14 @@ declare type ActionPayload = {
 
   SERVICE_SELECT: { serviceId: number; serviceView: ServiceConfigView };
 
+  SERVICE_CONFIG_FETCH: { serviceId: number };
+  SERVICE_CONFIG_FETCH_LOADING: {};
+  SERVICE_CONFIG_FETCH_SUCCESS: { id: number };
+  SERVICE_CONFIG_FETCH_ERROR: ApiError;
+
   CONFIG_FETCH: { configId: number };
   CONFIG_FETCH_LOADING: {};
-  CONFIG_FETCH_SUCCESS: IConfig | null;
+  CONFIG_FETCH_SUCCESS: IConfig;
   CONFIG_FETCH_ERROR: ApiError;
 
   CONFIG_UPDATE: { configId: number; token: string };
@@ -52,7 +60,7 @@ declare type ActionPayload = {
   CONFIG_UPDATE_SUCCESS: { id: number };
   CONFIG_UPDATE_ERROR: ApiError;
 
-  CONFIG_CREATE: { accountId: number; serviceId: number };
+  CONFIG_CREATE: { serviceId: number };
   CONFIG_CREATE_LOADING: {};
   CONFIG_CREATE_SUCCESS: { id: number };
   CONFIG_CREATE_ERROR: ApiError;
@@ -67,27 +75,24 @@ declare type ActionPayload = {
   NOTICES_FETCH_SUCCESS: INotice[];
   NOTICES_FETCH_ERROR: ApiError;
 
-  NOTICE_FETCH_DATA: { noticeId: number };
-  NOTICE_FETCH_DATA_LOADING: {};
-  NOTICE_FETCH_DATA_SUCCESS: {
-    values: INoticeValue[];
-    queries: INoticeQuery[];
-  };
-  NOTICE_FETCH_DATA_ERROR: ApiError;
+  NOTICE_FETCH: { noticeId: number };
+  NOTICE_FETCH_LOADING: { noticeId: number };
+  NOTICE_FETCH_SUCCESS: INoticeWithData;
+  NOTICE_FETCH_ERROR: ApiError;
 
   NOTICE_DELETE: { noticeId: number };
-  NOTICE_DELETE_LOADING: {};
+  NOTICE_DELETE_LOADING: { noticeId: number };
   NOTICE_DELETE_SUCCESS: { id: number };
   NOTICE_DELETE_ERROR: ApiError;
 
-  NOTICE_ADD: INotice & WithRandomId;
-  NOTICE_ADD_LOADING: {};
-  NOTICE_ADD_SUCCESS: INotice & WithRandomId;
+  NOTICE_ADD: INoticeWithData;
+  NOTICE_ADD_LOADING: { randomId: string };
+  NOTICE_ADD_SUCCESS: INoticeWithData;
   NOTICE_ADD_ERROR: ApiError;
 
-  NOTICE_SAVE: INotice & { values: INoticeValue; queries: INoticeQuery };
+  NOTICE_SAVE: INoticeWithData;
   NOTICE_SAVE_LOADING: {};
-  NOTICE_SAVE_SUCCESS: {};
+  NOTICE_SAVE_SUCCESS: INoticeWithData;
   NOTICE_SAVE_ERROR: ApiError;
 
   // // Получение известных сервисов
@@ -106,7 +111,7 @@ declare type ActionPayload = {
   //   configId: number;
   //   serviceId: number;
   // };
-  // CONFIG_FETCH_SUCCESS: {
+  //SERVICE_CONFIG_FETCH_SUCCESS: {
   //   serviceId: number;
   //   config: null | {
   //     token: string;
@@ -116,7 +121,7 @@ declare type ActionPayload = {
   //     configId: number;
   //   };
   // };
-  // CONFIG_FETCH_ERROR: { error: ApiError };
+  //SERVICE_CONFIG_FETCH_ERROR: { error: ApiError };
   // // Создание конфигурации для сервиса
   // CONFIG_CREATE: { serviceId: number };
   // CONFIG_CREATE_SUCCESS: ApiMap.POST["/service/config"];

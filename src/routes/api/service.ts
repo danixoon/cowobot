@@ -37,13 +37,13 @@ router.get(
 router.get(
   "/service/config",
   access.auth,
-  [query("serviceId")],
+  [query("serviceId").isNumeric()],
   validator,
   handleRequest(async (req, res) => {
     const { serviceId } = req.query as any;
     const { userId } = req.session;
 
     const config = await fetchServiceConfig(userId, serviceId);
-    res.send(createResponse(config));
+    res.send(createResponse({ id: config.id }));
   })
 );

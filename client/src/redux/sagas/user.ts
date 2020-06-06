@@ -80,7 +80,7 @@ export default function* watchSagas() {
 
 function* userFetch() {
   yield fetchApi(
-    ActionTypes.USER_FETCH_LOADING,
+    getAction(ActionTypes.USER_FETCH_LOADING),
     ActionTypes.USER_FETCH_SUCCESS,
     ActionTypes.USER_FETCH_ERROR,
     () => call(api.request, "/user", "GET")

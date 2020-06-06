@@ -26,6 +26,7 @@ import {
   fetchNoticeData,
   deleteNotice,
   fetchNotices,
+  updateNoticeData,
 } from "../../db";
 
 const router = express.Router();
@@ -36,15 +37,18 @@ router.put(
   access.auth,
   [query("noticeId").isNumeric()],
   validator,
-  async (
-    req: SessionRequest,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    const { messageTemplate, noticeId } = req.query as any;
-    const result = await updateNotice(noticeId, messageTemplate);
-    res.send(createResponse(result));
-  }
+  handleRequest(async (req, res) => {
+    const { noticeId } = req.query as any;
+    const { values = [], queries = [], messageTemplate } = req.body;
+    const tasks = [];
+    if (messageTemplate != null)
+      tasks.push(updateNotice(noticeId, messageTemplate));
+    if (values || tasks)
+      tasks.push(updateNoticeData(noticeId, queries, values));
+
+    await Promise.all(tasks);
+    res.send(createResponse());
+  })
 );
 
 // Запрос создания оповещения
@@ -67,7 +71,7 @@ router.post(
 
 // Запрос получения оповещения
 router.get(
-  "/notice/data",
+  "/notice",
   access.auth,
   [query("noticeId").isNumeric()],
   validator,
@@ -77,6 +81,18 @@ router.get(
     res.send(createResponse(noticeData));
   })
 );
+
+// router.get(
+//   "/notice",
+//   access.auth,
+//   [query("noticeId").isNumeric()],
+//   validator,
+//   handleRequest(async (req, res) => {
+//     const { noticeId } = req.query as any;
+//     const noticeData = await fetchNoticeData(noticeId);
+//     res.send(createResponse(noticeData));
+//   })
+// );
 
 // Запрос получений оповещений, привязанных к сервису
 router.get(

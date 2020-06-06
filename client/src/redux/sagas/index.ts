@@ -4,23 +4,32 @@ import { ActionTypes, getAction } from "../types";
 import userSaga from "./user";
 import serviceSaga from "./service";
 import authSaga from "./auth";
-
-export default function* rootSaga() {
-  yield all([fork(authSaga), fork(userSaga), fork(serviceSaga)]);
-}
+import configSaga from "./config";
+import noticeSaga from "./notice";
 
 export function* fetchApi(
-  loading: keyof ActionPayload,
+  loading: Action,
   succes: keyof ActionPayload,
   error: keyof ActionPayload,
   cb: () => CallEffect
 ) {
-  yield put(getAction(loading));
+  yield put(loading);
   try {
-    const result = yield cb();
-    yield put(getAction(succes, result));
-    return result;
+    const payload = yield cb();
+    const action = getAction(succes, payload);
+    yield put(action);
+    return action;
   } catch (e) {
-    yield put(getAction(error, e));
+    yield put(getAction(error, e.response?.data?.error ?? e));
   }
+}
+
+export default function* rootSaga() {
+  yield all([
+    fork(authSaga),
+    fork(userSaga),
+    fork(serviceSaga),
+    fork(configSaga),
+    fork(noticeSaga),
+  ]);
 }

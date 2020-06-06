@@ -5,15 +5,13 @@ import ServiceConfig from "../layout/ServiceConfig";
 
 const mapStateToProps = (state: RootState) => ({
   config: state.config,
-  serviceView: state.service.serviceView,
-  service: state.service.services.find(
-    (service) => service.id === state.config.serviceId
-  ),
+  service: state.service,
+  notice: state.notice,
 });
 const mapDispatchToProps = {
   createConfig: getActionCreator(ActionTypes.CONFIG_CREATE),
   deleteConfig: getActionCreator(ActionTypes.CONFIG_DELETE),
-  udateConfig: getActionCreator(ActionTypes.CONFIG_UPDATE),
+  updateConfig: getActionCreator(ActionTypes.CONFIG_UPDATE),
 };
 
 export const serviceConfigEnchancer = connect(

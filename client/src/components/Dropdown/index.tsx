@@ -2,9 +2,9 @@ import * as React from "react";
 import "./styles.scss";
 
 interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
-  items: { name: string; id: number }[];
+  items: { name: string; key: any }[];
   defaultSelectedId?: number;
-  onItemSelect?: (id: number) => void;
+  onItemSelect?: (key: any) => void;
 }
 
 const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
@@ -14,11 +14,11 @@ const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
     opened: false,
     selectedId:
       typeof defaultSelectedId === "undefined"
-        ? items[0].id
+        ? items[0].key
         : defaultSelectedId,
   }));
 
-  const dropdownItems = items.filter((v) => v.id !== selectedId);
+  const dropdownItems = items.filter((v) => v.key !== selectedId);
 
   const handleDropdownToggle = (open?: boolean) => {
     setState({ opened: open !== undefined ? open : !opened, selectedId });
@@ -31,7 +31,7 @@ const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
     }
   };
 
-  const selectedItem = items.find((item) => item.id === selectedId);
+  const selectedItem = items.find((item) => item.key === selectedId);
 
   return (
     <div className="dropdown">
@@ -55,8 +55,8 @@ const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
           return (
             <div
               tabIndex={0}
-              onMouseDown={() => handleItemSelect(v.id)}
-              key={v.id}
+              onMouseDown={() => handleItemSelect(v.key)}
+              key={v.key}
               className="dropdown__item"
             >
               {v.name}

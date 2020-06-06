@@ -28,6 +28,11 @@ export const ActionTypes: { [K in keyof ActionPayload]: K } = {
 
   SERVICE_SELECT: "SERVICE_SELECT",
 
+  SERVICE_CONFIG_FETCH: "SERVICE_CONFIG_FETCH",
+  SERVICE_CONFIG_FETCH_LOADING: "SERVICE_CONFIG_FETCH_LOADING",
+  SERVICE_CONFIG_FETCH_SUCCESS: "SERVICE_CONFIG_FETCH_SUCCESS",
+  SERVICE_CONFIG_FETCH_ERROR: "SERVICE_CONFIG_FETCH_ERROR",
+
   CONFIG_FETCH: "CONFIG_FETCH",
   CONFIG_FETCH_LOADING: "CONFIG_FETCH_LOADING",
   CONFIG_FETCH_SUCCESS: "CONFIG_FETCH_SUCCESS",
@@ -53,10 +58,10 @@ export const ActionTypes: { [K in keyof ActionPayload]: K } = {
   NOTICES_FETCH_SUCCESS: "NOTICES_FETCH_SUCCESS",
   NOTICES_FETCH_ERROR: "NOTICES_FETCH_ERROR",
 
-  NOTICE_FETCH_DATA: "NOTICE_FETCH_DATA",
-  NOTICE_FETCH_DATA_LOADING: "NOTICE_FETCH_DATA_LOADING",
-  NOTICE_FETCH_DATA_SUCCESS: "NOTICE_FETCH_DATA_SUCCESS",
-  NOTICE_FETCH_DATA_ERROR: "NOTICE_FETCH_DATA_ERROR",
+  NOTICE_FETCH: "NOTICE_FETCH",
+  NOTICE_FETCH_LOADING: "NOTICE_FETCH_LOADING",
+  NOTICE_FETCH_SUCCESS: "NOTICE_FETCH_SUCCESS",
+  NOTICE_FETCH_ERROR: "NOTICE_FETCH_ERROR",
 
   NOTICE_DELETE: "NOTICE_DELETE",
   NOTICE_DELETE_LOADING: "NOTICE_DELETE_LOADING",
@@ -104,11 +109,11 @@ export type ConfigState = StateSchema<
 
 export type NoticeState = StateSchema<
   {
-    notices: (INotice & WithRandomId)[];
-    data: StateSchema<
-      { values: INoticeValue[]; queries: INoticeQuery[] },
-      "fetch"
-    >;
+    notices: StateSchema<INoticeWithData, "fetch" | "delete" | "add">[];
+    // data: StateSchema<
+    //   { values: INoticeValue[]; queries: INoticeQuery[] },
+    //   "fetch"
+    // >;
   },
   "save" | "add" | "delete" | "fetch"
 >;

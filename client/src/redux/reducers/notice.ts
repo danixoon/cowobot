@@ -1,5 +1,6 @@
 import { Reducer } from "redux";
 import { ActionTypes, UserState, ServiceState, NoticeState } from "../types";
+import { v4 as uuid } from "uuid";
 import avatarUrl from "../../images/avatar.png";
 import { setAction, setError } from "../store";
 
@@ -7,12 +8,14 @@ const defaultState: () => NoticeState = () => ({
   action: null,
   error: null,
   notices: [],
-  data: {
-    action: null,
-    error: null,
-    queries: [],
-    values: [],
-  },
+  // noticesWithData: [],
+  // noti
+  // data: {
+  //   action: null,
+  //   error: null,
+  //   queries: [],
+  //   values: [],
+  // },
 });
 
 export const noticeReducer: Reducer<NoticeState, Action> = (
@@ -28,15 +31,28 @@ export const noticeReducer: Reducer<NoticeState, Action> = (
       return { ...state, ...setError(action.payload) };
 
     case ActionTypes.NOTICE_ADD:
-      return { ...state, notices: [...state.notices, action.payload] };
+      return {
+        ...state,
+        notices: [
+          ...state.notices,
+          { ...setAction(), ...action.payload, randomId: uuid() },
+        ],
+      };
     case ActionTypes.NOTICE_ADD_LOADING:
-      return { ...state, ...setAction("add") };
+      return {
+        ...state,
+        notices: state.notices.map((notice) =>
+          notice.randomId === action.payload.randomId
+            ? { ...notice, ...setAction("add") }
+            : notice
+        ),
+      };
     case ActionTypes.NOTICE_ADD_SUCCESS:
       return {
         ...state,
         notices: state.notices.map((notice) =>
           notice.randomId === action.payload.randomId
-            ? { ...notice, ...action.payload }
+            ? { ...action.payload, ...setAction() }
             : notice
         ),
         ...setAction(),
@@ -48,7 +64,14 @@ export const noticeReducer: Reducer<NoticeState, Action> = (
       };
 
     case ActionTypes.NOTICE_DELETE_LOADING:
-      return { ...state, ...setAction("delete") };
+      return {
+        ...state,
+        notices: state.notices.map((notice) =>
+          notice.id === action.payload.noticeId
+            ? { ...notice, ...setAction("delete") }
+            : notice
+        ),
+      };
     case ActionTypes.NOTICE_DELETE_SUCCESS:
       return {
         ...state,
@@ -59,30 +82,29 @@ export const noticeReducer: Reducer<NoticeState, Action> = (
       };
     case ActionTypes.NOTICE_DELETE_ERROR:
       return { ...state, ...setError(action.payload) };
-    case ActionTypes.NOTICE_FETCH_DATA_LOADING:
+    case ActionTypes.NOTICE_FETCH_LOADING:
       return {
         ...state,
-        data: {
-          ...state.data,
-          ...setAction("fetch"),
-        },
+        notices: state.notices.map((notice) =>
+          notice.id === action.payload.noticeId
+            ? { ...notice, ...setAction("fetch") }
+            : notice
+        ),
       };
-    case ActionTypes.NOTICE_FETCH_DATA_SUCCESS:
+    case ActionTypes.NOTICE_FETCH_SUCCESS:
       return {
         ...state,
-        data: {
-          ...state.data,
-          ...action.payload,
-          ...setAction(),
-        },
+        notices: state.notices.map((notice) =>
+          notice.id === action.payload.id
+            ? { ...setAction(), ...action.payload }
+            : notice
+        ),
+        ...setAction(),
       };
-    case ActionTypes.NOTICE_FETCH_DATA_ERROR:
+    case ActionTypes.NOTICE_FETCH_ERROR:
       return {
         ...state,
-        data: {
-          ...state.data,
-          ...setError(action.payload),
-        },
+        ...setError(action.payload),
       };
     case ActionTypes.NOTICES_FETCH_LOADING:
       return {
@@ -93,7 +115,12 @@ export const noticeReducer: Reducer<NoticeState, Action> = (
       return {
         ...state,
         ...setAction(),
-        notices: action.payload,
+        notices: action.payload.map((notice) => ({
+          ...setAction(),
+          ...notice,
+          values: [],
+          queries: [],
+        })),
       };
     case ActionTypes.NOTICES_FETCH_ERROR:
       return {

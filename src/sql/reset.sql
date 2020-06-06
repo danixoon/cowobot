@@ -17,6 +17,7 @@ CREATE TABLE "action"
 	"service_id" INTEGER REFERENCES "service" ON DELETE CASCADE NOT NULL,
    
    UNIQUE("service_id", "key"),
+   -- Для создания вторичного ключа от notice
    UNIQUE("service_id", "id")
 );
 
@@ -38,7 +39,7 @@ CREATE TABLE "config"
    "service_id" INTEGER REFERENCES "service" ON DELETE CASCADE NOT NULL,
 
 -- Временное решение для ограничения создания множества конфигураций у одного пользователя
-   UNIQUE("id", "account_id")
+   UNIQUE("account_id", "service_id")
 );
 
 CREATE TABLE "notice"

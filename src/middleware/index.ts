@@ -69,7 +69,7 @@ export const createErrorData = ({
   return { error: { ...rest, message, statusCode } };
 };
 
-export const createResponse = (data: any) => ({ data: data ?? null });
+export const createResponse = (data?: any) => ({ data: data ?? null });
 
 export const generateHash = async (value: string) => {
   const salt = await bcrypt.genSalt(10);
@@ -109,7 +109,8 @@ const auth: express.RequestHandler = (req: SessionRequest, res, next) => {
   } catch (error) {
     return res.status(403).send(invalidTokenError);
   }
-};``
+};
+``;
 
 const configOwner: express.RequestHandler = async (
   req: SessionRequest,

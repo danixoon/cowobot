@@ -3,7 +3,16 @@
 // import { put, call, takeLatest, take, fork } from "redux-saga/effects";
 // import { ActionTypes, getAction } from "../types";
 
-import { take, all, fork, cancel, race, put, call } from "redux-saga/effects";
+import {
+  take,
+  all,
+  fork,
+  cancel,
+  race,
+  put,
+  call,
+  takeLatest,
+} from "redux-saga/effects";
 import { ActionTypes, getAction } from "../types";
 import * as api from "../../api";
 import { fetchApi } from ".";
@@ -77,10 +86,16 @@ export function* watchLogin() {
     }
   }
 
+  // yield takeLatest(ActionTypes.USER_LOGIN_SUCCESS, function* (
+  //   action: Action<"USER_LOGIN_SUCCESS">
+  // ) {
+  //   localStorage.setItem("token", action.payload.token);
+  // });
+
   while (true) {
     const action = (yield take(ActionTypes.USER_LOGIN)) as Action<"USER_LOGIN">;
     const response = yield fetchApi(
-      ActionTypes.USER_LOGIN_LOADING,
+      getAction(ActionTypes.USER_LOGIN_LOADING),
       ActionTypes.USER_LOGIN_SUCCESS,
       ActionTypes.USER_LOGIN_ERROR,
       () =>
@@ -91,7 +106,10 @@ export function* watchLogin() {
           },
         })
     );
-    if (response) localStorage.setItem("token", response.token);
+
+    if (response) {
+      localStorage.setItem("token", response.payload.token);
+    }
   }
 }
 

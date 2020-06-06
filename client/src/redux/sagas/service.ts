@@ -34,14 +34,31 @@ function* watchServiceSelect() {
     } = (yield take(ActionTypes.SERVICE_SELECT)) as Action<"SERVICE_SELECT">;
 
     if (serviceId === oldServiceId) continue;
+    yield put(getAction(ActionTypes.SERVICE_CONFIG_FETCH, { serviceId }));
+  }
+}
 
-    const config = yield fetchApi(
-      ActionTypes.CONFIG_FETCH_LOADING,
-      ActionTypes.CONFIG_FETCH_SUCCESS,
-      ActionTypes.CONFIG_FETCH_ERROR,
+function* watchServiceConfigFetch() {
+  while (true) {
+    const {
+      payload: { serviceId },
+    } = (yield take(ActionTypes.SERVICE_CONFIG_FETCH)) as Action<
+      "SERVICE_CONFIG_FETCH"
+    >;
+    const serviceConfig = (yield fetchApi(
+      getAction(ActionTypes.SERVICE_CONFIG_FETCH_LOADING),
+      ActionTypes.SERVICE_CONFIG_FETCH_SUCCESS,
+      ActionTypes.SERVICE_CONFIG_FETCH_ERROR,
       () =>
         call(api.request, "/service/config", "GET", { params: { serviceId } })
-    );
+    )) as Action<"SERVICE_CONFIG_FETCH_SUCCESS">;
+
+    if (serviceConfig)
+      yield put(
+        getAction(ActionTypes.CONFIG_FETCH, {
+          configId: serviceConfig.payload.id,
+        })
+      );
   }
 }
 
@@ -49,7 +66,7 @@ function* watchServicesFetch() {
   while (true) {
     yield take(ActionTypes.SERVICES_FETCH);
     yield fetchApi(
-      ActionTypes.SERVICES_FETCH_LOADING,
+      getAction(ActionTypes.SERVICES_FETCH_LOADING),
       ActionTypes.SERVICES_FETCH_SUCCESS,
       ActionTypes.SERVICES_FETCH_ERROR,
       () => call(api.request, "/services", "GET")
@@ -63,6 +80,7 @@ export default function* watchSagas() {
     const tasks = yield all([
       fork(watchServiceSelect),
       fork(watchServicesFetch),
+      fork(watchServiceConfigFetch),
     ]);
     yield put(getAction(ActionTypes.SERVICES_FETCH));
     yield take(ActionTypes.USER_LOGOUT_SUCCESS);

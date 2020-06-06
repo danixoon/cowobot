@@ -38,6 +38,7 @@ export const getClient = <T = any>(
 type INoticeValue = {
   name: string;
   key: string;
+  value: string;
 };
 type INoticeQuery = {
   name: string;
@@ -82,6 +83,7 @@ const services: IServiceSchema[] = [
           {
             name: "Ид. группы",
             key: "group_id",
+            value: "",
           },
         ],
         queries: [
@@ -151,11 +153,11 @@ const accounts = [
 export const getInsertQuery = (
   table: string,
   values: string[],
-  isReturning: boolean = true
+  returns: string | undefined = "*"
 ) => {
   return `INSERT INTO "${table}" VALUES ${values
     .map((items) => `(${items})`)
-    .join()} ${isReturning ? `RETURNING "id"` : ""}`;
+    .join()} ${returns ? `RETURNING ${returns}` : ""}`;
 };
 
 export const getIdByCondition = async (
@@ -282,11 +284,11 @@ export const deleteNotice = async (noticeId: number) => {
 
 // Возвращает данные по оповещению
 export const fetchNoticeData = async (noticeId: number) => {
-  // const notice = (
-  //   await getAllColumnsByCondition("notice", `"id"='${noticeId}'`)
-  // )[0];
+  const notice = (
+    await getAllColumnsByCondition("notice", `"id"='${noticeId}'`)
+  )[0];
 
-  // if (!notice) return null;
+  if (!notice) return null;
 
   const [values, queries] = (await Promise.all([
     getAllColumnsByCondition("notice_value", `"notice_id"='${noticeId}'`),
@@ -296,7 +298,7 @@ export const fetchNoticeData = async (noticeId: number) => {
   const action = await getActionByNoticeId(noticeId);
 
   return {
-    // ...mapData(notice),
+    ...mapData(notice),
     values: mapData(mergeByKey(action.values, values)),
     queries: mapData(mergeByKey(action.queries, queries)),
   };
@@ -371,7 +373,7 @@ export const updateNoticeData = async (
             query.customKey
           }', '${noticeId}'`
       ),
-      false
+      `"id"`
     ) +
     `ON CONFLICT ("key", "notice_id") DO UPDATE SET "custom_key" = excluded."custom_key"`;
   const query2 =
@@ -383,7 +385,7 @@ export const updateNoticeData = async (
             value.value
           }', '${noticeId}'`
       ),
-      false
+      `"id"`
     ) +
     `ON CONFLICT ("key", "notice_id") DO UPDATE SET "value" = excluded."value"`;
 
@@ -408,7 +410,7 @@ export const createConfig = async (accountId: number, serviceId: number) => {
       )
     )
   ).rows[0];
-  return config.id;
+  return config;
 };
 
 export const updateConfig = async (configId: number, token: string) => {

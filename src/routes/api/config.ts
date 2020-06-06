@@ -42,7 +42,6 @@ router.get(
   }
 );
 
-
 router.put(
   "/config",
   access.auth,
@@ -58,13 +57,21 @@ router.put(
 router.post(
   "/config",
   access.auth,
-  [query("accountId").isNumeric(), query("serviceId").isNumeric()],
+  [query("serviceId").isNumeric()],
   validator,
-  handleRequest(async (req, res) => {
-    const { accountId, serviceId } = req.query as any;
-    const result = await createConfig(accountId, serviceId);
-    res.send(createResponse({ id: result }));
-  })
+  handleRequest(
+    async (req, res) => {
+      const { userId } = req.session;
+      const { serviceId } = req.query as any;
+      const config = await createConfig(userId, serviceId);
+      res.send(createResponse({ id: config.id }));
+    },
+    (error) =>
+      error.code === "23505" &&
+      createApiError({
+        message: "Невозможно создать две конфигурации на один аккаунт.",
+      })
+  )
 );
 
 export default router;
