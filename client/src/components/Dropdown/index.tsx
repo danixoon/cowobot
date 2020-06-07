@@ -3,35 +3,37 @@ import "./styles.scss";
 
 interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
   items: { name: string; key: any }[];
-  defaultSelectedId?: number;
+  selectedKey: any;
   onItemSelect?: (key: any) => void;
 }
 
 const Dropdown: React.FC<DropdownProps> = (props: DropdownProps) => {
-  const { items, onItemSelect, defaultSelectedId } = props;
+  const { items, onItemSelect, selectedKey } = props;
 
-  const [{ opened, selectedId }, setState] = React.useState(() => ({
+  const [{ opened }, setState] = React.useState(() => ({
     opened: false,
-    selectedId:
-      typeof defaultSelectedId === "undefined"
-        ? items[0].key
-        : defaultSelectedId,
+    // selectedId:
+    //   typeof selectedKey === "undefined"
+    //     ? items.length > 0
+    //       ? items[0].key
+    //       : null
+    //     : selectedKey,
   }));
 
-  const dropdownItems = items.filter((v) => v.key !== selectedId);
+  const dropdownItems = items.filter((v) => v.key !== selectedKey);
 
   const handleDropdownToggle = (open?: boolean) => {
-    setState({ opened: open !== undefined ? open : !opened, selectedId });
+    setState({ opened: open !== undefined ? open : !opened });
   };
 
   const handleItemSelect = (id: number) => {
-    setState({ opened: false, selectedId: id });
+    setState({ opened: false });
     if (onItemSelect) {
       onItemSelect(id);
     }
   };
 
-  const selectedItem = items.find((item) => item.key === selectedId);
+  const selectedItem = items.find((item) => item.key === selectedKey);
 
   return (
     <div className="dropdown">

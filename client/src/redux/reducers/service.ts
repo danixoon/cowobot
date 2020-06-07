@@ -7,7 +7,7 @@ const defaultState: () => ServiceState = () => ({
   action: null,
   error: null,
   serviceId: 0,
-  serviceView: "configuration",
+  serviceView: "config",
   services: [],
 });
 
@@ -16,6 +16,8 @@ export const serviceReducer: Reducer<ServiceState, Action> = (
   action
 ) => {
   switch (action.type) {
+    case ActionTypes.SERVICE_VIEW_SELECT:
+      return { ...state, serviceView: action.payload.serviceView };
     case ActionTypes.SERVICE_SELECT:
       return {
         ...state,

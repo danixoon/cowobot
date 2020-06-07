@@ -44,6 +44,6 @@ router.get(
     const { userId } = req.session;
 
     const config = await fetchServiceConfig(userId, serviceId);
-    res.send(createResponse({ id: config.id }));
+    res.send(createResponse(config ? { id: config.id } : null));
   })
 );

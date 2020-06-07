@@ -10,7 +10,7 @@ import {
 import {
   getClient,
   resetDatabase,
-  fetchNoticeData,
+  fetchNoticeWithData,
   createNotice,
   createConfig,
   fetchConfig,
@@ -36,13 +36,13 @@ router.get("/test/db/reset", async (req, res, next) => {
 
 router.get("/test/db/notice", async (req, res, next) => {
   const { noticeId } = req.query as any;
-  const noticeData = await fetchNoticeData(noticeId);
+  const noticeData = await fetchNoticeWithData(noticeId);
   res.send(createResponse(noticeData));
 });
 
 router.post("/test/db/notice", async (req, res, next) => {
-  const { messageTemplate, actionId, configId } = req.query as any;
-  const result = await createNotice(messageTemplate, configId, actionId);
+  const { messageTemplate, configId } = req.query as any;
+  const result = await createNotice(messageTemplate, configId);
   res.send(createResponse(result));
 });
 
@@ -71,7 +71,7 @@ router.put("/test/db/notice", async (req, res, next) => {
 
 router.put("/test/db/notice/data", async (req, res, next) => {
   const { noticeId } = req.query as any;
-  const { values, queries } = req.body;
+  const { values = [], queries = [] } = req.body;
   await updateNoticeData(noticeId, queries, values);
   res.send();
 });

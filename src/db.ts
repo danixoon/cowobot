@@ -44,6 +44,7 @@ type INoticeQuery = {
   name: string;
   custom_key: string;
   key: string;
+  role: QueryRole;
 };
 
 type IAction = {
@@ -68,6 +69,11 @@ enum ServiceRole {
   Event = 1 << 2,
 }
 
+enum QueryRole {
+  Messenger = 1 << 1,
+  Text = 1 << 2,
+}
+
 const services: IServiceSchema[] = [
   {
     id: 0,
@@ -85,12 +91,24 @@ const services: IServiceSchema[] = [
             key: "group_id",
             value: "",
           },
+          {
+            name: "Ид. получателя",
+            key: "target_id",
+            value: "",
+          },
         ],
         queries: [
           {
             name: "Содержимое поста",
             custom_key: "",
             key: "content",
+            role: QueryRole.Text,
+          },
+          {
+            name: "Имя получателя",
+            custom_key: "",
+            key: "username",
+            role: QueryRole.Messenger,
           },
         ],
       },
@@ -98,7 +116,14 @@ const services: IServiceSchema[] = [
         id: 0,
         name: "Новый комментарий",
         key: "post_comment_new",
-        queries: [],
+        queries: [
+          {
+            key: "post_comment",
+            name: "Комментарий",
+            custom_key: "",
+            role: QueryRole.Text,
+          },
+        ],
         values: [],
       },
     ],
@@ -122,7 +147,7 @@ const services: IServiceSchema[] = [
 
 export const getAction = (serviceKey: string, actionKey: string) => {
   return services
-    .find((service) => (service.key = serviceKey))
+    .find((service) => service.key === serviceKey)
     .actions.find((action) => action.key === actionKey);
 };
 
@@ -130,10 +155,9 @@ export const getActionByNoticeId = async (noticeId: number) => {
   const { serviceKey, actionKey } = (
     await getClient((client) =>
       client.query(`
-  SELECT "action"."key" AS "actionKey", "service"."key" AS "serviceKey" FROM "notice"
-  INNER JOIN "config" ON "config"."id"="notice"."config_id"
-  INNER JOIN "action" ON "action"."id"="notice"."action_id"
-  INNER JOIN "service" ON "service"."id"="config"."service_id"
+      SELECT "action"."key" AS "actionKey", "service"."key" AS "serviceKey" FROM "notice"
+      INNER JOIN "action" ON "action"."id"="notice"."action_id"
+      INNER JOIN "service" ON "service"."id"="notice"."service_id"
   WHERE "notice"."id"='${noticeId}'
   `)
     )
@@ -153,7 +177,7 @@ const accounts = [
 export const getInsertQuery = (
   table: string,
   values: string[],
-  returns: string | undefined = "*"
+  returns?: string | undefined
 ) => {
   return `INSERT INTO "${table}" VALUES ${values
     .map((items) => `(${items})`)
@@ -207,7 +231,8 @@ export const resetDatabase = async () => {
     client.query(
       getInsertQuery(
         "service",
-        services.map((v) => `DEFAULT, '${v.name}', '${v.key}', '${v.role}'`)
+        services.map((v) => `DEFAULT, '${v.name}', '${v.key}', '${v.role}'`),
+        `"id"`
       )
     )
   );
@@ -221,7 +246,8 @@ export const resetDatabase = async () => {
             (action) =>
               `DEFAULT, '${action.name}', '${action.key}', '${dbServices.rows[i].id}'`
           )
-        )
+        ),
+        `"id"`
       )
     )
   );
@@ -243,8 +269,18 @@ export const fetchServices = async () => {
   const services = await getClient((client) =>
     client.query(`SELECT * FROM "service"`)
   );
+  const actions = await Promise.all(
+    services.rows.map((service: IService) =>
+      getAllColumnsByCondition("action", `"service_id"='${service.id}'`)
+    )
+  );
 
-  return services.rows;
+  return services.rows.map((service, i) =>
+    mapData({
+      ...service,
+      actions: mapData(actions[i]),
+    })
+  );
 };
 
 // Возвращает все идентификаторы оповещений, привязанных к конфигу configId
@@ -254,7 +290,7 @@ export const fetchNotices = async (configId: number) => {
     `"config_id"='${configId}'`
   );
 
-  return notices;
+  return mapData(notices);
 };
 
 export const fetchServiceConfig = async (
@@ -282,25 +318,34 @@ export const deleteNotice = async (noticeId: number) => {
   );
 };
 
+// export const fetchNoticeData = async (noticeId: number) => {};
+
 // Возвращает данные по оповещению
-export const fetchNoticeData = async (noticeId: number) => {
+export const fetchNoticeWithData = async (noticeId: number) => {
   const notice = (
     await getAllColumnsByCondition("notice", `"id"='${noticeId}'`)
   )[0];
 
   if (!notice) return null;
 
-  const [values, queries] = (await Promise.all([
+  const [values, queries, target] = (await Promise.all([
     getAllColumnsByCondition("notice_value", `"notice_id"='${noticeId}'`),
     getAllColumnsByCondition("notice_query", `"notice_id"='${noticeId}'`),
+    getAllColumnsByCondition(
+      "notice_target",
+      `"notice_id"='${noticeId}' AND "action_id"='${notice.action_id}'`
+    ),
   ])) as any;
 
   const action = await getActionByNoticeId(noticeId);
+
+  // const targetKey =
 
   return {
     ...mapData(notice),
     values: mapData(mergeByKey(action.values, values)),
     queries: mapData(mergeByKey(action.queries, queries)),
+    targetKey: target[0]?.target_key ?? null,
   };
 
   // const
@@ -314,18 +359,29 @@ export const fetchNoticeData = async (noticeId: number) => {
 
 export const createNotice = async (
   messageTemplate: string,
-  configId: number,
-  actionId: number
+  configId: number
 ) => {
-  const serviceId = (
+  const config = (
     await getColumnsByCondition("config", ["service_id"], `"id"='${configId}'`)
-  )[0].service_id;
+  )[0];
+
+  const action = (
+    await getAllColumnsByCondition(
+      "action",
+      `"service_id"='${config.service_id}'`
+    )
+  )[0];
+
   const notice = (
     await getClient((client) =>
       client.query(
-        getInsertQuery("notice", [
-          `DEFAULT, '${messageTemplate}', '${configId}', '${actionId}', '${serviceId}'`,
-        ])
+        getInsertQuery(
+          "notice",
+          [
+            `DEFAULT, '${messageTemplate}', '${configId}', '${action.id}', '${config.service_id}'`,
+          ],
+          `"id"`
+        )
       )
     )
   ).rows[0];
@@ -334,13 +390,22 @@ export const createNotice = async (
 
 export const updateNotice = async (
   noticeId: number,
-  messageTemplate: string
+  data: {
+    messageTemplate?: string;
+    actionId?: string;
+  }
 ) => {
-  await getClient((client) =>
-    client.query(
-      `UPDATE "notice" SET "message_template"='${messageTemplate}' WHERE "id"='${noticeId}'`
-    )
-  );
+  const values: string[] = [];
+  if (data.messageTemplate)
+    values.push(`"message_template"='${data.messageTemplate}'`);
+  if (data.actionId) values.push(`"action_id"='${data.actionId}'`);
+
+  if (values.length > 0)
+    await getClient((client) =>
+      client.query(
+        `UPDATE "notice" SET ${values.join()} WHERE "id"='${noticeId}'`
+      )
+    );
 };
 
 // Объединяет значение А со значение Б, если в значении Б присутствует ключ в элемете значения А
@@ -353,6 +418,33 @@ const mergeByKey = <A extends { key: any }, B extends { key: any }>(
     ...(valueB.find((q) => q.key === query.key) ?? {}),
   }));
   return merged as (A & B)[];
+};
+
+export const updateNoticeTarget = async (
+  noticeId: number,
+  targetKey: string | null
+) => {
+  const notices = await getAllColumnsByCondition(
+    "notice",
+    `"id"='${noticeId}'`
+  );
+  const actionId = notices[0].action_id;
+  const noticeTarget = await getAllColumnsByCondition(
+    "notice_target",
+    `"action_id"='${actionId}' AND "notice_id"='${noticeId}'`
+  );
+  // Уже сохранена цель
+  if (noticeTarget.length > 0) {
+    const query = `UPDATE "notice_target" SET "target_key"=${
+      targetKey == null ? `NULL` : `'${targetKey}'`
+    } WHERE "action_id"='${actionId}' AND "notice_id"='${noticeId}'`;
+    await getClient((client) => client.query(query));
+  } else {
+    const query = `INSERT INTO "notice_target"("target_key", "action_id", "notice_id") VALUES (${
+      targetKey == null ? "NULL" : `'${targetKey}'`
+    }, '${actionId}', '${noticeId}')`;
+    await getClient((client) => client.query(query));
+  }
 };
 
 export const updateNoticeData = async (
@@ -371,9 +463,8 @@ export const updateNoticeData = async (
         (query) =>
           `${query.id ?? "DEFAULT"}, '${query.name}', '${query.key}', '${
             query.customKey
-          }', '${noticeId}'`
-      ),
-      `"id"`
+          }', ${query.role} , '${noticeId}'`
+      )
     ) +
     `ON CONFLICT ("key", "notice_id") DO UPDATE SET "custom_key" = excluded."custom_key"`;
   const query2 =
@@ -384,17 +475,18 @@ export const updateNoticeData = async (
           `${value.id ?? "DEFAULT"}, '${value.name}', '${value.key}', '${
             value.value
           }', '${noticeId}'`
-      ),
-      `"id"`
+      )
     ) +
     `ON CONFLICT ("key", "notice_id") DO UPDATE SET "value" = excluded."value"`;
 
   const query: string[] = [];
 
-  if (queries.length > 0) query.push(query1);
-  if (values.length > 0) query.push(query2);
+  if (mergedQueries.length > 0) query.push(query1);
+  if (mergedValues.length > 0) query.push(query2);
 
-  await getClient((client) => client.query(query.join("; ")));
+  console.warn(query);
+  if (query.length > 0)
+    await getClient((client) => client.query(query.join("; ")));
 
   // )`INSERT INTO "notice_query" (machine_id, machine_name)VALUES (1, 1, 'test_machine')
   // ON DUPLICATE KEY UPDATE machine_name=VALUES(machine_name);`;
@@ -404,20 +496,32 @@ export const createConfig = async (accountId: number, serviceId: number) => {
   const config = (
     await getClient((client) =>
       client.query(
-        getInsertQuery("config", [
-          `DEFAULT, NULL, '${accountId}', '${serviceId}'`,
-        ])
+        getInsertQuery(
+          "config",
+          [`DEFAULT, NULL, '${accountId}', '${serviceId}'`],
+          `"id"`
+        )
       )
     )
   ).rows[0];
   return config;
 };
 
+export const deleteConfig = async (configId: number) => {
+  return (
+    await getClient((client) =>
+      client.query(
+        `DELETE FROM "config" WHERE "id"='${configId}' RETURNING "id"`
+      )
+    )
+  ).rows[0];
+};
+
 export const updateConfig = async (configId: number, token: string) => {
   const config = (
     await getClient((client) =>
       client.query(
-        `UPDATE "config" SET "token"='${token}' WHERE "id"='${configId}'`
+        `UPDATE "config" SET "token"='${token}' WHERE "id"='${configId}' RETURNING "id"`
       )
     )
   ).rows[0];

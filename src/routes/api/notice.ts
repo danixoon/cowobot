@@ -23,10 +23,11 @@ import {
   createConfig,
   updateNotice,
   createNotice,
-  fetchNoticeData,
+  fetchNoticeWithData,
   deleteNotice,
   fetchNotices,
   updateNoticeData,
+  updateNoticeTarget,
 } from "../../db";
 
 const router = express.Router();
@@ -38,35 +39,27 @@ router.put(
   [query("noticeId").isNumeric()],
   validator,
   handleRequest(async (req, res) => {
-    const { noticeId } = req.query as any;
-    const { values = [], queries = [], messageTemplate } = req.body;
-    const tasks = [];
-    if (messageTemplate != null)
-      tasks.push(updateNotice(noticeId, messageTemplate));
-    if (values || tasks)
+    const { noticeId, randomId } = req.query as any;
+    const {
+      values = [],
+      queries = [],
+      messageTemplate,
+      targetKey,
+      actionId,
+    } = req.body;
+    const tasks: Promise<any>[] = [];
+
+    if (values.length > 0 || queries.length > 0)
       tasks.push(updateNoticeData(noticeId, queries, values));
 
-    await Promise.all(tasks);
-    res.send(createResponse());
-  })
-);
+    if (targetKey !== undefined)
+      tasks.push(updateNoticeTarget(noticeId, targetKey));
 
-// Запрос создания оповещения
-router.post(
-  "/notice",
-  access.auth,
-  [query("actionId").isNumeric(), query("configId").isNumeric()],
-  validator,
-  handleRequest(
-    async (req, res) => {
-      const { messageTemplate = "", actionId, configId } = req.query as any;
-      const result = await createNotice(messageTemplate, configId, actionId);
-      res.send(createResponse({ id: result }));
-    },
-    (error) =>
-      error.code === "23503" &&
-      createApiError({ message: "Некорректный actionId" })
-  )
+    tasks.push(updateNotice(noticeId, { messageTemplate, actionId }));
+
+    await Promise.all(tasks);
+    res.send(createResponse({ randomId }));
+  })
 );
 
 // Запрос получения оповещения
@@ -76,9 +69,23 @@ router.get(
   [query("noticeId").isNumeric()],
   validator,
   handleRequest(async (req, res) => {
-    const { noticeId } = req.query as any;
-    const noticeData = await fetchNoticeData(noticeId);
-    res.send(createResponse(noticeData));
+    const { noticeId, randomId } = req.query as any;
+    const noticeData = await fetchNoticeWithData(noticeId);
+    res.send(createResponse({ ...noticeData, randomId }));
+  })
+);
+
+// Запрос создания оповещения
+router.post(
+  "/notice",
+  access.auth,
+  [query("configId").isNumeric()],
+  validator,
+  handleRequest(async (req, res) => {
+    const { configId, randomId } = req.query as any;
+    const { messageTemplate = "" } = req.body;
+    const result = await createNotice(messageTemplate, configId);
+    res.send(createResponse({ id: result, randomId }));
   })
 );
 
@@ -113,9 +120,9 @@ router.delete(
   [query("noticeId").isNumeric()],
   validator,
   handleRequest(async (req, res) => {
-    const { noticeId } = req.query as any;
+    const { noticeId /* randomId */ } = req.query as any;
     const noticeData = await deleteNotice(noticeId);
-    res.send(createResponse(noticeData));
+    res.send(createResponse({ id: Number(noticeId) /* randomId */ }));
   })
 );
 

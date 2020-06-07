@@ -26,7 +26,7 @@ router.get(
 
 router.get(
   "/auth",
-  access.guest,
+  // access.guest,
   [query("username").isString(), query("password").isString()],
   validator,
   async (

@@ -3,27 +3,44 @@ import "./styles.scss";
 import Tree from "../../components/Tree";
 import { ConnectedProps } from "react-redux";
 import { servicesTreeEnchancer } from "../../containers/ServicesTreeContainer";
+import { usePrevious } from "../../hooks/usePrevious";
 
 export type ServicesTreeProps = React.HTMLAttributes<HTMLDivElement> &
   ConnectedProps<typeof servicesTreeEnchancer>;
 
 const ServicesTree: React.FC<ServicesTreeProps> = (props) => {
-  const { services, onServiceSelect } = props;
+  const { service, config, onServiceSelect, onServiceViewSelect } = props;
+
+  // const prevService = usePrevious(config);
+
+  // const [serviceId, setService] = React.useState(service.serviceId);
+  // React.useEffect(() => {
+
+  // }, [service.serviceId]);
+
   return (
     <Tree
       onItemSelect={(item) => {
-        const [serviceId, serviceView] = item.split("_") as [
+        const [key, serviceView] = item.split("_") as [
           string,
           ServiceConfigView
         ];
-        const id = Number(serviceId);
-        onServiceSelect({ serviceId: id, serviceView });
+        onServiceViewSelect({ serviceView });
+        // const id =;
+        const keyService = service.services.find(
+          (service) => service.key === key
+        ) as IService;
+        // if (!prevService || prevService.serviceId !== keyService.id) {
+        // console.warn(config);
+        onServiceSelect({ serviceId: keyService.id });
+        // }
+        // if (service.serviceView !== serviceView)
       }}
-      items={services.map((v) => ({
+      items={service.services.map((v) => ({
         content: v.name,
         items: [
-          { id: `${v.id}_configuration`, content: "Оповещения" },
-          { id: `${v.id}_connection`, content: "Подключение" },
+          { id: `${v.key}_config`, content: "Оповещения" },
+          { id: `${v.key}_control`, content: "Управление" },
         ],
       }))}
     />

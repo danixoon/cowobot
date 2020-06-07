@@ -23,6 +23,7 @@ export const handleRequest: (
   try {
     await requestHandler(req as SessionRequest, res);
   } catch (error) {
+    // console.log(error);
     let result = null;
     if (errorHandler) result = errorHandler(error);
     if (result != null) {

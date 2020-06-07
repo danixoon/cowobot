@@ -12,7 +12,10 @@ const router = express.Router();
 
 const handleNotFound: express.RequestHandler = (req, res, next) => {
   next({
-    response: createErrorData({ message: "Method not found", statusCode: 404 }),
+    response: createErrorData({
+      message: "Method not found (???)",
+      statusCode: 404,
+    }),
   });
 };
 

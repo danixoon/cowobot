@@ -13,7 +13,21 @@ declare type WithRandomId = {
 };
 
 declare type INoticeWithData = WithRandomId &
-  INotice & { values: INoticeValue[]; queries: INoticeQuery[] };
+  INotice & {
+    values: INoticeValue[];
+    queries: INoticeQuery[];
+    targetKey: string | null;
+  };
+
+declare type IServiceWithAction = IService & { actions: IAction[] };
+
+declare type ISavedNotice = {
+  messageTemplate: string;
+  values: { key: string; value: string }[];
+  queries: { key: string; customKey: string }[];
+  targetKey: null | string;
+  actionId?: number;
+};
 
 declare type ArrayElement<
   ArrayType extends readonly unknown[]
@@ -40,10 +54,11 @@ declare type ActionPayload = {
 
   SERVICES_FETCH: {};
   SERVICES_FETCH_LOADING: {};
-  SERVICES_FETCH_SUCCESS: IService[];
+  SERVICES_FETCH_SUCCESS: IServiceWithAction[];
   SERVICES_FETCH_ERROR: ApiError;
 
-  SERVICE_SELECT: { serviceId: number; serviceView: ServiceConfigView };
+  SERVICE_SELECT: { serviceId: number };
+  SERVICE_VIEW_SELECT: { serviceView: ServiceConfigView };
 
   SERVICE_CONFIG_FETCH: { serviceId: number };
   SERVICE_CONFIG_FETCH_LOADING: {};
@@ -52,7 +67,7 @@ declare type ActionPayload = {
 
   CONFIG_FETCH: { configId: number };
   CONFIG_FETCH_LOADING: {};
-  CONFIG_FETCH_SUCCESS: IConfig;
+  CONFIG_FETCH_SUCCESS: IConfig | null;
   CONFIG_FETCH_ERROR: ApiError;
 
   CONFIG_UPDATE: { configId: number; token: string };
@@ -75,9 +90,9 @@ declare type ActionPayload = {
   NOTICES_FETCH_SUCCESS: INotice[];
   NOTICES_FETCH_ERROR: ApiError;
 
-  NOTICE_FETCH: { noticeId: number };
+  NOTICE_FETCH: WithRandomId & { noticeId: number };
   NOTICE_FETCH_LOADING: { noticeId: number };
-  NOTICE_FETCH_SUCCESS: INoticeWithData;
+  NOTICE_FETCH_SUCCESS: WithRandomId & INoticeWithData;
   NOTICE_FETCH_ERROR: ApiError;
 
   NOTICE_DELETE: { noticeId: number };
@@ -86,12 +101,12 @@ declare type ActionPayload = {
   NOTICE_DELETE_ERROR: ApiError;
 
   NOTICE_ADD: INoticeWithData;
-  NOTICE_ADD_LOADING: { randomId: string };
-  NOTICE_ADD_SUCCESS: INoticeWithData;
+  NOTICE_ADD_LOADING: { randomId?: string };
+  NOTICE_ADD_SUCCESS: { id: number; randomId?: string };
   NOTICE_ADD_ERROR: ApiError;
 
-  NOTICE_SAVE: INoticeWithData;
-  NOTICE_SAVE_LOADING: {};
+  NOTICE_SAVE: WithRandomId & Partial<ISavedNotice> & { noticeId: number };
+  NOTICE_SAVE_LOADING: WithRandomId & {};
   NOTICE_SAVE_SUCCESS: INoticeWithData;
   NOTICE_SAVE_ERROR: ApiError;
 
@@ -161,4 +176,4 @@ declare type StateSchema<T, A extends string = null> = {
 } & T;
 
 declare type DataStatus = "idle" | "loading" | "success" | "error";
-declare type ServiceConfigView = "connection" | "configuration";
+declare type ServiceConfigView = "control" | "config";

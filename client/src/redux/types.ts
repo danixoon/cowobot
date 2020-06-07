@@ -27,6 +27,7 @@ export const ActionTypes: { [K in keyof ActionPayload]: K } = {
   SERVICES_FETCH_ERROR: "SERVICES_FETCH_ERROR",
 
   SERVICE_SELECT: "SERVICE_SELECT",
+  SERVICE_VIEW_SELECT: "SERVICE_VIEW_SELECT",
 
   SERVICE_CONFIG_FETCH: "SERVICE_CONFIG_FETCH",
   SERVICE_CONFIG_FETCH_LOADING: "SERVICE_CONFIG_FETCH_LOADING",
@@ -91,31 +92,35 @@ export type ServiceState = StateSchema<
   {
     serviceView: ServiceConfigView;
     serviceId: number;
-    services: IService[];
+    services: IServiceWithAction[];
   },
   "fetch"
 >;
 
 export type ConfigState = StateSchema<
-  {
-    configId: number;
-    token: string;
-    accountId: number;
-    serviceId: number;
+  IConfig & {
     isEmpty: boolean;
   },
-  "create" | "delete" | "fetch"
+  "create" | "delete" | "fetch" | "update"
 >;
+
+export enum QueryRole {
+  Messenger = 1 << 1,
+  Text = 1 << 2,
+}
 
 export type NoticeState = StateSchema<
   {
-    notices: StateSchema<INoticeWithData, "fetch" | "delete" | "add">[];
+    notices: StateSchema<
+      INoticeWithData,
+      "fetch" | "delete" | "add" | "save"
+    >[];
     // data: StateSchema<
     //   { values: INoticeValue[]; queries: INoticeQuery[] },
     //   "fetch"
     // >;
   },
-  "save" | "add" | "delete" | "fetch"
+  "fetch"
 >;
 // export type ServiceState = {
 //   serviceId: number | null;

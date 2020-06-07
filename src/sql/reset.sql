@@ -54,6 +54,18 @@ CREATE TABLE "notice"
    FOREIGN KEY ("action_id", "service_id") REFERENCES "action"("id", "service_id") ON DELETE CASCADE
  );
 
+CREATE TABLE "notice_target" (
+   "id" SERIAL PRIMARY KEY NOT NULL,
+   "notice_id" INTEGER REFERENCES "notice" ON DELETE CASCADE NOT NULL,
+   "action_id" INTEGER REFERENCES "action" ON DELETE CASCADE NOT NULL,
+
+   -- Если NULL - выбираем из notice_value пользовательское значение по коду,
+   -- забитому в коде бота
+   "target_key" VARCHAR(50) NULL
+
+   -- UNIQUE("notice_id", "action_id")
+);
+
 -- TODO Триггер на удаление если изменилось событие у нотиса
 CREATE OR REPLACE FUNCTION f_delete_if_action_changed()
   RETURNS TRIGGER AS
@@ -84,6 +96,7 @@ CREATE TABLE "notice_query"
 	"name" VARCHAR(50) NOT NULL,
    "key" VARCHAR(50) NOT NULL,
    "custom_key" VARCHAR(50) NOT NULL DEFAULT '',
+   "role" INTEGER NOT NULL,
    "notice_id" INTEGER REFERENCES "notice" ON DELETE CASCADE NOT NULL,
    
    UNIQUE("key", "notice_id")

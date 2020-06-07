@@ -16,7 +16,7 @@ const StatusSwitcher: React.FC<StatusSwitcherProps> = (props) => {
     case "error":
       return <div> Произошла ошибка. </div>;
     default:
-      return children as React.ReactElement;
+      return "";
   }
 };
 

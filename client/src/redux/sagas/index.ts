@@ -20,7 +20,9 @@ export function* fetchApi(
     yield put(action);
     return action;
   } catch (e) {
-    yield put(getAction(error, e.response?.data?.error ?? e));
+    const err = getAction(error, e.response?.data?.error ?? e);
+    yield put(err);
+    return err;
   }
 }
 

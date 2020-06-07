@@ -40,6 +40,7 @@ declare interface INoticeValue {
   name: string;
   key: string;
   value: string;
+  role: number;
   noticeId: number;
 }
 
@@ -48,6 +49,7 @@ declare interface INoticeQuery {
   name: string;
   key: string;
   customKey: string;
+  role: number;
   noticeId: number;
 }
 

@@ -23,6 +23,7 @@ import {
   createConfig,
   updateConfig,
   fetchServiceConfig,
+  deleteConfig,
 } from "../../db";
 
 const router = express.Router();
@@ -38,17 +39,18 @@ router.get(
     next: express.NextFunction
   ) => {
     const result = await fetchConfig(req.query.configId as any);
-    res.send(createResponse(result));
+    res.send(createResponse(mapData(result)));
   }
 );
 
 router.put(
   "/config",
   access.auth,
-  [query("configId").isNumeric(), query("token").isNumeric()],
+  [query("configId").isNumeric(), body("token").isNumeric()],
   validator,
   handleRequest(async (req, res) => {
-    const { configId, token } = req.query as any;
+    const { configId } = req.query as any;
+    const { token } = req.body;
     const result = await updateConfig(configId, token);
     res.send(createResponse({ id: result }));
   })
@@ -65,12 +67,33 @@ router.post(
       const { serviceId } = req.query as any;
       const config = await createConfig(userId, serviceId);
       res.send(createResponse({ id: config.id }));
-    },
-    (error) =>
-      error.code === "23505" &&
-      createApiError({
-        message: "Невозможно создать две конфигурации на один аккаунт.",
-      })
+    }
+    // (error) =>
+    //   error.code === "23505" &&
+    //   createApiError({
+    //     message: "Невозможно создать две конфигурации на один аккаунт.",
+    //   })
+  )
+);
+
+router.delete(
+  "/config",
+  access.auth,
+  [query("configId").isNumeric()],
+  validator,
+  // access.configOwner,
+  handleRequest(
+    async (req, res) => {
+      // const { userId } = req.session;
+      const { configId } = req.query as any;
+      const config = await deleteConfig(configId);
+      res.send(createResponse({ id: config.id }));
+    }
+    // (error) =>
+    //   error.code === "23505" &&
+    //   createApiError({
+    //     message: "Невозможно создать две конфигурации на один аккаунт.",
+    //   })
   )
 );
 
