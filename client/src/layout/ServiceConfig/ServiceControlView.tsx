@@ -52,7 +52,7 @@ export const ServiceControlView: React.FC<ServiceConfigProps> = (props) => {
         <Layout direction="row">
           <Layout style={{ flex: 1 }} direction="column">
             <Label text="Ключ доступа">
-              <Input {...controlBind} name="token" />
+              <Input type="password" {...controlBind} name="token" />
             </Label>
           </Layout>
           <Layout direction="column">

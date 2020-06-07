@@ -328,7 +328,7 @@ export const fetchServiceConfig = async (
 export const fetchConfig = async (configId: number) => {
   const config = await getAllColumnsByCondition("config", `"id"='${configId}'`);
 
-  return config[0];
+  return mapData(config[0]);
 };
 
 export const deleteNotice = async (noticeId: number) => {

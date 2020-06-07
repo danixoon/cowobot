@@ -7,7 +7,27 @@ import {
   getColumnsByCondition,
   query,
 } from "../db";
-import { INoticeBotData, IBot, Bot, VkBot } from "./bots";
+import { INoticeBotData, IBot, Bot, VkBot, ITargetBot } from "./bots";
+
+//@ts-ignore
+import * as Agent from "socks5-https-client/lib/Agent";
+import { getEnv } from "../config";
+
+import * as Telegram from "node-telegram-bot-api";
+
+const {
+  TELEGRAM_TOKEN,
+  SOCKS_HOST,
+  SOCKS_PORT,
+  SOCKS_USERNAME,
+  SOCKS_PASSWORD,
+} = getEnv(
+  "TELEGRAM_TOKEN",
+  "SOCKS_HOST",
+  "SOCKS_PORT",
+  "SOCKS_USERNAME",
+  "SOCKS_PASSWORD"
+);
 
 type INoticeWithData = INotice & {
   values: INoticeValue[];
@@ -21,6 +41,33 @@ type IBotData = {
   serviceKey: string;
   configId: number;
 };
+
+const tgBot = new Telegram(TELEGRAM_TOKEN, {
+  polling: true,
+  request: {
+    agentClass: Agent,
+    agentOptions: {
+      socksHost: SOCKS_HOST,
+      socksPort: parseInt(SOCKS_PORT),
+      socksUsername: SOCKS_USERNAME,
+      socksPassword: SOCKS_PASSWORD,
+    },
+  } as any,
+});
+
+tgBot.onText(/\/ид/, (message, match) => {
+  tgBot.sendMessage(message.chat.id, `id этой группы: ${message.chat.id}`);
+});
+
+// tgBot.on("")
+
+// setInterval(()
+
+// const target: ITargetBot = {
+//   async send(targetId, content) {
+//     await tgBot.sendMessage(targetId, content);
+//   },
+// };
 
 export const botMap = new Map<string, Bot>();
 
@@ -80,8 +127,9 @@ export const startBot = async (configId: number) => {
   switch (data.serviceKey) {
     case "vk":
       bot = new VkBot(data.token, data.notices, {
-        send: (targetId, content) => {
-          console.log(`message <${content}> sended to <${targetId}>`);
+        send: async (targetId, content) => {
+          const chat = await tgBot.getChat(targetId);
+          tgBot.sendMessage(chat.id, content);
         },
       });
       break;

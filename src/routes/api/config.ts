@@ -40,7 +40,19 @@ router.get(
     next: express.NextFunction
   ) => {
     const result = await fetchConfig(req.query.configId as any);
-    res.send(createResponse(mapData(result)));
+    // const
+
+    const token =
+      typeof result.token === "string"
+        ? `*`.repeat(result.token.length)
+        : result.token;
+
+    res.send(
+      createResponse({
+        ...result,
+        token,
+      })
+    );
   }
 );
 

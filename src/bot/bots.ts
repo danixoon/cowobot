@@ -1,5 +1,6 @@
 import * as vk from "vk-io";
 
+
 export interface IBot {
   target: ITargetBot;
   token: string;
@@ -49,6 +50,14 @@ export const getTargetId = (notice: INoticeBotData) => {
     notice.action.values.find((value) => value.key === "target_id").value
   );
 };
+
+export class TelegramBot extends Bot {
+  restart() {}
+  handle(action: string) {}
+  stop() {}
+}
+
+// const targetBot: ITargetBot = new TelegramBot(TELEGRAM_TOKEN);
 
 // export const getNoticeQueries = (
 //   notice: INoticeBotData,
@@ -102,10 +111,4 @@ export class VkBot extends Bot {
     console.log("VK bot restarted.");
   }
   handle(action: string) {}
-}
-
-export class TelegramBot extends Bot {
-  restart() {}
-  handle(action: string) {}
-  stop() {}
 }
