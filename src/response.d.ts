@@ -1,3 +1,58 @@
+declare interface IService {
+  id: number;
+  key: string;
+  name: string;
+  role: number;
+}
+
+declare interface IAction {
+  id: number;
+  name: string;
+  key: string;
+  serviceId: number;
+}
+
+declare interface IAccount {
+  id: number;
+  username: string;
+  // password: string;
+  nickname: string;
+  serviceId: number;
+}
+
+declare interface IConfig {
+  id: number;
+  token: string;
+  accountId: number;
+  serviceId: number;
+}
+
+declare interface INotice {
+  id: number;
+  messageTemplate: string;
+  configId: number;
+  actionId: number;
+  serviceId: number;
+}
+
+declare interface INoticeValue {
+  id: number;
+  name: string;
+  key: string;
+  value: string;
+  role: number;
+  noticeId: number;
+}
+
+declare interface INoticeQuery {
+  id: number;
+  name: string;
+  key: string;
+  customKey: string;
+  role: number;
+  noticeId: number;
+}
+
 declare namespace ApiResponseData {
   export namespace Service {
     export type Service = {
@@ -15,6 +70,13 @@ declare namespace ApiResponseData {
     export type Action = {
       actionId: number;
       name: string;
+      variables: {
+        variableId: number;
+        localId?: string;
+        actionId: number;
+        value: string;
+        name: string;
+      }[];
     };
 
     export type Variable = {
@@ -29,7 +91,7 @@ declare namespace ApiResponseData {
 
   export namespace Account {
     export type User = {
-      usename: string;
+      username: string;
     };
   }
 }
@@ -57,12 +119,17 @@ declare namespace ApiRequestData {
     "/service/config": {
       configId: number;
       changes: {
-        variables?: Pick<
+        token: string;
+        variables: Pick<
           ApiResponseData.Service.Variable,
           "variableId" | "customKey"
         >[];
-        notices?: (ApiResponseData.Service.Notice & {
+        notices: (ApiResponseData.Service.Notice & {
           modified: "create" | "delete" | "update";
+          variables: {
+            variableId: number;
+            value: string;
+          }[];
         })[];
       };
     };
@@ -73,6 +140,7 @@ declare type ApiError = Partial<{
   message: string;
   statusCode: number;
   param: string;
+  randomId?: string;
   [key: string]: any;
 }>;
 

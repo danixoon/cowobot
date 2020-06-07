@@ -4,7 +4,7 @@ import DropdownPopup from ".";
 import { useInput } from "../../hooks/useInput";
 
 const items = ["aabbcc", "aaaacc", "aabbcd"].map((v, i) => ({
-  id: i,
+  key: i,
   name: v,
 }));
 

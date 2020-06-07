@@ -8,6 +8,37 @@ import { getClient } from "../db";
 
 const { SECRET } = getEnv("SECRET");
 
+export const handleRequest: (
+  requestHandler: (
+    req: SessionRequest,
+    res: express.Response
+    // next: express.NextFunction
+  ) => Promise<void> | void,
+  errorHandler?: (error: any) => ApiError | null | false | undefined
+) => express.RequestHandler = (requestHandler, errorHandler) => async (
+  req,
+  res,
+  next
+) => {
+  try {
+    await requestHandler(req as SessionRequest, res);
+  } catch (error) {
+    // console.log(error);
+    let result = null;
+    if (errorHandler) result = errorHandler(error);
+    if (result != null) {
+      // res.send(result);
+      next(result);
+    } else {
+      if (error.response) next(error.response);
+      else next(error);
+      console.error("Request error: ", error);
+    }
+
+    // else throw error;
+  }
+};
+
 export const mapKeyToColumn = (key: string) =>
   key
     .split("")
@@ -39,7 +70,7 @@ export const createErrorData = ({
   return { error: { ...rest, message, statusCode } };
 };
 
-export const createResponse = (data: any) => ({ data });
+export const createResponse = (data?: any) => ({ data: data ?? null });
 
 export const generateHash = async (value: string) => {
   const salt = await bcrypt.genSalt(10);
@@ -74,12 +105,13 @@ const auth: express.RequestHandler = (req: SessionRequest, res, next) => {
   if (!token) return res.status(403).send(invalidTokenError);
   try {
     const userId = jwt.verify(token, SECRET) as string;
-    if (!req.session) req.session = { userId };
+    if (!req.session) req.session = { userId: Number(userId) };
     next();
   } catch (error) {
     return res.status(403).send(invalidTokenError);
   }
 };
+``;
 
 const configOwner: express.RequestHandler = async (
   req: SessionRequest,
@@ -114,7 +146,7 @@ const configOwner: express.RequestHandler = async (
 const guest: express.RequestHandler = (req, res, next) => {
   if (req.header("Authorization"))
     return res
-      .status(402)
+      .status(403)
       .send(createErrorData({ message: "You need to logout" }));
   next();
 };

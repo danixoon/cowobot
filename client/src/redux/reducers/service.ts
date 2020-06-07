@@ -1,56 +1,40 @@
 import { Reducer } from "redux";
 import { ActionTypes, UserState, ServiceState } from "../types";
 import avatarUrl from "../../images/avatar.png";
+import { setAction, setError } from "../store";
 
 const defaultState: () => ServiceState = () => ({
-  serviceId: null,
-  services: {
-    status: "idle",
-    error: null,
-    data: [],
-  },
-  config: {
-    data: null,
-    status: "idle",
-    error: null,
-  },
+  action: null,
+  error: null,
+  serviceId: 0,
+  serviceView: "config",
+  services: [],
 });
 
-export const serviceReducer: Reducer<ServiceState, ActionMap.Actions> = (
+export const serviceReducer: Reducer<ServiceState, Action> = (
   state = defaultState(),
   action
 ) => {
   switch (action.type) {
-    case ActionTypes.SERVICE_FETCH:
-      return { ...state, services: { ...state.services, status: "loading" } };
-    case ActionTypes.SERVICE_FETCH_SUCCESS:
+    case ActionTypes.SERVICE_VIEW_SELECT:
+      return { ...state, serviceView: action.payload.serviceView };
+    case ActionTypes.SERVICE_SELECT:
       return {
         ...state,
-        services: {
-          ...state.services,
-          status: "success",
-          data: action.payload.services,
-        },
+        ...action.payload,
       };
-    case ActionTypes.CONFIG_FETCH:
+    case ActionTypes.SERVICES_FETCH_LOADING:
+      return { ...state, ...setAction("fetch") };
+    case ActionTypes.SERVICES_FETCH_SUCCESS:
       return {
         ...state,
-        config: { data: null, error: null, status: "loading" },
+        ...setAction(),
+        services: action.payload,
       };
-    case ActionTypes.CONFIG_DELETE_SUCCESS:
+    case ActionTypes.SERVICES_FETCH_ERROR:
       return {
         ...state,
-        config: { status: "success", error: null, data: null },
-      };
-    case ActionTypes.CONFIG_FETCH_SUCCESS:
-      return {
-        ...state,
-        serviceId: action.payload?.serviceId ?? null,
-        config: {
-          ...state.config,
-          status: "success",
-          data: action.payload.config !== null ? action.payload.config : null,
-        },
+        ...setError(action.payload),
       };
     case ActionTypes.USER_LOGOUT_SUCCESS:
       return defaultState();

@@ -2,12 +2,10 @@ import * as React from "react";
 import Layout from "../../components/Layout";
 import ControlPanel from "../../components/ControlPanel";
 import AccountPanel from "../../components/AccountPanel";
+import { ConnectedProps } from "react-redux";
+import { headerEnchancer } from "../../containers/HeaderContainer";
 
-export interface HeaderPanelProps {
-  user: { username: string };
-  logout: () => void;
-}
-
+export type HeaderPanelProps = {} & ConnectedProps<typeof headerEnchancer>;
 const HeaderPanel: React.FC<HeaderPanelProps> = (props) => {
   const { user, logout } = props;
   return (

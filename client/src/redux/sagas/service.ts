@@ -8,180 +8,103 @@ import {
   all,
   select,
   cancel,
+  CallEffect,
+  takeEvery,
 } from "redux-saga/effects";
-import { ActionTypes, RootState } from "../types";
-import * as api from "../../api/service";
-import {
-  serviceFetchError,
-  serviceFetchSuccess,
-  // configIdsFetchSuccess,
-  configFetchSuccess,
-  // configIdsFetch,
-  configFetch,
-  serviceFetch,
-  configCreateSuccess,
-  configCreateError,
-  configDeleteSuccess,
-  configDeleteError,
-  configSaveSuccess,
-  configSaveError,
-  // configIdsFetchError,
-} from "../actions/service";
+import { ActionTypes, RootState, getAction } from "../types";
+import * as api from "../../api";
+import { fetchApi } from ".";
 
-function* fetchServices() {
-  try {
-    const { data } = yield call(api.servicesFetch);
-    yield put(serviceFetchSuccess(data));
-  } catch (error) {
-    yield put(serviceFetchError(error.response?.data.error ?? error));
-  }
-}
-
-function* fetchServiceConfig(
-  action: ActionMap.Action<typeof ActionTypes.CONFIG_FETCH>
-) {
-  try {
-    const { data } = yield call(api.configFetch, action.payload.configId);
-    yield put(
-      configFetchSuccess({
-        config: { ...data },
-        serviceId: action.payload.serviceId,
-      })
-    );
-  } catch (error) {
-    yield put(serviceFetchError(error.response?.data.error ?? error));
-  }
-}
-
-// function* fetchConfigIds(serviceId: number) {
-//   yield put(configIdsFetch(serviceId));
+// function* fetchServices() {
 //   try {
-//     const { data } = yield call(api.configIdsFetch, serviceId);
-//     yield put(configIdsFetchSuccess(data));
+//     yield put(getAction(ActionTypes.SERVICES_FETCH_LOADING));
 //   } catch (error) {
-//     yield put(configIdsFetchError(error.response.data.error));
+//     yield put(getAction(ActionTypes.SERVICES_FETCH_ERROR, error));
 //   }
 // }
 
-// Обрабтка логики
+function* watchServiceViewSelect() {
+  // while (true) {
+  //   const {
+  //     payload: { serviceView },
+  //   } = (yield take(ActionTypes.SERVICE_VIEW_SELECT)) as Action<
+  //     "SERVICE_VIEW_SELECT"
+  //   >;
+  //   // if (serviceId === oldServiceId) continue;
+  //   yield put(getAction(ActionTypes.SERVICE_CONFIG_FETCH, { serviceId }));
+  // }
+}
 
-function* serviceSelectFlow(
-  action: ActionMap.Action<typeof ActionTypes.SERVICE_SELECT>
-) {
-  const { serviceId } = action.payload;
-  const selectedServiceId = yield select(
-    (state: RootState) => state.service?.serviceId
-  );
+function* watchServiceSelect() {
+  yield takeLatest(ActionTypes.SERVICE_SELECT, function* (
+    action: Action<"SERVICE_SELECT">
+  ) {
+    yield put(
+      getAction(ActionTypes.SERVICE_CONFIG_FETCH, {
+        serviceId: action.payload.serviceId,
+      })
+    );
+  });
+  // while (true) {
+  //   // const {
+  //   //   payload: { serviceId },
+  //   // } = (yield take(ActionTypes.SERVICE_SELECT)) as ;
+  //   // if (serviceId === oldServiceId) continue;
+  // }
+}
 
-  // Если выбранный id сервиса не поменялся - ничего не делаем
-  if (selectedServiceId === serviceId) return;
+function* watchServiceConfigFetch() {
+  // yield takeEvery()
+  while (true) {
+    const {
+      payload: { serviceId },
+    } = (yield take(ActionTypes.SERVICE_CONFIG_FETCH)) as Action<
+      "SERVICE_CONFIG_FETCH"
+    >;
+    const serviceConfig = (yield fetchApi(
+      getAction(ActionTypes.SERVICE_CONFIG_FETCH_LOADING),
+      ActionTypes.SERVICE_CONFIG_FETCH_SUCCESS,
+      ActionTypes.SERVICE_CONFIG_FETCH_ERROR,
+      () =>
+        call(api.request, "/service/config", "GET", { params: { serviceId } })
+    )) as Action<"SERVICE_CONFIG_FETCH_SUCCESS">;
 
-  // Запускаем получение идентификаторов конфига
-  const response = yield call(api.configIdsFetch, serviceId);
-  let configId = response.data.length > 0 ? response.data[0] : null;
-
-  // Если не пришло конфигураций - переключаем поведение на создание конфигурации
-  if (typeof configId !== "number") {
-    yield put(configFetchSuccess({ config: null, serviceId }));
-  } else {
-    yield put(configFetch(configId, serviceId));
-    // yield call(fetchServiceConfig, serviceId, configId);
+    if (serviceConfig.payload)
+      yield put(
+        getAction(ActionTypes.CONFIG_FETCH, {
+          configId: serviceConfig.payload.id,
+        })
+      );
+    else yield put(getAction(ActionTypes.CONFIG_FETCH_SUCCESS, null));
   }
 }
 
-// Создание конфигурации для сервиса для пользователя
-function* createConfig(
-  action: ActionMap.Action<typeof ActionTypes.CONFIG_CREATE>
-) {
-  const { serviceId } = action.payload;
-  try {
-    const { data } = yield call(api.configCreate, serviceId);
-    yield put(configCreateSuccess({ configId: data.id }));
-    yield put(configFetch(data.id, serviceId));
-  } catch (error) {
-    yield put(configCreateError(error.response?.data.error ?? error));
+function* watchServicesFetch() {
+  while (true) {
+    yield take(ActionTypes.SERVICES_FETCH);
+    yield fetchApi(
+      getAction(ActionTypes.SERVICES_FETCH_LOADING),
+      ActionTypes.SERVICES_FETCH_SUCCESS,
+      ActionTypes.SERVICES_FETCH_ERROR,
+      () => call(api.request, "/services", "GET")
+    );
   }
 }
 
-// Создание конфигурации для сервиса для пользователя
-function* deleteConfig(
-  action: ActionMap.Action<typeof ActionTypes.CONFIG_DELETE>
-) {
-  const { configId } = action.payload;
-  try {
-    const { data } = yield call(api.configDelete, configId);
-    yield put(configDeleteSuccess({ configId: data.id }));
-  } catch (error) {
-    yield put(configDeleteError(error.response?.data.error ?? error));
-  }
-}
-
-// Создание конфигурации для сервиса для пользователя
-function* saveConfig(action: ActionMap.Action<typeof ActionTypes.CONFIG_SAVE>) {
-  const data = action.payload;
-  try {
-    yield call(api.configSave, data);
-    yield put(configSaveSuccess());
-  } catch (error) {
-    yield put(configSaveError(error.response?.data.error ?? error));
-  }
-}
-
-function* watchService() {}
-
-export default function* serviceFlow() {
+export default function* watchSagas() {
   while (true) {
     yield take(ActionTypes.USER_LOGIN_SUCCESS);
-
-    const configCreateTask = yield fork(function* () {
-      while (true)
-        yield call(createConfig, yield take(ActionTypes.CONFIG_CREATE));
-    });
-
-    const configFetchTask = yield fork(function* () {
-      while (true)
-        yield call(fetchServiceConfig, yield take(ActionTypes.CONFIG_FETCH));
-    });
-
-    const configSaveTask = yield fork(function* () {
-      while (true) {
-        yield call(saveConfig, yield take(ActionTypes.CONFIG_SAVE));
-        const { configId, serviceId } = yield select((state: RootState) => ({
-          serviceId: state.service.serviceId,
-          configId: state.service.config.data?.configId,
-        }));
-        yield put(configFetch(configId, serviceId));
-      }
-    });
-
-    const fetchServicesTask = yield fork(function* () {
-      while (true) {
-        yield take(ActionTypes.SERVICE_FETCH);
-        yield call(fetchServices);
-      }
-    });
-
-    const serviceSelectTask = yield fork(function* () {
-      while (true)
-        yield call(serviceSelectFlow, yield take(ActionTypes.SERVICE_SELECT));
-    });
-
-    const configDeleteTask = yield fork(function* () {
-      while (true)
-        yield call(deleteConfig, yield take(ActionTypes.CONFIG_DELETE));
-    });
-
-    yield put(serviceFetch());
-
-    yield take(ActionTypes.USER_LOGOUT);
-
-    yield cancel([
-      fetchServicesTask,
-      serviceSelectTask,
-      configSaveTask,
-      configFetchTask,
-      configCreateTask,
-      configDeleteTask,
+    const tasks = yield all([
+      fork(watchServiceSelect),
+      fork(watchServicesFetch),
+      fork(watchServiceConfigFetch),
     ]);
+    yield put(getAction(ActionTypes.SERVICES_FETCH));
+    yield take(ActionTypes.USER_LOGOUT_SUCCESS);
+    yield cancel(tasks);
   }
+}
+
+function* watchActions() {
+  // yield takeLatest(ActionTypes.SERVICES_FETCH)
 }

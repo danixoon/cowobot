@@ -65,7 +65,7 @@ const Input: React.FC<InputProps> = (props) => {
         <DropdownPopup
           opened={state.dropdownOpened}
           filter={inputValue?.toString() || ""}
-          items={dropdownItems?.map((v, i) => ({ id: i, name: v })) || []}
+          items={dropdownItems?.map((v, i) => ({ key: i, name: v })) || []}
           onSelect={(item) => {
             setInput && setInput({ ...input, [name]: item });
           }}

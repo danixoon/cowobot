@@ -8,22 +8,23 @@ import Form from "../../components/Form";
 import Section from "../../components/Section";
 import Button from "../../components/Button";
 import Label from "../../components/Label";
+import { ConnectedProps } from "react-redux";
+import { authPopupEnchancer } from "../../containers/AuthPopupContainer";
 
-export type AuthPopupProps = React.HTMLAttributes<HTMLDivElement> & {
-  isAuth: boolean;
-  status: DataStatus;
-  error: string;
-  login: (username: string, password: string) => void;
-};
+export type AuthPopupProps = React.HTMLAttributes<HTMLDivElement> &
+  ConnectedProps<typeof authPopupEnchancer>;
 
 const AuthPopup: React.FC<AuthPopupProps> = (props) => {
-  const { isAuth, login, status, error } = props;
-  const [input, bind, setInput] = useInput({} as any);
+  const { login, error, isAuth } = props;
+  const bindInput = useInput({} as any);
+  const { input } = bindInput;
   // const mergedProps = mergeProps({}, rest);
 
   const handleOnSubmit = () => {
-    login(input.username, input.password);
+    login({ username: input.username, password: input.password });
   };
+
+  // React.useEffect(() => {}, []);
 
   React.useEffect(() => {
     if (status === "error" && error) alert(error);
@@ -34,22 +35,10 @@ const AuthPopup: React.FC<AuthPopupProps> = (props) => {
       <Section textAlign="center" header="Войдите в аккаунт">
         <Form onSubmit={handleOnSubmit} style={{ padding: "0 2rem" }}>
           <Label text="Имя пользователя">
-            <Input
-              name="username"
-              type="username"
-              {...bind}
-              input={input}
-              setInput={setInput}
-            />
+            <Input name="username" type="username" {...bindInput} />
           </Label>
           <Label text="Пароль">
-            <Input
-              name="password"
-              type="password"
-              {...bind}
-              input={input}
-              setInput={setInput}
-            />
+            <Input name="password" type="password" {...bindInput} />
           </Label>
           <Button
             disabled={status === "loading"}

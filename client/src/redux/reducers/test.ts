@@ -3,7 +3,7 @@ import { ActionTypes, UserState, TestState } from "../types";
 
 const defaultState: () => TestState = () => ({ message: "" });
 
-export const testReducer: Reducer<TestState, ActionMap.Actions> = (
+export const testReducer: Reducer<TestState, Action> = (
   state = defaultState(),
   action
 ) => {

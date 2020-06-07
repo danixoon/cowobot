@@ -4,19 +4,22 @@ import reactStringReplace from "react-string-replace";
 
 import "./styles.scss";
 import DropdownPopup from "../DropdownPopup";
+import { usePrevious } from "../../hooks/usePrevious";
 
-export type TextAreaProps = React.PropsWithChildren<
-  React.HTMLAttributes<HTMLDivElement>
-> & {
+export interface TextAreaProps
+  extends Omit<
+    React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>,
+    "onChange"
+  > {
   value: string;
-  variables: { id: number; name: string }[];
-  onInputChange?: (value: string) => void;
-};
+  tokens: { key: any; name: string }[];
+  onChange: (value: string) => void;
+}
 
 interface TextVariableProps {
   value: string;
-  items: { id: number; name: string }[];
-  onChange: (id: number) => void;
+  items: { key: any; name: string }[];
+  onChange: (key: any) => void;
 }
 const TextVariable: React.FC<TextVariableProps> = ({
   value,
@@ -51,12 +54,32 @@ const TextVariable: React.FC<TextVariableProps> = ({
 };
 
 const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
-  const { children, onInputChange, variables, value, ...rest } = props;
+  const { children, tokens, onChange, value, ...rest } = props;
 
-  const [input, setInput] = React.useState(() => value);
-  const [edit, setEdit] = React.useState(() => false);
+  const savedTokens = React.useRef<
+    {
+      name: string;
+      key: any;
+    }[]
+  >([]);
 
-  const editor = React.useRef<Editor>();
+  const prevTokens = usePrevious(tokens);
+
+  React.useEffect(() => {
+    if (!prevTokens) return;
+
+    let input = value;
+
+    for (let savedToken of savedTokens.current) {
+      const token = tokens.find((token) => token.key === savedToken.key);
+      if (token)
+        input = input.replace(
+          `\${${savedToken.name}}`,
+          `\${${token?.name ?? savedToken}}`
+        );
+    }
+    if (input !== value) onChange(input);
+  }, [tokens]);
 
   const handleVariableSelect = (
     before: string,
@@ -64,12 +87,13 @@ const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
     offset: number
   ) => {
     const replaced =
-      input.substr(0, offset) + after + input.substr(offset + before.length);
-    setInput(replaced);
+      value.substr(0, offset) + after + value.substr(offset + before.length);
+    onChange(replaced);
   };
 
   const formatContent = (content: string): React.ReactNodeArray => {
     let offsetI = 0;
+    let saved: any[] = [];
     const result = reactStringReplace(
       content,
       /\${(.*?)}/,
@@ -78,23 +102,33 @@ const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
         return (
           <span key={i} style={{ color: "purple" }}>
             {"${"}
-            {reactStringReplace(match, /(.+)/, (match, i) => (
-              <TextVariable
-                onChange={(id) => {
-                  const variable = variables.find((v) => v.id === id);
-                  if (variable)
-                    handleVariableSelect(match, variable.name, offset);
-                }}
-                items={variables}
-                value={match}
-                key={i}
-              />
-            ))}
+            {reactStringReplace(match, /(.+)/, (match, i) => {
+              if (prevTokens) {
+                const token = prevTokens.find((token) => token.name === match);
+                if (token) {
+                  saved.push({ key: token.key, name: match });
+                }
+              }
+
+              return (
+                <TextVariable
+                  onChange={(id) => {
+                    const variable = tokens.find((v) => v.key === id);
+                    if (variable)
+                      handleVariableSelect(match, variable.name, offset);
+                  }}
+                  items={tokens}
+                  value={match}
+                  key={i}
+                />
+              );
+            })}
             {"}"}
           </span>
         );
       }
     );
+    savedTokens.current = saved;
     return result;
   };
 
@@ -108,11 +142,8 @@ const TextArea: React.FC<TextAreaProps> = (props: TextAreaProps) => {
       textareaClassName="editor__text-area"
       preClassName="editor__pre"
       highlight={formatContent}
-      onValueChange={(value) => {
-        setInput(value);
-        if (onInputChange) onInputChange(value);
-      }}
-      value={input || ""}
+      onValueChange={(input) => onChange(input)}
+      value={value}
     />
   );
 };

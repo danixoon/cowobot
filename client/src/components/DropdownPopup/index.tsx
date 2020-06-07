@@ -2,11 +2,11 @@ import * as React from "react";
 import "./styles.scss";
 
 interface DropdownPopupProps {
-  items: { id: number; name: string }[];
+  items: { key: any; name: string }[];
   filter: string;
   opened?: boolean;
   focusOpen?: boolean;
-  onSelect: (id: number) => void;
+  onSelect: (key: any) => void;
 }
 
 export const DropdownPopup: React.FC<DropdownPopupProps> = ({
@@ -37,9 +37,9 @@ export const DropdownPopup: React.FC<DropdownPopupProps> = ({
           return (
             <div
               onMouseDown={(e) => {
-                handleSelect(item.id);
+                handleSelect(item.key);
               }}
-              key={item.id}
+              key={item.key}
               className="dropdown-popup__item"
             >
               {filtered ? item.name.substring(0, filter.length) : item.name}

@@ -7,7 +7,17 @@ import {
   generateHash,
   mapData,
 } from "../../middleware";
-import { getClient } from "../../db";
+import {
+  getClient,
+  resetDatabase,
+  fetchNoticeWithData,
+  createNotice,
+  createConfig,
+  fetchConfig,
+  updateNotice,
+  updateNoticeData,
+  fetchNotice,
+} from "../../db";
 
 const router = express.Router();
 
@@ -17,6 +27,53 @@ router.get("/test", (req, res, next) => {
 
 router.get("/test/auth", access.auth, (req: SessionRequest, res, next) => {
   res.send(createResponse({ userId: req.session.userId }));
+});
+
+router.get("/test/db/reset", async (req, res, next) => {
+  await resetDatabase();
+  res.send();
+});
+
+router.get("/test/db/notice", async (req, res, next) => {
+  const { noticeId } = req.query as any;
+  const noticeData = await fetchNoticeWithData(noticeId);
+  res.send(createResponse(noticeData));
+});
+
+router.post("/test/db/notice", async (req, res, next) => {
+  const { messageTemplate, configId } = req.query as any;
+  const result = await createNotice(messageTemplate, configId);
+  res.send(createResponse(result));
+});
+
+router.post("/test/db/config", async (req, res, next) => {
+  const { accountId, serviceId } = req.query as any;
+  const result = await createConfig(accountId, serviceId);
+  res.send(createResponse(result));
+});
+
+router.get("/test/db/config", async (req, res, next) => {
+  const result = await fetchConfig(req.query.configId as any);
+  res.send(createResponse(result));
+});
+
+router.put("/test/db/notice", async (req, res, next) => {
+  const { messageTemplate, noticeId } = req.query as any;
+  const result = await updateNotice(noticeId, messageTemplate);
+  res.send(createResponse(result));
+});
+
+// router.get("/test/db/notice", async (req, res, next) => {
+//   const { noticeId } = req.query as any;
+//   const result = await fetchNotice(noticeId);
+//   res.send(createResponse(result));
+// });
+
+router.put("/test/db/notice/data", async (req, res, next) => {
+  const { noticeId } = req.query as any;
+  const { values = [], queries = [] } = req.body;
+  await updateNoticeData(noticeId, queries, values);
+  res.send();
 });
 
 router.get("/test/data", (req, res, next) => {
