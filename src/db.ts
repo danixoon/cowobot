@@ -35,33 +35,50 @@ export const getClient = <T = any>(
   });
 };
 
-type INoticeValue = {
-  name: string;
-  key: string;
-  value: string;
-};
-type INoticeQuery = {
-  name: string;
-  custom_key: string;
-  key: string;
-  role: QueryRole;
-};
+export namespace DBSchema {
+  export type IConfig = {
+    id: number;
+    token: string | null;
+    account_id: number;
+    service_id: number;
+  };
 
-type IAction = {
-  id: number;
-  name: string;
-  key: string;
-  values: INoticeValue[];
-  queries: INoticeQuery[];
-};
+  export type INotice = {
+    id: number;
+    message_template: string;
+    config_id: number;
 
-type IServiceSchema = {
-  id: number;
-  name: string;
-  key: string;
-  role: number;
-  actions: IAction[];
-};
+    action_id: number;
+    service_id: number;
+  };
+  export type INoticeValue = {
+    name: string;
+    key: string;
+    value: string;
+  };
+  export type INoticeQuery = {
+    name: string;
+    custom_key: string;
+    key: string;
+    role: QueryRole;
+  };
+
+  export type IAction = {
+    id: number;
+    name: string;
+    key: string;
+    values: INoticeValue[];
+    queries: INoticeQuery[];
+  };
+
+  export type IServiceSchema = {
+    id: number;
+    name: string;
+    key: string;
+    role: number;
+    actions: IAction[];
+  };
+}
 
 // const noticeDataMap = new Map()
 enum ServiceRole {
@@ -74,7 +91,7 @@ enum QueryRole {
   Text = 1 << 2,
 }
 
-const services: IServiceSchema[] = [
+const services: DBSchema.IServiceSchema[] = [
   {
     id: 0,
     name: "Вконтакте",
@@ -83,14 +100,9 @@ const services: IServiceSchema[] = [
     actions: [
       {
         id: 0,
-        name: "Новый пост",
-        key: "post_new",
+        name: "Сообщение группы",
+        key: "group_message",
         values: [
-          {
-            name: "Ид. группы",
-            key: "group_id",
-            value: "",
-          },
           {
             name: "Ид. получателя",
             key: "target_id",
@@ -99,16 +111,16 @@ const services: IServiceSchema[] = [
         ],
         queries: [
           {
-            name: "Содержимое поста",
+            name: "Содержимое сообщения",
             custom_key: "",
             key: "content",
             role: QueryRole.Text,
           },
           {
-            name: "Имя получателя",
+            name: "Автор сообщения",
             custom_key: "",
             key: "username",
-            role: QueryRole.Messenger,
+            role: QueryRole.Text,
           },
         ],
       },
@@ -149,6 +161,11 @@ export const getAction = (serviceKey: string, actionKey: string) => {
   return services
     .find((service) => service.key === serviceKey)
     .actions.find((action) => action.key === actionKey);
+};
+
+export const query = async (query: string) => {
+  const rows = (await getClient((client) => client.query(query))).rows;
+  return rows;
 };
 
 export const getActionByNoticeId = async (noticeId: number) => {
@@ -217,6 +234,8 @@ export const getAllColumnsByCondition = async (
   );
   return result.rows;
 };
+
+// export const getConfigId
 
 export const resetDatabase = async () => {
   const query = await util.promisify(fs.readFile)(
@@ -408,6 +427,8 @@ export const updateNotice = async (
     );
 };
 
+// export const getConfigIdByNotic
+
 // Объединяет значение А со значение Б, если в значении Б присутствует ключ в элемете значения А
 const mergeByKey = <A extends { key: any }, B extends { key: any }>(
   valueA: A[],
@@ -529,7 +550,7 @@ export const updateConfig = async (configId: number, token: string) => {
 };
 
 export const fetchNotice = async (noticeId: string) => {
-  const result = await getAllColumnsByCondition("notice", `"id"='${noticeId}'`);
+  const result = await query(`SELECT * FROM "notice" WHERE "id"='${noticeId}' LIMIT 1`); // getAllColumnsByCondition("notice", `"id"='${noticeId}'`);
   return result[0];
 };
 

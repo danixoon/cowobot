@@ -9,6 +9,7 @@ loadConfig();
 import { pool } from "./db";
 import apiRouter from "./routes/api";
 import { createErrorData } from "./middleware";
+import { setupBots } from "./bot";
 
 const { PORT, NODE_ENV, DATABASE_URL } = getEnv(
   "PORT",
@@ -46,6 +47,8 @@ const init = async () => {
   app.use(bodyParser.json());
   app.use(apiRouter);
   app.use(errorRequestHandler);
+
+  await setupBots();
 
   app.listen(PORT, () => {
     console.log("Server is listening on port " + PORT);

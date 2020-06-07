@@ -34,7 +34,7 @@ CREATE TABLE "account"
 CREATE TABLE "config"
 (
 	"id" SERIAL PRIMARY KEY NOT NULL,
-	"token" VARCHAR(100),
+	"token" VARCHAR(100) NULL,
    "account_id" INTEGER REFERENCES "account" ON DELETE CASCADE NOT NULL,
    "service_id" INTEGER REFERENCES "service" ON DELETE CASCADE NOT NULL,
 

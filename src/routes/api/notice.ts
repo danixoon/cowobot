@@ -28,7 +28,9 @@ import {
   fetchNotices,
   updateNoticeData,
   updateNoticeTarget,
+  fetchNotice,
 } from "../../db";
+import { restartBot, deleteBot } from "../../bot";
 
 const router = express.Router();
 
@@ -58,6 +60,9 @@ router.put(
     tasks.push(updateNotice(noticeId, { messageTemplate, actionId }));
 
     await Promise.all(tasks);
+
+    const configId = (await fetchNotice(noticeId)).config_id;
+    await restartBot(configId);
     res.send(createResponse({ randomId }));
   })
 );
@@ -85,6 +90,7 @@ router.post(
     const { configId, randomId } = req.query as any;
     const { messageTemplate = "" } = req.body;
     const result = await createNotice(messageTemplate, configId);
+    await restartBot(configId);
     res.send(createResponse({ id: result, randomId }));
   })
 );
@@ -122,6 +128,8 @@ router.delete(
   handleRequest(async (req, res) => {
     const { noticeId /* randomId */ } = req.query as any;
     const noticeData = await deleteNotice(noticeId);
+    const configId = (await fetchNotice(noticeId)).config_id;
+    await restartBot(configId);
     res.send(createResponse({ id: Number(noticeId) /* randomId */ }));
   })
 );
