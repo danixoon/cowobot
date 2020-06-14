@@ -15,7 +15,6 @@ declare interface IAction {
 declare interface IAccount {
   id: number;
   username: string;
-  // password: string;
   nickname: string;
   serviceId: number;
 }

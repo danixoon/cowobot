@@ -1,10 +1,13 @@
 import * as dotenv from "dotenv";
 
+// Хак для бота телеги
+process.env.NTBA_FIX_319 = "1";
+
 export const nodeEnvType = {
   production: "production" as const,
   development: "development" as const,
 };
-
+ 
 let isLoaded = false;
 
 type ElementType<T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<

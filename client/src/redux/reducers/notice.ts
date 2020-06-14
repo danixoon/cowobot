@@ -107,6 +107,34 @@ export const noticeReducer: Reducer<NoticeState, Action> = (
     //   };
     // case ActionTypes.NOTICE_DELETE_ERROR:
     //   return { ...state, ...setError(action.payload) };
+    case ActionTypes.NOTICE_SAVE:
+      return {
+        ...state,
+        notices: state.notices.map((notice) =>
+          notice.id === action.payload.noticeId
+            ? { ...notice, ...setAction("save") }
+            : notice
+        ),
+      };
+    case ActionTypes.NOTICE_SAVE_SUCCESS:
+      return {
+        ...state,
+        notices: state.notices
+          .map((notice) =>
+            (notice.randomId && notice.randomId === action.payload.randomId) ||
+            notice.id === action.payload.id
+              ? { ...setAction(), ...action.payload }
+              : notice
+          )
+          .sort((a, b) => (a.id > b.id ? 1 : -1)),
+        ...setAction(),
+      };
+    case ActionTypes.NOTICE_SAVE_ERROR:
+      return {
+        ...state,
+        ...setError(action.payload),
+      };
+
     case ActionTypes.NOTICE_FETCH_LOADING:
       return {
         ...state,

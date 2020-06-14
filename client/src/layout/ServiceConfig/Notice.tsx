@@ -15,6 +15,8 @@ import Dropdown from "../../components/Dropdown";
 import LoadingBanner from "../../components/LoadingBanner";
 import DialogPopup from "../../components/DialogPopup";
 import Form from "../../components/Form";
+import Axios from "axios";
+import { request } from "../../api";
 
 export const Notice: React.FC<{
   notice: ArrayElement<NoticeState["notices"]>;
@@ -95,6 +97,10 @@ export const Notice: React.FC<{
 
   const handleNoticeDelete = () => {
     onNoticeDelete(notice.id);
+  };
+
+  const handleNoticeTest = () => {
+    request("/notice/test", "GET", { params: { noticeId: notice.id } });
   };
 
   return (
@@ -188,7 +194,7 @@ export const Notice: React.FC<{
                 </Button>
               </Layout>
               <Layout direction="column" style={{ flex: 1 }}>
-                <Label text="Щаблон оповещения">
+                <Label text="Шаблон оповещения">
                   <TextArea
                     style={{ height: "150px" }}
                     tokens={Object.entries(queriesBind.input).map(
@@ -210,7 +216,7 @@ export const Notice: React.FC<{
             </Layout>
           </Layout>
           <Layout direction="row" style={{ justifyContent: "flex-end" }}>
-            <Button>Тест</Button>
+            <Button onClick={handleNoticeTest}>Тест</Button>
             <Button onClick={handleNoticeSave}>Сохранить</Button>
           </Layout>
         </Section>

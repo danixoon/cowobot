@@ -42,15 +42,15 @@ router.get(
     const result = await fetchConfig(req.query.configId as any);
     // const
 
-    const token =
-      typeof result.token === "string"
-        ? `*`.repeat(result.token.length)
-        : result.token;
+    // const token =
+    //   typeof result.token === "string"
+    //     ? `*`.repeat(result.token.length)
+    //     : result.token;
 
     res.send(
       createResponse({
         ...result,
-        token,
+        // token,
       })
     );
   }

@@ -32,6 +32,8 @@
   position: absolute;
   left: 0;
 
+  z-index: 1;
+
   @include font-default();
 
   position: absolute;

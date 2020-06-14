@@ -91,7 +91,26 @@ enum QueryRole {
   Text = 1 << 2,
 }
 
-const services: DBSchema.IServiceSchema[] = [
+const prepareServicesKeys = (
+  services: DBSchema.IServiceSchema[]
+): DBSchema.IServiceSchema[] =>
+  services.map((service) => ({
+    ...service,
+    actions: service.actions.map((action) => ({
+      ...action,
+      queries: action.queries.map((query) => ({
+        ...query,
+        key: `${action.key}.${query.key}`,
+      })),
+      values: action.values.map((value) => ({
+        ...value,
+        key: `${action.key}.${value.key}`,
+      })),
+    })),
+  }));
+
+// Склеить action.key и values.key
+const services = prepareServicesKeys([
   {
     id: 0,
     name: "Вконтакте",
@@ -108,6 +127,11 @@ const services: DBSchema.IServiceSchema[] = [
             key: "target_id",
             value: "",
           },
+          {
+            name: "Ид. группы",
+            key: "group_id",
+            value: "",
+          },
         ],
         queries: [
           {
@@ -122,21 +146,39 @@ const services: DBSchema.IServiceSchema[] = [
             key: "username",
             role: QueryRole.Text,
           },
+          {
+            name: "Ссылка на диалог",
+            custom_key: "",
+            key: "url",
+            role: QueryRole.Text,
+          },
         ],
       },
       {
         id: 0,
-        name: "Новый комментарий",
-        key: "post_comment_new",
+        name: "Новый пост",
+        key: "group_post",
+        values: [
+          {
+            name: "Ид. получателя",
+            key: "group_post.target_id",
+            value: "",
+          },
+        ],
         queries: [
           {
-            key: "post_comment",
-            name: "Комментарий",
+            key: "group_post.content",
+            name: "Содержимое поста",
+            custom_key: "",
+            role: QueryRole.Text,
+          },
+          {
+            key: "group_post.url",
+            name: "Ссылка на пост",
             custom_key: "",
             role: QueryRole.Text,
           },
         ],
-        values: [],
       },
     ],
   },
@@ -155,7 +197,7 @@ const services: DBSchema.IServiceSchema[] = [
       },
     ],
   },
-];
+]);
 
 export const getAction = (serviceKey: string, actionKey: string) => {
   return services
@@ -188,6 +230,16 @@ const accounts = [
     username: "danixoon",
     nickname: "danixoon",
     password: "$2b$10$1N3RfmrbnJ/9xxfdmAv3/ezsyiSPvGjrtWmF6tbx8mAA1.wtjBPE6",
+  },
+  {
+    username: "andrei2034",
+    nickname: "andrei2034",
+    password: "$2b$10$vDIu5s9rf6pCU/uEZSpsoOeC/iqDmVotthFnTSV8aeHSq3zGm6FlS",
+  },
+  {
+    username: "sergiy",
+    nickname: "sergiy",
+    password: "$2b$10$Im2ieeNVJagnyZ1hKp8mJeYgsseAharIjNNWTrb0IgG0j3vybcF9i",
   },
 ];
 
@@ -271,17 +323,17 @@ export const resetDatabase = async () => {
     )
   );
 
-  const dbAccounts = await getClient((client) =>
-    client.query(
-      getInsertQuery(
-        "account",
-        accounts.map(
-          (account) =>
-            `DEFAULT, '${account.username}', '${account.password}', '${account.nickname}', ${dbServices.rows[0].id}`
-        )
-      )
-    )
-  );
+  // const dbAccounts = await getClient((client) =>
+  //   client.query(
+  //     getInsertQuery(
+  //       "account",
+  //       accounts.map(
+  //         (account) =>
+  //           `DEFAULT, '${account.username}', '${account.password}', '${account.nickname}', ${dbServices.rows[0].id}`
+  //       )
+  //     )
+  //   )
+  // );
 };
 
 export const fetchServices = async () => {
@@ -550,7 +602,9 @@ export const updateConfig = async (configId: number, token: string) => {
 };
 
 export const fetchNotice = async (noticeId: string) => {
-  const result = await query(`SELECT * FROM "notice" WHERE "id"='${noticeId}' LIMIT 1`); // getAllColumnsByCondition("notice", `"id"='${noticeId}'`);
+  const result = await query(
+    `SELECT * FROM "notice" WHERE "id"='${noticeId}' LIMIT 1`
+  ); // getAllColumnsByCondition("notice", `"id"='${noticeId}'`);
   return result[0];
 };
 

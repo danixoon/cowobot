@@ -5,6 +5,7 @@ import userRouter from "./user";
 import configRouter from "./config";
 import serviceRouter from "./service";
 import noticeRouter from "./notice";
+import adminRouter from "./admin";
 import testRouter from "./test";
 import { createErrorData } from "../../middleware";
 
@@ -26,6 +27,7 @@ router.use(
   serviceRouter,
   configRouter,
   noticeRouter,
+  adminRouter,
   testRouter,
   handleNotFound
 );

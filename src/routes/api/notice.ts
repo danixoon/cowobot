@@ -29,10 +29,28 @@ import {
   updateNoticeData,
   updateNoticeTarget,
   fetchNotice,
+  query as dbQuery,
 } from "../../db";
-import { restartBot, deleteBot } from "../../bot";
+import { restartBot, deleteBot, tgBot } from "../../bot";
 
 const router = express.Router();
+
+router.get(
+  "/notice/test",
+  access.auth,
+  [query("noticeId")],
+  handleRequest(async (req, res) => {
+    const { noticeId } = req.query as any;
+    const { userId } = req.session;
+    const notice = await fetchNotice(noticeId);
+    const users = await dbQuery(
+      `SELECT "nickname" FROM "account" WHERE "id"='${userId}'`
+    );
+
+    tgBot.sendMessage(users[0].nickname, "Проверка связи...");
+    res.send();
+  })
+);
 
 // Запрос модификации оповещения
 router.put(
@@ -127,8 +145,9 @@ router.delete(
   validator,
   handleRequest(async (req, res) => {
     const { noticeId /* randomId */ } = req.query as any;
-    const noticeData = await deleteNotice(noticeId);
     const configId = (await fetchNotice(noticeId)).config_id;
+    const noticeData = await deleteNotice(noticeId);
+
     await restartBot(configId);
     res.send(createResponse({ id: Number(noticeId) /* randomId */ }));
   })

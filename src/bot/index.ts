@@ -7,7 +7,14 @@ import {
   getColumnsByCondition,
   query,
 } from "../db";
-import { INoticeBotData, IBot, Bot, VkBot, ITargetBot } from "./bots";
+import {
+  INoticeBotData,
+  IBot,
+  Bot,
+  VkBot,
+  ITargetBot,
+  IActionBotData,
+} from "./bots";
 
 //@ts-ignore
 import * as Agent from "socks5-https-client/lib/Agent";
@@ -42,7 +49,7 @@ type IBotData = {
   configId: number;
 };
 
-const tgBot = new Telegram(TELEGRAM_TOKEN, {
+export const tgBot = new Telegram(TELEGRAM_TOKEN, {
   polling: true,
   request: {
     agentClass: Agent,
@@ -58,6 +65,17 @@ const tgBot = new Telegram(TELEGRAM_TOKEN, {
 tgBot.onText(/\/ид/, (message, match) => {
   tgBot.sendMessage(message.chat.id, `id этой группы: ${message.chat.id}`);
 });
+
+export type ActionHandler<T> = {
+  key: string;
+  // handle: (action: IActionBotData) => Promise<void> | void;
+  parser: {
+    [key: string]: (
+      context: T,
+      values: { [key: string]: string }
+    ) => string | Promise<string>;
+  };
+};
 
 // tgBot.on("")
 

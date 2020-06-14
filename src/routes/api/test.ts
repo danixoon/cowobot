@@ -29,11 +29,6 @@ router.get("/test/auth", access.auth, (req: SessionRequest, res, next) => {
   res.send(createResponse({ userId: req.session.userId }));
 });
 
-router.get("/test/db/reset", async (req, res, next) => {
-  await resetDatabase();
-  res.send();
-});
-
 router.get("/test/db/notice", async (req, res, next) => {
   const { noticeId } = req.query as any;
   const noticeData = await fetchNoticeWithData(noticeId);
