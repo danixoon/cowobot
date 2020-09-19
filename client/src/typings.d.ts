@@ -109,52 +109,6 @@ declare type ActionPayload = {
   NOTICE_SAVE_LOADING: WithRandomId & {};
   NOTICE_SAVE_SUCCESS: INoticeWithData;
   NOTICE_SAVE_ERROR: ApiError;
-
-  // // Получение известных сервисов
-  // SERVICE_FETCH: {};
-  // SERVICE_FETCH_SUCCESS: {
-  //   services: ApiResponseData.Service.Service[];
-  // };
-  // SERVICE_FETCH_ERROR: { error: ApiError };
-  // // Выбор сервиса на дереве
-  // SERVICE_SELECT: {
-  //   serviceId: number;
-  //   serviceView: ServiceConfigView;
-  // };
-  // // Получение конфигурации по идентификатору
-  // CONFIG_FETCH: {
-  //   configId: number;
-  //   serviceId: number;
-  // };
-  //SERVICE_CONFIG_FETCH_SUCCESS: {
-  //   serviceId: number;
-  //   config: null | {
-  //     token: string;
-  //     variables: ApiResponseData.Service.Variable[];
-  //     notices: ApiResponseData.Service.Notice[];
-  //     actions: ApiResponseData.Service.Action[];
-  //     configId: number;
-  //   };
-  // };
-  //SERVICE_CONFIG_FETCH_ERROR: { error: ApiError };
-  // // Создание конфигурации для сервиса
-  // CONFIG_CREATE: { serviceId: number };
-  // CONFIG_CREATE_SUCCESS: ApiMap.POST["/service/config"];
-  // CONFIG_CREATE_ERROR: { error: ApiError };
-  // // Удаление конфигурации из сервиса
-  // CONFIG_DELETE: { configId: number };
-  // CONFIG_DELETE_SUCCESS: ApiMap.DELETE["/service/config"];
-  // CONFIG_DELETE_ERROR: { error: ApiError };
-  // // Сохранение конфигурации
-  // CONFIG_SAVE: ApiRequestData.PUT["/service/config"];
-  // CONFIG_SAVE_SUCCESS: {};
-  // CONFIG_SAVE_ERROR: { error: ApiError };
-  // CONFIG_TOKEN_CHANGE: { token: string };
-  // // // Получение идентификаторов известных конфигураций
-  // // CONFIG_IDS_FETCH: "CONF,
-  // // CONFIG_IDS_FETCH_SUCCESS: "CONFIG_IDS_F,
-  // // CONFIG_IDS_FETCH_ERROR: "CONFIG_IDS,
-  // TEST_HELLO: {};
 };
 
 declare type Action<
@@ -162,13 +116,6 @@ declare type Action<
 > = A extends keyof ActionPayload
   ? { type: A; payload: ActionPayload[A] }
   : never;
-
-// type ActionTypes = import("./redux/types").ActionNames;
-// type ActionCreators = import("./redux/types").ActionCreators;
-
-// export type ActionType = ActionTypes[keyof ActionTypes];
-// export type Actions = ReturnType<ActionCreators[keyof ActionCreators]>;
-// export type Action<T extends ActionType> = Extract<Actions, { type: T }>;
 
 declare type StateSchema<T, A extends string = null> = {
   action: A | null;

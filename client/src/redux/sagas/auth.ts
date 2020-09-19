@@ -86,12 +86,6 @@ export function* watchLogin() {
     }
   }
 
-  // yield takeLatest(ActionTypes.USER_LOGIN_SUCCESS, function* (
-  //   action: Action<"USER_LOGIN_SUCCESS">
-  // ) {
-  //   localStorage.setItem("token", action.payload.token);
-  // });
-
   while (true) {
     const action = (yield take(ActionTypes.USER_LOGIN)) as Action<
       typeof ActionTypes.USER_LOGIN

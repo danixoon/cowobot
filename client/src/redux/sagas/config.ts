@@ -9,6 +9,7 @@ import {
   select,
   cancel,
   CallEffect,
+  StrictEffect,
 } from "redux-saga/effects";
 import { ActionTypes, RootState, getAction } from "../types";
 import * as api from "../../api";
@@ -27,7 +28,7 @@ function* watchConfigCreate() {
         call(api.request, "/config", "POST", {
           params: { serviceId: createAction.payload.serviceId },
         })
-    )) as Action<"CONFIG_CREATE_SUCCESS">;
+    )) as Action<typeof ActionTypes.CONFIG_CREATE_SUCCESS>;
 
     if (!createdConfig) continue;
 
@@ -39,12 +40,17 @@ function* watchConfigCreate() {
   }
 }
 
+function* _take<T extends keyof ActionPayload>(
+  pattern: T
+): Generator<StrictEffect, Action<T>, unknown> {
+  const action = yield take(pattern);
+  return action as Action<T>;
+}
+
 function* watchConfigUpdate() {
   while (true) {
-    const updateAction = (yield take(ActionTypes.CONFIG_UPDATE)) as Action<
-      "CONFIG_UPDATE"
-    >;
-    const updatedConfig = (yield fetchApi(
+    const updateAction = yield* _take(ActionTypes.CONFIG_UPDATE);
+    const updatedConfig = yield* fetchApi(
       getAction(ActionTypes.CONFIG_UPDATE_LOADING),
       ActionTypes.CONFIG_UPDATE_SUCCESS,
       ActionTypes.CONFIG_UPDATE_ERROR,
@@ -53,9 +59,9 @@ function* watchConfigUpdate() {
           params: { configId: updateAction.payload.configId },
           data: { token: updateAction.payload.token },
         })
-    )) as Action<"CONFIG_UPDATE_SUCCESS">;
+    );
 
-    if (!updatedConfig) continue;
+    if (updatedConfig.type === ActionTypes.CONFIG_UPDATE_ERROR) continue;
 
     yield put(
       getAction(ActionTypes.CONFIG_FETCH, {
