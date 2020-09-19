@@ -93,7 +93,9 @@ export function* watchLogin() {
   // });
 
   while (true) {
-    const action = (yield take(ActionTypes.USER_LOGIN)) as Action<"USER_LOGIN">;
+    const action = (yield take(ActionTypes.USER_LOGIN)) as Action<
+      typeof ActionTypes.USER_LOGIN
+    >;
     const response = yield fetchApi(
       getAction(ActionTypes.USER_LOGIN_LOADING),
       ActionTypes.USER_LOGIN_SUCCESS,
